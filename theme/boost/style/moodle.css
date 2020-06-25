@@ -18,8 +18,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
 
-.block_simplehtml { border: 5px red}
-
 /* makes the font 33% larger relative to the icon container */
 .fa-lg {
   font-size: 1.3333333333em;
@@ -12719,7 +12717,7 @@ body.h5p-embed .h5pmessages {
   background-color: #d8bfd8; }
 
 .calendar_event_course {
-  background-color: #e7bdff; }
+  background-color: #ffd3bd; }
 
 .calendar_event_site {
   background-color: #d6f8cd; }
