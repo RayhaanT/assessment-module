@@ -340,6 +340,25 @@ class question_type {
         $question->length = $this->actual_number_of_questions($question);
         $question->penalty = isset($form->penalty) ? $form->penalty : 0;
 
+        // Save assessment engine-related parameters
+        if(isset($form->topic)) {
+            $question->topic = trim($form->topic);
+        }
+        if(isset($form->difficulty)) {
+            $question->difficulty = $form->difficulty;
+        }
+        if(isset($form->role)) {
+            $question->role = $form->role;
+        }
+        if(isset($form->lifecycleexpiry)) {
+            if(date("Y-m-d", time()) != date("Y-m-d", $form->lifecycleexpiry)) {
+                $question->lifecycleexpiry = $form->lifecycleexpiry;
+            }
+            else {
+                $question->lifecycleexpiry = 0;
+            }
+        }
+
         // The trim call below has the effect of casting any strange values received,
         // like null or false, to an appropriate string, so we only need to test for
         // missing values. Be careful not to break the value '0' here.

@@ -44,3 +44,6 @@ composer.phar
 /lib/yuilib/*/*/*-coverage.js
 atlassian-ide-plugin.xml
 /node_modules/
+
+# Vagrant log file
+ubuntu-bionic-18.04-cloudimg-console.log

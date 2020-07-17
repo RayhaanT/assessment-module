@@ -201,6 +201,29 @@ abstract class question_edit_form extends question_wizard_form {
         $mform->addHelpButton('idnumber', 'idnumber', 'question');
         $mform->setType('idnumber', PARAM_RAW);
 
+
+        // Fields used by the assessment engine to poll the question bank
+        $difficulties = array(
+            'None',
+            'EASY',
+            'MEDIUM',
+            'HARD'
+        );
+        $roles = array(
+            'None',
+            'Fresher',
+            'Mid-level',
+            'Senior'
+        );
+        $mform->addElement('select', 'difficulty', 'Difficulty', $difficulties);
+
+        $mform->addElement('text', 'topic', 'Topic');
+        $mform->setType('topic', PARAM_TEXT);
+
+        $mform->addElement('select', 'role', 'Role', $roles);
+
+        $mform->addElement('date_selector', 'lifecycleexpiry', 'Question life cycle end date (set to current date to disable)');
+
         // Any questiontype specific fields.
         $this->definition_inner($mform);
 
