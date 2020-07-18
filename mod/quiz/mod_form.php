@@ -64,7 +64,7 @@ class mod_quiz_mod_form extends moodleform_mod {
         $mform = $this->_form;
 
         // -------------------------------------------------------------------------------
-        $mform->addElement('header', 'general', 'Hey bb');
+        $mform->addElement('header', 'general', get_string('general', 'form'));
 
         // Name.
         $mform->addElement('text', 'name', get_string('name'), array('size'=>'64'));

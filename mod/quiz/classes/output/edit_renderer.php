@@ -637,13 +637,14 @@ class edit_renderer extends \plugin_renderer_base {
         static $str;
         if (!isset($str)) {
             $str = get_strings(array('addasection', 'addaquestion', 'addarandomquestion',
-                    'addarandomselectedquestion', 'questionbank'), 'quiz');
+                    'addarandomselectedquestion', 'questionbank', 'addgeneratedsection'), 'quiz');
         }
 
         // Get section, page, slotnumber and maxmark.
         $actions = array();
 
         // Add a new question to the quiz.
+        $icon = new \pix_icon('t/add', $str->questionbank, 'moodle', array('class' => 'iconsmall', 'title' => ''));
         $returnurl = new \moodle_url($pageurl, array('addonpage' => $page));
         $params = array('returnurl' => $returnurl->out_as_local_url(false),
                 'cmid' => $structure->get_cmid(), 'category' => $questioncategoryid,
@@ -651,12 +652,20 @@ class edit_renderer extends \plugin_renderer_base {
 
         $actions['addaquestion'] = new \action_menu_link_secondary(
             new \moodle_url('/question/addquestion.php', $params),
-            new \pix_icon('t/add', $str->addaquestion, 'moodle', array('class' => 'iconsmall', 'title' => '')),
-            $str->addaquestion, array('class' => 'cm-edit-action addquestion', 'data-action' => 'addquestion')
+            $icon, $str->addaquestion, array('class' => 'cm-edit-action addquestion', 'data-action' => 'addquestion')
+        );
+
+        // Generate a new section of questions from the assessment engine
+        $gnenerationParams = array(
+            'returnurl' => $returnurl->out_as_local_url(false),
+            'cmid' => $structure->get_cmid(), 'addafterpage' => $page
+        );
+        $actions['addgeneratedsection'] = new \action_menu_link_secondary(
+            new \moodle_url('/mod/quiz/assessmentengine/generatesection.php', $gnenerationParams),
+            $icon, $str->addgeneratedsection
         );
 
         // Call question bank.
-        $icon = new \pix_icon('t/add', $str->questionbank, 'moodle', array('class' => 'iconsmall', 'title' => ''));
         if ($page) {
             $title = get_string('addquestionfrombanktopage', 'quiz', $page);
         } else {
