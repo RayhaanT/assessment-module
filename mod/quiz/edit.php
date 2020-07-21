@@ -41,6 +41,17 @@
  */
 
 
+function addSelectCondition($currentCondition, $column, $value) {
+    if (!$value) {
+        return $currentCondition;
+    }
+    if ($currentCondition != '') {
+        $currentCondition .= ' AND ';
+    }
+    $currentCondition .= $column . ' = ' . $value;
+    return $currentCondition;
+}
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once($CFG->dirroot . '/mod/quiz/addrandomform.php');
@@ -102,6 +113,43 @@ if (optional_param('repaginate', false, PARAM_BOOL) && confirm_sesskey()) {
     $questionsperpage = optional_param('questionsperpage', $quiz->questionsperpage, PARAM_INT);
     quiz_repaginate_questions($quiz->id, $questionsperpage );
     quiz_delete_previews($quiz);
+    redirect($afteractionurl);
+}
+
+if ($addqsection = optional_param('addqsection', 0, PARAM_INT) && confirm_sesskey()) {
+    // Add a group of questions to the quiz based on provided parameters
+    $structure->check_can_be_edited();
+
+    $addafterpage = optional_param('addafterpage', 0, PARAM_INT);
+    $difficulty = optional_param('difficulty', 0, PARAM_INT);
+    $role = optional_param('role', 0, PARAM_INT);
+    $topic = optional_param('topic', '', PARAM_ALPHA);
+    $timelimit = optional_param('timelimit', 0, PARAM_INT);
+    $lifecycle = optional_param('lifecycle', 0, PARAM_INT);
+
+    $condition = '';
+    $condition = addSelectCondition($condition, 'difficulty', $difficulty);
+    $condition = addSelectCondition($condition, 'role', $role);
+    $condition = addSelectCondition($condition, 'topic', $topic);
+    if($condition != '' && $lifecycle) {
+        $condition .= ' AND ';
+    }
+    if($lifecycle) {
+        $condition .= 'lifecycleexpiry > ' . time();
+    }
+    $qpool = $DB->get_records_select('question', $condition);
+    $maxindex = sizeof($qpool) - 1;
+
+    for($x = 0; $x < $addqsection; $x++) {
+        $newq = rand(0, $maxindex);
+        quiz_add_quiz_question($qpool[$newq]->id, $quiz, $addafterpage);
+        array_splice($qpool, $newq, 1);
+        $maxindex--;
+    }
+
+    // Wrap up
+    quiz_delete_previews($quiz);
+    quiz_update_sumgrades($quiz);
     redirect($afteractionurl);
 }
 

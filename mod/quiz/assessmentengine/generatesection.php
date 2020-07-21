@@ -2,6 +2,7 @@
 
 require_once(__DIR__ . '/../../../config.php');
 require_once(__DIR__ . '/../../../question/editlib.php');  
+require_once(__DIR__ . '/generate_section_form.php');
 
 // GET properties
 $returnurl = optional_param('returnurl', 0, PARAM_LOCALURL);
@@ -30,7 +31,6 @@ $mform = NULL;
 
 // Pass data to the form
 $toform = new stdClass();
-$toform->returnurl = $originalreturnurl;
 if ($cm !== null) {
   $toform->cmid = $cm->id;
   $toform->courseid = $cm->course;
@@ -38,6 +38,7 @@ if ($cm !== null) {
   throw coding_exception('No course module id provided');
 }
 
+$mform = new generate_section_form('generatesection.php', $contexts);
 $mform->set_data($toform);
 
 // Process form data
@@ -49,14 +50,35 @@ if ($mform->is_cancelled()) {
   }
 }
 else if($fromform = $mform->get_data()) {
-  // Process data from form, do the sql queries, etc;
+  // Return data from form to quiz for processing
+  if ($appendqnumstring) {
+    $returnurl->param('sesskey', sesskey());
+    $returnurl->param('cmid', $cmid);
+
+    // Required parameters
+    $returnurl->param('addqsection', floor($fromform->numberofquestions));
+
+    // Optional parameters
+    if(isset($fromform->difficulty)) { $returnurl->param('difficulty', $fromform->difficulty); }
+    if(isset($fromform->role)) { $returnurl->param('role', $fromform->role); }
+    if(isset($fromform->lifecycle)) { $returnurl->param('lifecycle', $fromform->lifecycle); }
+    if(isset($fromform->topic)) { $returnurl->param('topic', $fromform->topic); }
+    if(isset($fromform->timelimit)) { $returnurl->param('timelimit', $fromform->timelimit); }
+  }
+  redirect($returnurl);
 }
 else {
   // Data failed validation, redisplay form
-
-  $mform->setdata($toform);
+  $mform->set_data($toform);
   $mform->display();
 }
 
+$PAGE->set_title('Add generated section');
+$PAGE->set_heading($COURSE->fullname);
+$PAGE->navbar->add('Add generated section');
 
-
+// Display a heading, question editing form and possibly some extra content needed for
+// for this question type.
+echo $OUTPUT->header();
+$mform->display();
+echo $OUTPUT->footer();
