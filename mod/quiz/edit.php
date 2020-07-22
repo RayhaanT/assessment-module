@@ -138,6 +138,10 @@ if ($addqsection = optional_param('addqsection', 0, PARAM_INT) && confirm_sesske
     if($lifecycle) {
         $condition .= '(lifecycleexpiry > ' . time() . ' OR lifecycleexpiry = 0)';
     }
+    if($condition != '') {
+        $condition .= ' AND ';
+    }
+    $condition .= 'parent = 0';
     $qpool = $DB->get_records_select('question', $condition);
     $maxindex = sizeof($qpool) - 1;
     if($maxindex + 1 < $addqsection) {
