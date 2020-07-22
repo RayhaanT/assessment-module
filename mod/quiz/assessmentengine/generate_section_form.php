@@ -31,9 +31,6 @@ class generate_section_form extends moodleform {
     $mform->setType('returnurl', PARAM_LOCALURL);
 
     // General fields
-    $mform->addElement('text', 'sectionname', get_string('sectionnamefield', 'quiz'));
-    $mform->setType('sectionname', PARAM_TEXT);
-
     $mform->addElement('float', 'numberofquestions', get_string('numberofquestions', 'quiz'));
     $mform->setDefault('numberofquestions', 1);
     $mform->addRule('numberofquestions', null, 'required', null, 'client');

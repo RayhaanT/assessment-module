@@ -148,6 +148,25 @@ if ($addqsection = optional_param('addqsection', 0, PARAM_INT) && confirm_sesske
         array_push($indexedpool, $q);
     }
 
+    // Get slot data for repagination
+    if ($addbeforepage == 0) {
+        $allslots = $DB->get_records('quiz_slots', array('quizid' => $quiz->id), 'slot');
+        if($allslots) {
+            $lastslot = end($allslots)->slot;
+            $newpage = end($allslots)->page + 1;
+        }
+        else {
+            $lastslot = 0;
+            $newpage = 1;
+        }
+    }
+    else {
+        $pageslots = $DB->get_records('quiz_slots', array('quizid' => $quiz->id, 'page' => $addbeforepage), 'slot');
+        $lastslot = end($pageslots)->slot;
+        $newpage = $addbeforepage;
+        $numberofslots = sizeof($pageslots);
+    }
+
     for($x = 0; $x < $addqsection; $x++) {
         $newq = rand(0, $maxindex);
         quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage);
@@ -155,9 +174,58 @@ if ($addqsection = optional_param('addqsection', 0, PARAM_INT) && confirm_sesske
         $maxindex--;
     }
 
+    // Repaginate to place all questions from section on same page
+    $repage = new \mod_quiz\repaginate($quiz->id);
     if($addbeforepage == 0) {
-        $allslots = $DB->get_records('quiz_slots', array('quizid' => $this->quizid), 'slot');
-        
+        // Close page gaps between added questions
+        for($x = 0; $x < $addqsection - 1; $x++) {
+            $repage->repaginate_slots($lastslot + $x + 2, 1);
+        }
+    }
+    else {
+        // Move all questions from later pages down a page
+        $condition = "page > '" . $addbeforepage . "'" . " AND " . "quizid = '" . $quiz->id . "'";
+        $allslots = $DB->get_records_select('quiz_slots', $condition);
+        foreach($allslots as $s) {
+            $s->page = $s->page + 1;
+            $DB->update_record('quiz_slots', $s);
+        }
+
+        // Move new slots out of the way to prevent id conflicts
+        $allpageslots = $DB->get_records('quiz_slots', array('quizid' => $quiz->id, 'page' => $addbeforepage), 'slot');
+        $placeholderslot = -1;
+        $oldslotnumbers = [];
+        foreach($allpageslots as $s) {
+            if($s->slot > $lastslot) {
+                array_push($oldslotnumbers, $s->slot);
+                $s->slot = $placeholderslot;
+                $placeholderslot--;
+                $DB->update_record('quiz_slots', $s);
+            }
+        }
+
+        $indexedpageslots = [];
+        foreach($pageslots as $s) {
+            array_push($indexedpageslots, $s);
+        }
+        array_reverse($indexedpageslots);
+        // Move all questions on current page to next page
+        foreach($pageslots as $s) {
+            $s->page = $s->page + 1;
+            $s->slot = $s->slot + $addqsection;
+            $DB->update_record('quiz_slots', $s);
+        }
+
+        $allpageslots = $DB->get_records('quiz_slots', array('quizid' => $quiz->id, 'page' => $addbeforepage), 'slot');
+        $indexedslots = [];
+        foreach($allpageslots as $x) {
+            array_push($indexedslots, $x);
+        }
+        // Move new slots back into place
+        for($x = 0; $x < sizeof($indexedslots); $x++) {
+            $indexedslots[$x]->slot = $oldslotnumbers[$x] - sizeof($pageslots);
+            $DB->update_record('quiz_slots', $indexedslots[$x]);
+        }
     }
 
     // Wrap up
