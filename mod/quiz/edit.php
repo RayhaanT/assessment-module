@@ -48,7 +48,7 @@ function addSelectCondition($currentCondition, $column, $value) {
     if ($currentCondition != '') {
         $currentCondition .= ' AND ';
     }
-    $currentCondition .= $column . ' = ' . $value;
+    $currentCondition .= $column . " = '" . $value . "'";
     return $currentCondition;
 }
 
@@ -120,12 +120,13 @@ if ($addqsection = optional_param('addqsection', 0, PARAM_INT) && confirm_sesske
     // Add a group of questions to the quiz based on provided parameters
     $structure->check_can_be_edited();
 
-    $addafterpage = optional_param('addafterpage', 0, PARAM_INT);
+    $addbeforepage = optional_param('addbeforepage', 0, PARAM_INT);
     $difficulty = optional_param('difficulty', 0, PARAM_INT);
     $role = optional_param('role', 0, PARAM_INT);
     $topic = optional_param('topic', '', PARAM_ALPHA);
     $timelimit = optional_param('timelimit', 0, PARAM_INT);
     $lifecycle = optional_param('lifecycle', 0, PARAM_INT);
+    $addqsection = optional_param('addqsection', 0, PARAM_INT);
 
     $condition = '';
     $condition = addSelectCondition($condition, 'difficulty', $difficulty);
@@ -135,16 +136,28 @@ if ($addqsection = optional_param('addqsection', 0, PARAM_INT) && confirm_sesske
         $condition .= ' AND ';
     }
     if($lifecycle) {
-        $condition .= 'lifecycleexpiry > ' . time();
+        $condition .= '(lifecycleexpiry > ' . time() . ' OR lifecycleexpiry = 0)';
     }
     $qpool = $DB->get_records_select('question', $condition);
     $maxindex = sizeof($qpool) - 1;
+    if($maxindex + 1 < $addqsection) {
+        $addqsection = $maxindex + 1;
+    }
+    $indexedpool = [];
+    foreach ($qpool as $q) {
+        array_push($indexedpool, $q);
+    }
 
     for($x = 0; $x < $addqsection; $x++) {
         $newq = rand(0, $maxindex);
-        quiz_add_quiz_question($qpool[$newq]->id, $quiz, $addafterpage);
-        array_splice($qpool, $newq, 1);
+        quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage);
+        array_splice($indexedpool, $newq, 1);
         $maxindex--;
+    }
+
+    if($addbeforepage == 0) {
+        $allslots = $DB->get_records('quiz_slots', array('quizid' => $this->quizid), 'slot');
+        
     }
 
     // Wrap up

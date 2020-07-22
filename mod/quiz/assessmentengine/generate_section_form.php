@@ -20,6 +20,16 @@ class generate_section_form extends moodleform {
 
     $mform->addElement('header', 'generalheader', get_string("general", 'form'));
 
+    // Hidden fields?
+    $mform->addElement('hidden', 'cmid');
+    $mform->setType('cmid', PARAM_INT);
+
+    $mform->addElement('hidden', 'addbeforepage');
+    $mform->setType('addbeforepage', PARAM_INT);
+
+    $mform->addElement('hidden', 'returnurl');
+    $mform->setType('returnurl', PARAM_LOCALURL);
+
     // General fields
     $mform->addElement('text', 'sectionname', get_string('sectionnamefield', 'quiz'));
     $mform->setType('sectionname', PARAM_TEXT);
@@ -41,6 +51,9 @@ class generate_section_form extends moodleform {
       'Mid-level',
       'Senior'
     );
+    $mform->addElement('checkbox', 'lifecycle', get_string('lifecycleenable', 'quiz'));
+    $mform->setDefault('lifecycle', 1);
+
     $mform->addElement('select', 'difficulty', get_string('difficulty', 'quiz'), $difficulties);
 
     $mform->addElement('text', 'topic', get_string('topic', 'quiz'));
@@ -48,14 +61,13 @@ class generate_section_form extends moodleform {
 
     $mform->addElement('select', 'role', get_string('role', 'quiz'), $roles);
 
-    $mform->addElement('checkbox', 'lifecycle', get_string('lifecycleenable', 'quiz'));
-    $mform->setDefault('lifecycle', 1);
-
     // Timing options
     $mform->addElement('header', 'timingheader', get_string('timing', 'quiz'));
 
     $mform->addElement('duration', 'timelimit', get_string('timelimit', 'quiz'));
     $mform->setDefault('duration', 0);
+
+    $this->add_action_buttons();
   }
 
   // Validate form inputs

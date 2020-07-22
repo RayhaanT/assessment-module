@@ -658,7 +658,7 @@ class edit_renderer extends \plugin_renderer_base {
         // Generate a new section of questions from the assessment engine
         $generationParams = array(
             'returnurl' => $returnurl->out_as_local_url(false),
-            'cmid' => $structure->get_cmid(), 'addafterpage' => $page
+            'cmid' => $structure->get_cmid(), 'addbeforepage' => $page
         );
         $actions['addgeneratedsection'] = new \action_menu_link_secondary(
             new \moodle_url('/mod/quiz/assessmentengine/generatesection.php', $generationParams),
