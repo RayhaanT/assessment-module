@@ -38,9 +38,9 @@ class generate_section_form extends moodleform {
     // Fields used by the assessment engine to poll the question bank
     $difficulties = array(
       'None',
-      'EASY',
-      'MEDIUM',
-      'HARD'
+      'Low',
+      'Medium',
+      'High'
     );
     $roles = array(
       'None',

@@ -205,9 +205,9 @@ abstract class question_edit_form extends question_wizard_form {
         // Fields used by the assessment engine to poll the question bank
         $difficulties = array(
             'None',
-            'EASY',
-            'MEDIUM',
-            'HARD'
+            'Low',
+            'Medium',
+            'High'
         );
         $roles = array(
             'None',
