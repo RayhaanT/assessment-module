@@ -41,7 +41,7 @@ if ($cmid) {
 	require_login($cm->course, false, $cm);
 	$thiscontext = context_module::instance($cmid);
 } else {
-	// print_error('missingcourseorcmid', 'question');
+	print_error('missingcourseorcmid', 'question');
 }
 $contexts = new question_edit_contexts($thiscontext);
 $PAGE->set_pagelayout('admin');
@@ -82,17 +82,7 @@ if ($mform->is_cancelled()) {
 	$course = $DB->get_record('course', array('id' => $quiz->course), '*', MUST_EXIST);
 	$quizobj = new quiz($quiz, $cm, $course);
 	$structure = $quizobj->get_structure();
-
-	// Add a group of questions to the quiz based on provided parameters
-	// $structure->check_can_be_edited();
-
-	// $addbeforepage = optional_param('addbeforepage', 0, PARAM_INT);
-	// $difficulty = optional_param('difficulty', 0, PARAM_INT);
-	// $role = optional_param('role', 0, PARAM_INT);
-	// $topic = optional_param('topic', '', PARAM_ALPHA);
-	// $timelimit = optional_param('timelimit', 0, PARAM_INT);
-	// $lifecycle = optional_param('lifecycle', 0, PARAM_INT);
-	// $addqsection = optional_param('addqsection', 0, PARAM_INT);
+	$structure->check_can_be_edited();
 
 	// Get slot data for repagination
 	if ($addbeforepage == 0) {
@@ -116,6 +106,8 @@ if ($mform->is_cancelled()) {
 	$addqsection = 0;
 
 	for($m = 0; $m < $fromform->nosubmods; $m++) {
+		$lowertopic = strtolower($fromform->topic[$m]);
+		$topic = trim($lowertopic);
 		$topic = $fromform->topic[$m];
 		if(isset($fromform->lifecycle)) {
 			$lifecycle = $fromform->lifecycle[$m];
@@ -204,12 +196,15 @@ if ($mform->is_cancelled()) {
 
 	// Repaginate to place all questions from section on same page
 	$repage = new \mod_quiz\repaginate($quiz->id);
+	$firstnewslot = 1;
 	if ($addbeforepage == 0) {
+		$firstnewslot = $lastslot + 1;
 		// Close page gaps between added questions
 		for ($x = 0; $x < $addqsection - 1; $x++) {
 			$repage->repaginate_slots($lastslot + $x + 2, 1);
 		}
-	} else {
+	} 
+	else {
 		// Move all questions from later pages down a page
 		$condition = "page > '" . $addbeforepage . "'" . " AND " . "quizid = '" . $quiz->id . "'";
 		$allslots = $DB->get_records_select('quiz_slots', $condition);
@@ -248,11 +243,52 @@ if ($mform->is_cancelled()) {
 		foreach ($allpageslots as $x) {
 			array_push($indexedslots, $x);
 		}
+		
 		// Move new slots back into place
 		for ($x = 0; $x < sizeof($indexedslots); $x++) {
+			if($x == 0) {
+				$firstnewslot = $oldslotnumbers[$x] - sizeof($pageslots);
+			}
 			$indexedslots[$x]->slot = $oldslotnumbers[$x] - sizeof($pageslots);
 			$DB->update_record('quiz_slots', $indexedslots[$x]);
 		}
+	}
+
+
+	// Create section for module
+	// If a section already exists where the module was added (otherwise results in database conflict)
+	if ($modulesection = $DB->get_record('quiz_sections', array('quizid' => $quiz->id, 'firstslot' => $firstnewslot))) {
+		// Only triggers if there are no other questions in the quiz. Edits the default section
+		if($addbeforepage == 0) {
+			$modulesection->heading = $fromform->name;
+			$modulesection->module = 1;
+			$DB->update_record('quiz_sections', $modulesection);
+		}
+		// Move existing section to match with repagination and create a new heading for the module
+		else {
+			$reversed = array_reverse($pageslots);
+			$firstoldslot = array_pop($reversed);
+			$modulesection->firstslot = $firstoldslot->slot;
+			$DB->update_record('quiz_sections', $modulesection);
+
+			$structure->add_section_heading($addbeforepage, $fromform->name);
+			$newmodsection = $DB->get_record('quiz_sections', array('quizid' => $quiz->id, 'firstslot' => $firstnewslot));
+			$newmodsection->module = 1;
+			$DB->update_record('quiz_sections', $newmodsection);
+		}
+	} 
+	// If a new section needs to be created
+	else {
+		if($addbeforepage == 0) {
+			$sectionpage = end($allslots)->page + 1;
+		}
+		else {
+			$sectionpage = $addbeforepage;
+		}
+		$structure->add_section_heading($sectionpage, $fromform->name);
+		$modulesection = $DB->get_record('quiz_sections', array('quizid' => $quiz->id, 'firstslot' => $firstnewslot));
+		$modulesection->module = 1;
+		$DB->update_record('quiz_sections', $modulesection);
 	}
 
 	// Wrap up

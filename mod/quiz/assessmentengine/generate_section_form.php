@@ -75,21 +75,6 @@ class generate_section_form extends moodleform {
       'nosubmods', 'addsubmod', $submodulesperclick,
       get_string('addsubmodule', 'quiz'), true);
 
-    // $difficulties = array(
-    //   'None',
-    //   'Low',
-    //   'Medium',
-    //   'High'
-    // );
-
-    // $mform->addElement('checkbox', 'lifecycle', get_string('lifecycleenable', 'quiz'));
-    // $mform->setDefault('lifecycle', 1);
-
-    // $mform->addElement('select', 'difficulty', get_string('difficulty', 'quiz'), $difficulties);
-
-    // $mform->addElement('text', 'topic', get_string('topic', 'quiz'));
-    // $mform->setType('topic', PARAM_TEXT);
-
     // Timing options
     $mform->addElement('header', 'timingheader', get_string('timing', 'quiz'));
 

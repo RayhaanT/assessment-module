@@ -342,7 +342,8 @@ class question_type {
 
         // Save assessment engine-related parameters
         if(isset($form->topic)) {
-            $question->topic = trim($form->topic);
+            $lowertopic = trim($form->topic);
+            $question->topic = strtolower($lowertopic);
         }
         if(isset($form->difficulty)) {
             $question->difficulty = $form->difficulty;
