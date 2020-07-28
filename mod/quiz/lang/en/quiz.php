@@ -22,6 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// Assessment Engine
 $string['addgeneratedsection'] = "a new module";
 $string['modulenamefield'] = "Module name";
 $string['addsubmodule'] = "Add a new submodule";
@@ -31,6 +32,7 @@ $string['topic'] = "Topic";
 $string['role'] = "Role";
 $string['lifeexpirydate'] = "Question life cycle end date (set to current date to disable)";
 $string['lifecycleenable'] = "Pick only questions within life cycle?";
+$string['newpagesectionheading'] = 'New Page';
 
 // Errors
 $string['topicinvalid'] = "This topic doesn't match any existing questions";

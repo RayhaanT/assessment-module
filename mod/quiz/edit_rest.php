@@ -183,6 +183,14 @@ switch($requestmethod) {
         switch ($class) {
             case 'section':
                 require_capability('mod/quiz:manage', $modcontext);
+
+                // Section can only be deleted if its not the first, so merge the section and previous page
+                $section = $DB->get_record('quiz_sections', array('id' => $id));
+                $quizid = $section->quizid;
+                $slotnumber = $section->firstslot;
+                $firstslot = $DB->get_record('quiz_slots', array('quizid' => $quizid, 'slot' => $slotnumber));
+                $structure->update_page_break($firstslot->id, 1);
+
                 $structure->remove_section_heading($id);
                 $result = array('deleted' => true);
                 break;

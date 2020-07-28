@@ -506,8 +506,14 @@ class edit_renderer extends \plugin_renderer_base {
             $contexts, $pagevars, $pageurl) {
 
         $output = '';
+        $inmod = $section->module;
         foreach ($structure->get_slots_in_section($section->id) as $slot) {
-            $output .= $this->question_row($structure, $slot, $contexts, $pagevars, $pageurl);
+            if($inmod) {
+                $output .= $this->mod_question_row($structure, $slot, $contexts, $pagevars, $pageurl);
+            }
+            else {
+                $output .= $this->question_row($structure, $slot, $contexts, $pagevars, $pageurl);
+            }
         }
         return html_writer::tag('ul', $output, array('class' => 'section img-text'));
     }
@@ -539,6 +545,22 @@ class edit_renderer extends \plugin_renderer_base {
         $questionclasses = 'activity ' . $qtype . ' qtype_' . $qtype . ' slot';
 
         $output .= html_writer::tag('li', $questionhtml . $joinhtml,
+                array('class' => $questionclasses, 'id' => 'slot-' . $structure->get_slot_id_for_slot($slot),
+                        'data-canfinish' => $structure->can_finish_during_the_attempt($slot)));
+
+        return $output;
+    }
+
+    public function mod_question_row(structure $structure, $slot, $contexts, $pagevars, $pageurl) {
+        $output = '';
+        $output .= $this->page_row($structure, $slot, $contexts, $pagevars, $pageurl);
+
+        // Question HTML.
+        $questionhtml = $this->question($structure, $slot, $pageurl);
+        $qtype = $structure->get_question_type_for_slot($slot);
+        $questionclasses = 'activity ' . $qtype . ' qtype_' . $qtype . ' slot';
+
+        $output .= html_writer::tag('li', $questionhtml,
                 array('class' => $questionclasses, 'id' => 'slot-' . $structure->get_slot_id_for_slot($slot),
                         'data-canfinish' => $structure->can_finish_during_the_attempt($slot)));
 

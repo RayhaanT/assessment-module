@@ -199,7 +199,7 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
      * Handles the submit event when editing section heading.
      *
      * @protected
-     * @method edit_section_title_submiy
+     * @method edit_section_title_submit
      * @param {EventFacade} ev The event that triggered this.
      * @param {Node} activity The activity whose maxmark we are altering.
      * @param {String} oldtext The original maxmark the activity or resource had.

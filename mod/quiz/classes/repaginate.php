@@ -142,6 +142,17 @@ class repaginate {
                 // Update DB.
                 $DB->update_record('quiz_slots', $nextslot, true);
 
+                // Add new section if new page was created
+                if ($type == self::UNLINK) {
+                    $section = new \stdClass();
+                    $section->heading = get_string('newpagesectionheading', 'quiz');
+                    $section->quizid = $this->quizid;
+                    $section->firstslot = $nextslotnumber;
+                    $section->shufflequestions = 0;
+                    $section->module = 0;
+                    $DB->insert_record('quiz_sections', $section);
+                }
+
                 // Update returning object.
                 $newslots[$slot->id] = $nextslot;
             }

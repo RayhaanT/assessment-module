@@ -2144,7 +2144,7 @@ function quiz_has_question_use($quiz, $slot) {
 function quiz_add_quiz_question($questionid, $quiz, $page = 0, $maxmark = null) {
     global $DB;
 
-    // Make sue the question is not of the "random" type.
+    // Make sure the question is not of the "random" type.
     $questiontype = $DB->get_field('question', 'qtype', array('id' => $questionid));
     if ($questiontype == 'random') {
         throw new coding_exception(
@@ -2213,6 +2213,18 @@ function quiz_add_quiz_question($questionid, $quiz, $page = 0, $maxmark = null) 
     }
 
     $DB->insert_record('quiz_slots', $slot);
+
+    // Add new section if new page was created
+    if($slot->page > $maxpage) {
+        $section = new \stdClass();
+        $section->heading = get_string('newpagesectionheading', 'quiz');
+        $section->quizid = $quiz->id;
+        $section->firstslot = $slot->slot;
+        $section->shufflequestions = 0;
+        $section->module = 0;
+        $DB->insert_record('quiz_sections', $section);
+    }
+
     $trans->allow_commit();
 }
 

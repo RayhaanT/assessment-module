@@ -511,6 +511,9 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
                     Y.Moodle.mod_quiz.util.page.remove(page, true);
                 }
                 this.reorganise_edit_page();
+                if (value === 2) {
+                    window.location.reload(true);
+                }
             }
         });
 
