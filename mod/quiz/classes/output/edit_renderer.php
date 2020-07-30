@@ -90,7 +90,7 @@ class edit_renderer extends \plugin_renderer_base {
         $output .= $this->start_section_list($structure);
 
         foreach ($structure->get_sections() as $section) {
-            $output .= $this->start_section($structure, $section);
+            $output .= $this->start_section($structure, $section, $quizobj->get_quiz());
             $output .= $this->questions_in_section($structure, $section, $contexts, $pagevars, $pageurl);
 
             if ($structure->is_last_section($section)) {
@@ -385,7 +385,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \stdClass $section The quiz_section entry from DB
      * @return string HTML to output.
      */
-    protected function start_section($structure, $section) {
+    protected function start_section($structure, $section, $quiz) {
 
         $output = '';
 
@@ -419,6 +419,10 @@ class edit_renderer extends \plugin_renderer_base {
             $output .= $this->section_remove_icon($section);
         }
         $output .= $this->section_shuffle_questions($structure, $section);
+
+        if($quiz->usesectiontimelimits) {
+            $output .= $this->time_limit_field($section);
+        }
 
         $output .= html_writer::end_div($output, 'section-heading');
 
@@ -1083,6 +1087,33 @@ class edit_renderer extends \plugin_renderer_base {
             )
         );
         return html_writer::span($output, 'instancemaxmarkcontainer');
+    }
+
+    public function time_limit_field($section) {
+        $minutes = floor($section->timelimit / 60);
+
+        $output = html_writer::span('Time limit: ');
+
+        $output .= html_writer::span($minutes, 'instancetimelimit',
+                array('title' => get_string('sectiontimelimit', 'quiz')));
+
+        $output .= html_writer::span(' ');
+
+        $output .= html_writer::span(
+            html_writer::link(
+                new \moodle_url('#'),
+                $this->pix_icon('t/editstring', '', 'moodle', array('class' => 'editicon visibleifjs', 'title' => '')),
+                array(
+                    'class' => 'editing_timelimit',
+                    'data-action' => 'editsectiontimelimit',
+                    'title' => get_string('edittimelimit', 'quiz'),
+                )
+            )
+        );
+
+        $output .= html_writer::span(' mins');
+
+        return html_writer::span($output, 'instancetimelimitcontainer shuffle-progress');
     }
 
     /**

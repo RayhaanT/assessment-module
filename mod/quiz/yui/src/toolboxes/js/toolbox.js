@@ -35,7 +35,7 @@ var CSS = {
     SELECTOR = {
         ACTIONAREA: '.actions',
         ACTIONLINKTEXT: '.actionlinktext',
-        ACTIVITYACTION: 'a.cm-edit-action[data-action], a.editing_maxmark, a.editing_section, input.shuffle_questions',
+        ACTIVITYACTION: 'a.cm-edit-action[data-action], a.editing_maxmark, a.editing_section, input.shuffle_questions, a.editing_timelimit',
         ACTIVITYFORM: 'span.instancemaxmarkcontainer form',
         ACTIVITYINSTANCE: '.' + CSS.ACTIVITYINSTANCE,
         SECTIONINSTANCE: '.sectioninstance',
@@ -56,6 +56,7 @@ var CSS = {
         INSTANCEMAXMARK: 'span.instancemaxmark',
         INSTANCESECTION: 'span.instancesection',
         INSTANCESECTIONAREA: 'div.section-heading',
+        INSTANCETIMELIMIT: 'span.instancetimelimit',
         MODINDENTDIV: '.mod-indent',
         MODINDENTOUTER: '.mod-indent-outer',
         NUMQUESTIONS: '.numberofquestions',
@@ -72,7 +73,8 @@ var CSS = {
         SELECTALL: '#questionselectall',
         SHOW: 'a.' + CSS.SHOW,
         SLOTLI: 'li.slot',
-        SUMMARKS: '.mod_quiz_summarks'
+        SUMMARKS: '.mod_quiz_summarks',
+        TIMELIMITFORM: '.instancetimelimitcontainer form'
     },
     BODY = Y.one(document.body);
 

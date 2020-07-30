@@ -45,6 +45,7 @@ $visible    = optional_param('visible', 0, PARAM_INT);
 $pageaction = optional_param('action', '', PARAM_ALPHA); // Used to simulate a DELETE command.
 $maxmark    = optional_param('maxmark', '', PARAM_FLOAT);
 $newheading = optional_param('newheading', '', PARAM_TEXT);
+$timelimit  = optional_param('newtimelimit', '', PARAM_FLOAT);
 $shuffle    = optional_param('newshuffle', 0, PARAM_INT);
 $page       = optional_param('page', '', PARAM_INT);
 $ids        = optional_param('ids', '', PARAM_SEQUENCE);
@@ -88,6 +89,10 @@ switch($requestmethod) {
                         require_capability('mod/quiz:manage', $modcontext);
                         $result = array('instancesection' => $section->heading);
                         break;
+                    case 'getsectiontimelimit':
+                        require_capability('mod/quiz:manage', $modcontext);
+                        $result = array('instancetimelimit' => $section->timelimit / 60);
+                        break;
                     case 'updatesectiontitle':
                         require_capability('mod/quiz:manage', $modcontext);
                         $structure->set_section_heading($id, $newheading);
@@ -97,6 +102,14 @@ switch($requestmethod) {
                         require_capability('mod/quiz:manage', $modcontext);
                         $structure->set_section_shuffle($id, $shuffle);
                         $result = array('instanceshuffle' => $section->shufflequestions);
+                        break;
+                    case 'updatesectiontimelimit':
+                        require_capability('mod/quiz:manage', $modcontext);
+                        $section = $DB->get_record('quiz_sections', array('id' => $id), '*', MUST_EXIST);
+                        $section->timelimit = $timelimit * 60;
+                        $DB->update_record('quiz_sections', $section);
+                        $result = array('instancetimelimit' => $timelimit . ' ');
+                        update_section_time_limits($quiz);
                         break;
                 }
                 break;
@@ -192,6 +205,10 @@ switch($requestmethod) {
                 $structure->update_page_break($firstslot->id, 1);
 
                 $structure->remove_section_heading($id);
+
+                // Update time limits if section time limits are enabled
+                update_section_time_limits($quiz);
+
                 $result = array('deleted' => true);
                 break;
 

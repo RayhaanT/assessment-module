@@ -33,6 +33,9 @@ $string['role'] = "Role";
 $string['lifeexpirydate'] = "Question life cycle end date (set to current date to disable)";
 $string['lifecycleenable'] = "Pick only questions within life cycle?";
 $string['newpagesectionheading'] = 'New Page';
+$string['edittimelimit'] = 'Edit section time limit';
+$string['sectiontimelimit'] = 'Section time limit';
+$string['sectionlimitfield'] = 'Use per-section time limits?';
 
 // Errors
 $string['topicinvalid'] = "This topic doesn't match any existing questions";
@@ -967,7 +970,7 @@ $string['time'] = 'Time';
 $string['timecompleted'] = 'Completed';
 $string['timedelay'] = 'You are not allowed to do the quiz since you have not passed the time delay before attempting another quiz';
 $string['timeleft'] = 'Time left';
-$string['timelimit'] = 'Time limit';
+$string['timelimit'] = 'Overall quiz time limit';
 $string['timelimit_help'] = 'If enabled, the time limit is stated on the initial quiz page and a countdown timer is displayed in the quiz navigation block.';
 $string['timelimit_link'] = 'mod/quiz/timing';
 $string['timelimitexeeded'] = 'Sorry! Quiz time limit exceeded!';

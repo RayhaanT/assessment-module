@@ -91,9 +91,13 @@ class mod_quiz_mod_form extends moodleform_mod {
                 self::$datefieldoptions);
 
         // Time limit.
+        $mform->addElement('checkbox', 'usesectiontimelimits', get_string('sectionlimitfield', 'quiz'));
+
         $mform->addElement('duration', 'timelimit', get_string('timelimit', 'quiz'),
                 array('optional' => true));
         $mform->addHelpButton('timelimit', 'timelimit', 'quiz');
+
+        $mform->hideIf('timelimit', 'usesectiontimelimits', 'checked');
 
         // What to do with overdue attempts.
         $mform->addElement('select', 'overduehandling', get_string('overduehandling', 'quiz'),

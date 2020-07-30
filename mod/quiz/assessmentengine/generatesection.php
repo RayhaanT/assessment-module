@@ -11,6 +11,16 @@ function addSelectCondition($currentCondition, $column, $value) {
     return $currentCondition;
 }
 
+function filterDuplicates($questions, $existing) {
+	foreach($questions as $q) {
+		if (($key = array_search($q, $existing)) !== false) {
+			unset($questions[$key]);
+			echo 'hey ' . $key . '      ';
+		}
+	}
+	return $questions;
+}
+
 require_once(__DIR__ . '/../../../config.php');
 require_once(__DIR__ . '/../../../question/editlib.php');
 require_once(__DIR__ . '/generate_section_form.php');
@@ -103,7 +113,19 @@ if ($mform->is_cancelled()) {
 
 	// Add questions to quiz via database and form data
 	$role = $fromform->role;
+	$timelimit = $fromform->timelimit;
 	$addqsection = 0;
+
+	// Get current quiz questions to remove duplicates
+	$questionslotsinquiz = $DB->get_records('quiz_slots', array('quizid' => $quiz->id));
+	$selectquestions = '';
+	foreach($questionslotsinquiz as $q) {
+		if($selectquestions != '') {
+			$selectquestions .= ' OR ';
+		}
+		$selectquestions .= "id = '" . $q->questionid . "'";
+	}
+	$questionsinquiz = $DB->get_records_select('question', $selectquestions);
 
 	for($m = 0; $m < $fromform->nosubmods; $m++) {
 		$lowertopic = strtolower($fromform->topic[$m]);
@@ -135,6 +157,7 @@ if ($mform->is_cancelled()) {
 		if($highq) {
 			$highcondition= addSelectCondition($condition, 'difficulty', 3);
 			$qpool = $DB->get_records_select('question', $highcondition);
+			$qpool = filterDuplicates($qpool, $questionsinquiz);
 			$maxindex = sizeof($qpool) - 1;
 			if ($maxindex + 1 < $highq) {
 				$highq = $maxindex + 1;
@@ -154,6 +177,7 @@ if ($mform->is_cancelled()) {
 		if ($midq) {
 			$midcondition = addSelectCondition($condition, 'difficulty', 2);
 			$qpool = $DB->get_records_select('question', $midcondition);
+			$qpool = filterDuplicates($qpool, $questionsinquiz);
 			$maxindex = sizeof($qpool) - 1;
 			if ($maxindex + 1 < $midq) {
 				$midq = $maxindex + 1;
@@ -173,6 +197,7 @@ if ($mform->is_cancelled()) {
 		if ($lowq) {
 			$lowcondition = addSelectCondition($condition, 'difficulty', 1);
 			$qpool = $DB->get_records_select('question', $lowcondition);
+			$qpool = filterDuplicates($qpool, $questionsinquiz);
 			$maxindex = sizeof($qpool) - 1;
 			if ($maxindex + 1 < $lowq) {
 				$lowq = $maxindex + 1;
@@ -255,41 +280,48 @@ if ($mform->is_cancelled()) {
 	}
 
 
-	// Create section for module
-	// If a section already exists where the module was added (otherwise results in database conflict)
-	if ($modulesection = $DB->get_record('quiz_sections', array('quizid' => $quiz->id, 'firstslot' => $firstnewslot))) {
-		// Only triggers if there are no other questions in the quiz. Edits the default section
-		if($addbeforepage == 0) {
-			$modulesection->heading = $fromform->name;
-			$modulesection->module = 1;
-			$DB->update_record('quiz_sections', $modulesection);
-		}
-		// Move existing section to match with repagination and create a new heading for the module
-		else {
-			$reversed = array_reverse($pageslots);
-			$firstoldslot = array_pop($reversed);
-			$modulesection->firstslot = $firstoldslot->slot;
-			$DB->update_record('quiz_sections', $modulesection);
+	if($addqsection > 0) {
+		// Create section for module
+		// If a section already exists where the module was added (otherwise results in database conflict)
+		if ($modulesection = $DB->get_record('quiz_sections', array('quizid' => $quiz->id, 'firstslot' => $firstnewslot))) {
+			// Only triggers if there are no other questions in the quiz. Edits the default section
+			if($addbeforepage == 0) {
+				$modulesection->heading = $fromform->name;
+				$modulesection->module = 1;
+				$modulesection->timelimit = $timelimit;
+				$DB->update_record('quiz_sections', $modulesection);
+			}
+			// Move existing section to match with repagination and create a new heading for the module
+			else {
+				$reversed = array_reverse($pageslots);
+				$firstoldslot = array_pop($reversed);
+				$modulesection->firstslot = $firstoldslot->slot;
+				$DB->update_record('quiz_sections', $modulesection);
 
-			$structure->add_section_heading($addbeforepage, $fromform->name);
-			$newmodsection = $DB->get_record('quiz_sections', array('quizid' => $quiz->id, 'firstslot' => $firstnewslot));
-			$newmodsection->module = 1;
-			$DB->update_record('quiz_sections', $newmodsection);
-		}
-	} 
-	// If a new section needs to be created
-	else {
-		if($addbeforepage == 0) {
-			$sectionpage = end($allslots)->page + 1;
-		}
+				$structure->add_section_heading($addbeforepage, $fromform->name);
+				$newmodsection = $DB->get_record('quiz_sections', array('quizid' => $quiz->id, 'firstslot' => $firstnewslot));
+				$newmodsection->module = 1;
+				$newmodsection->timelimit = $timelimit;
+				$DB->update_record('quiz_sections', $newmodsection);
+			}
+		} 
+		// If a new section needs to be created
 		else {
-			$sectionpage = $addbeforepage;
+			if($addbeforepage == 0) {
+				$sectionpage = end($allslots)->page + 1;
+			}
+			else {
+				$sectionpage = $addbeforepage;
+			}
+			$structure->add_section_heading($sectionpage, $fromform->name);
+			$modulesection = $DB->get_record('quiz_sections', array('quizid' => $quiz->id, 'firstslot' => $firstnewslot));
+			$modulesection->module = 1;
+			$modulesection->timelimit = $timelimit;
+			$DB->update_record('quiz_sections', $modulesection);
 		}
-		$structure->add_section_heading($sectionpage, $fromform->name);
-		$modulesection = $DB->get_record('quiz_sections', array('quizid' => $quiz->id, 'firstslot' => $firstnewslot));
-		$modulesection->module = 1;
-		$DB->update_record('quiz_sections', $modulesection);
 	}
+
+	update_section_time_limits($quiz);
 
 	// Wrap up
 	quiz_delete_previews($quiz);

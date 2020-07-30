@@ -69,6 +69,31 @@ define('QUIZ_NAVMETHOD_SEQ',  'sequential');
 define('QUIZ_EVENT_TYPE_OPEN', 'open');
 define('QUIZ_EVENT_TYPE_CLOSE', 'close');
 
+function update_section_time_limits($quiz) {
+    global $DB;
+
+    if(isset($quiz->usesectiontimelimits)) {
+        if ($quiz->usesectiontimelimits == 1) {
+            if ($sections = $DB->get_records('quiz_sections', array('quizid' => $quiz->id))) {
+                $totallimit = 0;
+                foreach ($sections as $s) {
+                    $totallimit += $s->timelimit;
+                }
+                $quiz->timelimit = $totallimit;
+            } else {
+                // Default time limit for 1 section
+                // Only triggered on creation of a new quiz
+                $quiz->timelimit = 600;
+            }
+        }
+    }
+    else {
+        $quiz->usesectiontimelimits = 0;
+    }
+    $DB->update_record('quiz', $quiz);
+    return $quiz;
+}
+
 /**
  * Given an object containing all the necessary data,
  * (defined by the form in mod_form.php) this function
@@ -96,6 +121,8 @@ function quiz_add_instance($quiz) {
     // Create the first section for this quiz.
     $DB->insert_record('quiz_sections', array('quizid' => $quiz->id,
             'firstslot' => 1, 'heading' => '', 'shufflequestions' => 0));
+
+    $quiz = update_section_time_limits($quiz);
 
     // Do the processing required after an add or an update.
     quiz_after_add_or_update($quiz);
@@ -132,6 +159,8 @@ function quiz_update_instance($quiz, $mform) {
     // Update the database.
     $quiz->id = $quiz->instance;
     $DB->update_record('quiz', $quiz);
+
+    $quiz = update_section_time_limits($quiz);
 
     // Do the processing required after an add or an update.
     quiz_after_add_or_update($quiz);
