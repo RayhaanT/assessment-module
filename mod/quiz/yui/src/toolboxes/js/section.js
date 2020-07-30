@@ -93,6 +93,9 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
                 // The user is deleting the activity.
                 this.delete_section_with_confirmation(ev, node, activity, action);
                 break;
+            case 'fulldeletesection':
+                this.full_delete_section_with_confirmation(ev, node, activity, action);
+                break;
             case 'editsectiontimelimit':
                 this.edit_section_time_limit(ev, node, activity, action);
                 break;
@@ -132,6 +135,34 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
                 'id':     activity.get('id').replace('section-', '')
             };
             this.send_request(data, spinner, function(response) {
+                if (response.deleted) {
+                    window.location.reload(true);
+                }
+            });
+
+        }, this);
+    },
+
+    full_delete_section_with_confirmation: function (ev, button, activity) {
+        // Prevent the default button action.
+        ev.preventDefault();
+
+        // Create the confirmation dialogue.
+        var confirm = new M.core.confirm({
+            question: M.util.get_string('confirmdeletesection', 'quiz', activity.get('aria-label')),
+            modal: true
+        });
+
+        // If it is confirmed.
+        confirm.on('complete-yes', function () {
+
+            var spinner = M.util.add_spinner(Y, activity.one(SELECTOR.ACTIONAREA));
+            var data = {
+                'class': 'sectionfull',
+                'action': 'DELETE',
+                'id': activity.get('id').replace('section-', '')
+            };
+            this.send_request(data, spinner, function (response) {
                 if (response.deleted) {
                     window.location.reload(true);
                 }
@@ -210,15 +241,6 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
             this.send_request(data, spinner, function (response) {
                 if (response) {
                     activity.one(SELECTOR.INSTANCETIMELIMIT).setContent(response.instancetimelimit);
-                    activity.one(SELECTOR.EDITSECTIONICON).set('title',
-                        M.util.get_string('sectionheadingedit', 'quiz', response.instancetimelimit));
-                    activity.one(SELECTOR.EDITSECTIONICON).set('alt',
-                        M.util.get_string('sectionheadingedit', 'quiz', response.instancetimelimit));
-                    var deleteicon = activity.one(SELECTOR.DELETESECTIONICON);
-                    if (deleteicon) {
-                        deleteicon.set('title', M.util.get_string('sectionheadingremove', 'quiz', response.instancetimelimit));
-                        deleteicon.set('alt', M.util.get_string('sectionheadingremove', 'quiz', response.instancetimelimit));
-                    }
                 }
             });
         }
@@ -351,6 +373,11 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
                     if (deleteicon) {
                         deleteicon.set('title', M.util.get_string('sectionheadingremove', 'quiz', response.instancesection));
                         deleteicon.set('alt', M.util.get_string('sectionheadingremove', 'quiz', response.instancesection));
+                    }
+                    var fulldeleteicon = activity.one(SELECTOR.FULLDELETESECTIONICON);
+                    if (fulldeleteicon) {
+                        fulldeleteicon.set('title', M.util.get_string('sectionheadingremove', 'quiz', response.instancesection));
+                        fulldeleteicon.set('alt', M.util.get_string('sectionheadingremove', 'quiz', response.instancesection));
                     }
                 }
             });

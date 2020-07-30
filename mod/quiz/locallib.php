@@ -2141,7 +2141,7 @@ function quiz_has_question_use($quiz, $slot) {
  *      defaults to question.defaultmark.
  * @return bool false if the question was already in the quiz
  */
-function quiz_add_quiz_question($questionid, $quiz, $page = 0, $maxmark = null) {
+function quiz_add_quiz_question($questionid, $quiz, $page = 0, $maxmark = null, $ignorenewsection = false) {
     global $DB;
 
     // Make sure the question is not of the "random" type.
@@ -2214,15 +2214,17 @@ function quiz_add_quiz_question($questionid, $quiz, $page = 0, $maxmark = null) 
 
     $DB->insert_record('quiz_slots', $slot);
 
-    // Add new section if new page was created
-    if($slot->page > $maxpage) {
-        $section = new \stdClass();
-        $section->heading = get_string('newpagesectionheading', 'quiz');
-        $section->quizid = $quiz->id;
-        $section->firstslot = $slot->slot;
-        $section->shufflequestions = 0;
-        $section->module = 0;
-        $DB->insert_record('quiz_sections', $section);
+    if(!$ignorenewsection) {
+        // Add new section if new page was created
+        if($slot->page > $maxpage) {
+            $section = new \stdClass();
+            $section->heading = get_string('newpagesectionheading', 'quiz');
+            $section->quizid = $quiz->id;
+            $section->firstslot = $slot->slot;
+            $section->shufflequestions = 0;
+            $section->module = 0;
+            $DB->insert_record('quiz_sections', $section);
+        }
     }
 
     $trans->allow_commit();

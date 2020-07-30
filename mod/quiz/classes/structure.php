@@ -23,6 +23,9 @@
  */
 
 namespace mod_quiz;
+
+use moodle_exception;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -912,9 +915,9 @@ class structure {
 
         $this->check_can_be_edited();
 
-        if ($this->is_only_slot_in_section($slotnumber) && $this->get_section_count() > 1) {
-            throw new \coding_exception('You cannot remove the last slot in a section.');
-        }
+        // if ($this->is_only_slot_in_section($slotnumber) && $this->get_section_count() > 1) {
+        //     throw new \coding_exception('You cannot remove the last slot in a section.');
+        // }
 
         $slot = $DB->get_record('quiz_slots', array('quizid' => $this->get_quizid(), 'slot' => $slotnumber));
         if (!$slot) {

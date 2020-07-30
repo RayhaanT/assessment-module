@@ -45,6 +45,7 @@ var CSS = {
         CONTENTAFTERLINK: 'div.contentafterlink',
         CONTENTWITHOUTLINK: 'div.contentwithoutlink',
         DELETESECTIONICON: 'a.editing_delete .icon',
+        FULLDELETESECTIONICON: 'a.editing_full_delete .icon',
         EDITMAXMARK: 'a.editing_maxmark',
         EDITSECTION: 'a.editing_section',
         EDITSECTIONICON: 'a.editing_section .icon',

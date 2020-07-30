@@ -416,7 +416,8 @@ class edit_renderer extends \plugin_renderer_base {
         $output .= html_writer::div($headingtext . $editsectionheadingicon, 'instancesectioncontainer');
 
         if (!$structure->is_first_section($section) && $structure->can_be_edited()) {
-            $output .= $this->section_remove_icon($section);
+            $output .= $this->section_merge_button($section);
+            $output .= $this->section_full_delete_button($section);
         }
         $output .= $this->section_shuffle_questions($structure, $section);
 
@@ -479,6 +480,30 @@ class edit_renderer extends \plugin_renderer_base {
         return $output;
     }
 
+    public function section_merge_button($section) {
+        $title = get_string('sectionheadingremove', 'quiz', $section->heading);
+        $url = new \moodle_url(
+            '/mod/quiz/edit.php',
+            array('sesskey' => sesskey(), 'removesection' => '1', 'sectionid' => $section->id)
+        );
+        $image = $this->pix_icon('e/merge_cells', $title);
+        return $this->action_link($url, $image, null, array(
+            'class' => 'cm-edit-action editing_delete', 'data-action' => 'deletesection'
+        ));
+    }
+
+    public function section_full_delete_button($section) {
+        $title = get_string('sectionfulldelete', 'quiz', $section->heading);
+        $url = new \moodle_url(
+            '/mod/quiz/edit.php',
+            array('sesskey' => sesskey(), 'removesection' => '2', 'sectionid' => $section->id)
+        );
+        $image = $this->pix_icon('t/delete', $title);
+        return $this->action_link($url, $image, null, array(
+            'class' => 'cm-edit-action editing_full_delete', 'data-action' => 'fulldeletesection'
+        ));
+    }
+
     /**
      * Render an icon to remove a section from the quiz.
      *
@@ -510,14 +535,8 @@ class edit_renderer extends \plugin_renderer_base {
             $contexts, $pagevars, $pageurl) {
 
         $output = '';
-        $inmod = $section->module;
         foreach ($structure->get_slots_in_section($section->id) as $slot) {
-            if($inmod) {
-                $output .= $this->mod_question_row($structure, $slot, $contexts, $pagevars, $pageurl);
-            }
-            else {
-                $output .= $this->question_row($structure, $slot, $contexts, $pagevars, $pageurl);
-            }
+            $output .= $this->question_row($structure, $slot, $contexts, $pagevars, $pageurl);
         }
         return html_writer::tag('ul', $output, array('class' => 'section img-text'));
     }
@@ -549,22 +568,6 @@ class edit_renderer extends \plugin_renderer_base {
         $questionclasses = 'activity ' . $qtype . ' qtype_' . $qtype . ' slot';
 
         $output .= html_writer::tag('li', $questionhtml . $joinhtml,
-                array('class' => $questionclasses, 'id' => 'slot-' . $structure->get_slot_id_for_slot($slot),
-                        'data-canfinish' => $structure->can_finish_during_the_attempt($slot)));
-
-        return $output;
-    }
-
-    public function mod_question_row(structure $structure, $slot, $contexts, $pagevars, $pageurl) {
-        $output = '';
-        $output .= $this->page_row($structure, $slot, $contexts, $pagevars, $pageurl);
-
-        // Question HTML.
-        $questionhtml = $this->question($structure, $slot, $pageurl);
-        $qtype = $structure->get_question_type_for_slot($slot);
-        $questionclasses = 'activity ' . $qtype . ' qtype_' . $qtype . ' slot';
-
-        $output .= html_writer::tag('li', $questionhtml,
                 array('class' => $questionclasses, 'id' => 'slot-' . $structure->get_slot_id_for_slot($slot),
                         'data-canfinish' => $structure->can_finish_during_the_attempt($slot)));
 

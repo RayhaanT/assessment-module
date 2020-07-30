@@ -212,6 +212,58 @@ switch($requestmethod) {
                 $result = array('deleted' => true);
                 break;
 
+            case 'sectionfull':
+                require_capability('mod/quiz:manage', $modcontext);
+
+                // Get all slots in the section
+
+                /* -------------------  page != section ------------------- */
+                /* $allsections = $DB->get_records('quiz_sections', array('quizid' => $quiz->id));
+                $thissection = $DB->get_record('quiz_sections', array('id' => $id));
+                $firstslot = $thissection->firstslot;
+                $allslots = $DB->get_records('quiz_slots', array('quizid' => $quiz->id));
+                $lastslotobj = end($allslots);
+                $lastslot = $lastslotobj->slot;
+
+                foreach($allsections as $s) {
+                    if($s->firstslot > $firstslot && $s->firstslot <= $lastslot) {
+                        $lastslot = $s->$firstslot - 1;
+                    }
+                }
+
+                $deleteslots = $DB->get_records_select(
+                    'quiz_slots',
+                    "slot >= '" . $firstslot . "' AND slot <= '" . $lastslot . "'"
+                ) */
+                /* ------------------- /page != section ------------------- */
+
+                /* -------------------  page == section ------------------- */
+                $section = $structure->get_section_by_id($id);
+                $firstslotobj = $DB->get_record('quiz_slots', array('quizid' => $quiz->id, 'slot' => $section->firstslot));
+                $deleteslots = $DB->get_records('quiz_slots', array('quizid' => $quiz->id, 'page' => $firstslotobj->page));
+                /* ------------------- /page == section ------------------- */
+
+                // throw new moodle_exception('Number of slots to be deleted: ' . sizeof($deleteslots));
+                $structure->remove_section_heading($id);
+
+                // Delete all pages in the section
+                // Every time a slot is deletedthe other ones are pushed up, so deleting the same slot repeatedly actually deletes subsequent ones
+                for($d = 0; $d < sizeof($deleteslots); $d++) {
+                    $structure->remove_slot($firstslotobj->slot);
+                }
+
+                // Update time limits if section time limits are enabled
+                update_section_time_limits($quiz);
+
+                quiz_delete_previews($quiz);
+                quiz_update_sumgrades($quiz);
+
+                $result = array(
+                    'newsummarks' => quiz_format_grade($quiz, $quiz->sumgrades),
+                    'deleted' => true, 'newnumquestions' => $structure->get_question_count()
+                );
+                break;
+
             case 'resource':
                 require_capability('mod/quiz:manage', $modcontext);
                 if (!$slot = $DB->get_record('quiz_slots', array('quizid' => $quiz->id, 'id' => $id))) {

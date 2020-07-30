@@ -15,7 +15,6 @@ function filterDuplicates($questions, $existing) {
 	foreach($questions as $q) {
 		if (($key = array_search($q, $existing)) !== false) {
 			unset($questions[$key]);
-			echo 'hey ' . $key . '      ';
 		}
 	}
 	return $questions;
@@ -168,7 +167,7 @@ if ($mform->is_cancelled()) {
 			}
 			for ($y = 0; $y < $highq; $y++) {
 				$newq = rand(0, $maxindex);
-				quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage);
+				quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage, null, true);
 				array_splice($indexedpool, $newq, 1);
 				$maxindex--;
 			}
@@ -188,7 +187,7 @@ if ($mform->is_cancelled()) {
 			}
 			for ($y = 0; $y < $midq; $y++) {
 				$newq = rand(0, $maxindex);
-				quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage);
+				quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage, null, true);
 				array_splice($indexedpool, $newq, 1);
 				$maxindex--;
 			}
@@ -208,7 +207,7 @@ if ($mform->is_cancelled()) {
 			}
 			for ($y = 0; $y < $lowq; $y++) {
 				$newq = rand(0, $maxindex);
-				quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage);
+				quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage, null, true);
 				array_splice($indexedpool, $newq, 1);
 				$maxindex--;
 			}
@@ -255,9 +254,12 @@ if ($mform->is_cancelled()) {
 		foreach ($pageslots as $s) {
 			array_push($indexedpageslots, $s);
 		}
-		array_reverse($indexedpageslots);
+		$reversedpageslots = [];
+		for($p = sizeof($indexedpageslots) - 1; $p > -1; $p--) {
+			array_push($reversedpageslots, $indexedpageslots[$p]);
+		}
 		// Move all questions on current page to next page
-		foreach ($pageslots as $s) {
+		foreach ($reversedpageslots as $s) {
 			$s->page = $s->page + 1;
 			$s->slot = $s->slot + $addqsection;
 			$DB->update_record('quiz_slots', $s);
