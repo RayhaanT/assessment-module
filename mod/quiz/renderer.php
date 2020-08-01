@@ -280,18 +280,41 @@ class mod_quiz_renderer extends plugin_renderer_base {
      * Return the HTML of the quiz timer.
      * @return string HTML content.
      */
-    public function countdown_timer(quiz_attempt $attemptobj, $timenow) {
+    public function countdown_timer(quiz_attempt $attemptobj, $timenow, $page) {
+        global $DB;
+        $quiz = $attemptobj->get_quiz();
+        $usesectionlimits = $quiz->usesectiontimelimits;
 
-        $timeleft = $attemptobj->get_time_left_display($timenow);
+        if(!$usesectionlimits) {
+            $timeleft = $attemptobj->get_time_left_display($timenow);
+        }
+        else {
+            $allsections = $DB->get_records('quiz_sections', array('quizid' => $quiz->id), 'firstslot');
+            if($page == -1) {
+                $thissection = end($allsections);
+            }
+            else {
+                $keys = array_keys($allsections);
+                $thissection = $allsections[$keys[$page]];
+            }
+
+            $attempt = $DB->get_record('quiz_attempts', array('id' => $attemptobj->get_attemptid()));
+            $starttime = $attempt->pagechangetime;
+            if(!$starttime) {
+                $starttime = $attempt->timestart;
+            }
+            $timelimit = $thissection->timelimit;
+            $timeleft = $starttime + $timelimit - time();
+        }
         if ($timeleft !== false) {
             $ispreview = $attemptobj->is_preview();
             $timerstartvalue = $timeleft;
             if (!$ispreview) {
                 // Make sure the timer starts just above zero. If $timeleft was <= 0, then
                 // this will just have the effect of causing the quiz to be submitted immediately.
-                $timerstartvalue = max($timerstartvalue, 1);
+                // $timerstartvalue = max($timerstartvalue, 1);
             }
-            $this->initialise_timer($timerstartvalue, $ispreview);
+            $this->initialise_timer($timerstartvalue, $ispreview, $usesectionlimits);
         }
 
         return html_writer::tag('div', get_string('timeleft', 'quiz') . ' ' .
@@ -507,6 +530,10 @@ class mod_quiz_renderer extends plugin_renderer_base {
                 'value' => sesskey()));
         $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'scrollpos',
                 'value' => '', 'id' => 'scrollpos'));
+        $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sectiontimeup',
+                'value' => '0', 'id' => 'sectiontimeup'));
+        $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'overtime',
+                'value' => '0', 'id' => 'overtime'));
 
         // Add a hidden field with questionids. Do this at the end of the form, so
         // if you navigate before the form has finished loading, it does not wipe all
@@ -572,8 +599,8 @@ class mod_quiz_renderer extends plugin_renderer_base {
      * Output the JavaScript required to initialise the countdown timer.
      * @param int $timerstartvalue time remaining, in seconds.
      */
-    public function initialise_timer($timerstartvalue, $ispreview) {
-        $options = array($timerstartvalue, (bool)$ispreview);
+    public function initialise_timer($timerstartvalue, $ispreview, $usesectionlimits) {
+        $options = array($timerstartvalue, (bool)$ispreview, $usesectionlimits);
         $this->page->requires->js_init_call('M.mod_quiz.timer.init', $options, false, quiz_get_js_module());
     }
 
@@ -755,7 +782,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
             $message = get_string('mustbesubmittedby', 'quiz', userdate($duedate));
         }
 
-        $output .= $this->countdown_timer($attemptobj, time());
+        $output .= $this->countdown_timer($attemptobj, time(), -1);
         $output .= $this->container($message . $this->container(
                 $this->render($button), 'controls'), 'submitbtns mdl-align');
 

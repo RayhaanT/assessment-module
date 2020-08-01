@@ -1882,7 +1882,7 @@ class quiz_attempt {
         $bc->attributes['role'] = 'navigation';
         $bc->attributes['aria-labelledby'] = 'mod_quiz_navblock_title';
         $bc->title = html_writer::span(get_string('quiznavigation', 'quiz'), '', array('id' => 'mod_quiz_navblock_title'));
-        $bc->content = $output->navigation_panel($panel);
+        $bc->content = $output->navigation_panel($panel, $page);
         return $bc;
     }
 
@@ -2795,7 +2795,7 @@ class quiz_attempt_nav_panel extends quiz_nav_panel_base {
         }
         return html_writer::link($this->attemptobj->summary_url(),
                 get_string('endtest', 'quiz'), array('class' => 'endtestlink aalink')) .
-                $output->countdown_timer($this->attemptobj, time()) .
+                $output->countdown_timer($this->attemptobj, time(), $this->page) .
                 $this->render_restart_preview_link($output);
     }
 }

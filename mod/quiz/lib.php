@@ -85,6 +85,7 @@ function update_section_time_limits($quiz) {
                 // Only triggered on creation of a new quiz
                 $quiz->timelimit = 600;
             }
+            $quiz->navmethod = 'sequential';
         }
     }
     else {

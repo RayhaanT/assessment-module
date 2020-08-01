@@ -58,15 +58,18 @@ M.mod_quiz.timer = {
     // so we can cancel.
     timeoutid: null,
 
+    usesectionlimits: 0,
+
     /**
      * @param Y the YUI object
      * @param start, the timer starting time, in seconds.
      * @param preview, is this a quiz preview?
      */
-    init: function(Y, start, preview) {
+    init: function (Y, start, preview, usesectionlimits) {
         M.mod_quiz.timer.Y = Y;
         M.mod_quiz.timer.endtime = M.pageloadstarttime.getTime() + start*1000;
         M.mod_quiz.timer.preview = preview;
+        M.mod_quiz.timer.usesectionlimits = usesectionlimits;
         M.mod_quiz.timer.update();
         Y.one('#quiz-timer').setStyle('display', 'block');
     },
@@ -100,9 +103,20 @@ M.mod_quiz.timer = {
         if (secondsleft < 0) {
             M.mod_quiz.timer.stop(null);
             Y.one('#quiz-time-left').setContent(M.util.get_string('timesup', 'quiz'));
-            var input = Y.one('input[name=timeup]');
-            input.set('value', 1);
-            var form = input.ancestor('form');
+            var nextpage = Y.one('input[name=nextpage]');
+            if (nextpage.get('value') == -1 || !M.mod_quiz.timer.usesectionlimits) {
+                var input = Y.one('input[name=timeup]');
+                input.set('value', 1);
+            }
+            else {
+                var nexttrigger = Y.one('input[name=sectiontimeup]');
+                nexttrigger.set('value', 1);
+                var overtime = Y.one('input[name=overtime]');
+                if (secondsleft < -10) {
+                    overtime.set('value', secondsleft);
+                }
+            }
+            var form = nextpage.ancestor('form');
             if (form.one('input[name=finishattempt]')) {
                 form.one('input[name=finishattempt]').set('value', 0);
             }

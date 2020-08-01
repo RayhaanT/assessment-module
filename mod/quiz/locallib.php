@@ -120,6 +120,7 @@ function quiz_create_attempt(quiz $quizobj, $attemptnumber, $lastattempt, $timen
 
     $attempt->attempt = $attemptnumber;
     $attempt->timestart = $timenow;
+    $attempt->pagechangetime = $timenow;
     $attempt->timefinish = 0;
     $attempt->timemodified = $timenow;
     $attempt->timemodifiedoffline = 0;

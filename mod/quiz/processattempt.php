@@ -45,11 +45,13 @@ $finishattempt = optional_param('finishattempt', false, PARAM_BOOL);
 $timeup        = optional_param('timeup',        0,      PARAM_BOOL); // True if form was submitted by timer.
 $scrollpos     = optional_param('scrollpos',     '',     PARAM_RAW);
 $cmid          = optional_param('cmid', null, PARAM_INT);
+$timeoutnext   = optional_param('sectiontimeup', false, PARAM_BOOL);
+$overtime      = optional_param('overtime', 0, PARAM_INT);
 
 $attemptobj = quiz_create_attempt_handling_errors($attemptid, $cmid);
 
 // Set $nexturl now.
-if ($next) {
+if ($next || $timeoutnext) {
     $page = $nextpage;
 } else if ($previous && $thispage > 0) {
     $page = $thispage - 1;
@@ -91,6 +93,11 @@ $status = $attemptobj->process_attempt($timenow, $finishattempt, $timeup, $thisp
 if ($status == quiz_attempt::OVERDUE) {
     redirect($attemptobj->summary_url());
 } else if ($status == quiz_attempt::IN_PROGRESS) {
+    if($page != -1) {
+        $thisattempt = $DB->get_record('quiz_attempts', array('id' => $attemptid));
+        $thisattempt->pagechangetime = $timenow + $overtime;
+        $DB->update_record('quiz_attempts', $thisattempt);
+    }
     redirect($nexturl);
 } else {
     // Attempt abandoned or finished.
