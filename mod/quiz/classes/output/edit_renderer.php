@@ -1114,7 +1114,12 @@ class edit_renderer extends \plugin_renderer_base {
             )
         );
 
-        $output .= html_writer::span(' mins');
+        if($minutes == 1) {
+            $output .= html_writer::span(' min', 'minormins', array('name' => 'minormins'));
+        }
+        else {
+            $output .= html_writer::span(' mins', 'minormins', array('name' => 'minormins'));
+        }
 
         return html_writer::span($output, 'instancetimelimitcontainer shuffle-progress');
     }

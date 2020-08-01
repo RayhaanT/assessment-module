@@ -77,7 +77,10 @@ $mform->set_data($toform);
 
 // Process form data
 if ($mform->is_cancelled()) {
-	$returnurl = new moodle_url($returnurl);
+	$returnurl = new moodle_url('/mod/quiz/edit.php');
+	// Return data from form to quiz for processing
+	$returnurl->param('sesskey', sesskey());
+	$returnurl->param('cmid', $cmid);
 	redirect($returnurl);
 } else if ($fromform = $mform->get_data()) {
 	$returnurl = new moodle_url('/mod/quiz/edit.php');
@@ -124,7 +127,10 @@ if ($mform->is_cancelled()) {
 		}
 		$selectquestions .= "id = '" . $q->questionid . "'";
 	}
-	$questionsinquiz = $DB->get_records_select('question', $selectquestions);
+	$questionsinquiz = array();
+	if($selectquestions != '') {
+		$questionsinquiz = $DB->get_records_select('question', $selectquestions);
+	}
 
 	for($m = 0; $m < $fromform->nosubmods; $m++) {
 		$lowertopic = strtolower($fromform->topic[$m]);

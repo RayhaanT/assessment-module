@@ -215,14 +215,14 @@ abstract class question_edit_form extends question_wizard_form {
             'Mid-level',
             'Senior'
         );
-        $mform->addElement('select', 'difficulty', 'Difficulty', $difficulties);
+        $mform->addElement('select', 'difficulty', get_string('difficulty', 'quiz'), $difficulties);
 
-        $mform->addElement('text', 'topic', 'Topic');
+        $mform->addElement('text', 'topic', get_string('topic', 'quiz'));
         $mform->setType('topic', PARAM_TEXT);
 
-        $mform->addElement('select', 'role', 'Role', $roles);
+        $mform->addElement('select', 'role', get_string('role', 'quiz'), $roles);
 
-        $mform->addElement('date_selector', 'lifecycleexpiry', 'Question life cycle end date (set to current date to disable)');
+        $mform->addElement('date_selector', 'lifecycleexpiry', get_string('lifeexpirydate', 'quiz'));
 
         // Any questiontype specific fields.
         $this->definition_inner($mform);

@@ -971,7 +971,7 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
 
         // Create the confirmation dialogue.
         var confirm = new M.core.confirm({
-            question: M.util.get_string('confirmdeletesection', 'quiz', activity.get('aria-label')),
+            question: 'Are you sure you want to remove all contents of the ' + activity.get('aria-label') + ' section?',
             modal: true
         });
 

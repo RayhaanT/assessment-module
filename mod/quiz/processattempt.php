@@ -93,7 +93,7 @@ $status = $attemptobj->process_attempt($timenow, $finishattempt, $timeup, $thisp
 if ($status == quiz_attempt::OVERDUE) {
     redirect($attemptobj->summary_url());
 } else if ($status == quiz_attempt::IN_PROGRESS) {
-    if($page != -1) {
+    if($page != -1 && $page != $thispage) {
         $thisattempt = $DB->get_record('quiz_attempts', array('id' => $attemptid));
         $thisattempt->pagechangetime = $timenow + $overtime;
         $DB->update_record('quiz_attempts', $thisattempt);
