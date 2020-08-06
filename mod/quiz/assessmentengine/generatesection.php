@@ -137,7 +137,9 @@ if ($mform->is_cancelled()) {
 		$topic = trim($lowertopic);
 		$topic = $fromform->topic[$m];
 		if(isset($fromform->lifecycle)) {
-			$lifecycle = $fromform->lifecycle[$m];
+			if(isset($fromform->lifecycle[$m])) {
+				$lifecycle = $fromform->lifecycle[$m];
+			}
 		} else {
 			$lifecycle = 0;
 		}

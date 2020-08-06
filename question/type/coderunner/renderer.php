@@ -154,6 +154,12 @@ class qtype_coderunner_renderer extends qtype_renderer {
             $currentanswer = "\n" . $currentanswer;
         }
 
+        // Show review specific fields if reviewing (readonly == review)
+        $review = false;
+        if ($options->readonly) {
+            $review = true;
+        }
+
         $rows = isset($question->answerboxlines) ? $question->answerboxlines : 18;
         $taattributes = array(
                 'class' => 'coderunner-answer edit_code',
@@ -167,12 +173,19 @@ class qtype_coderunner_renderer extends qtype_renderer {
                 'data-test0' => $question->testcases ? $question->testcases[0]->testcode : ''
         );
 
-        if ($options->readonly) {
-            $taattributes['readonly'] = 'readonly';
+        if($review) {
+            $preloadattributes = $taattributes;
+            $preloadid = $responsefieldid . '_preload';
+            $preloadattributes['id'] = $preloadid;
+            $preloadattributes['name'] = $responsefieldname . '_preload';
+            $qtext .= html_writer::tag('div', s($preload), $preloadattributes);
         }
-
-
-        $qtext .= html_writer::tag('textarea', s($currentanswer), $taattributes);
+        else {
+            if ($options->readonly) {
+                $taattributes['readonly'] = 'readonly';
+            }
+            $qtext .= html_writer::tag('textarea', s($currentanswer), $taattributes);
+        }
 
         if ($qa->get_state() == question_state::$invalid) {
             $qtext .= html_writer::nonempty_tag('div',
@@ -194,19 +207,30 @@ class qtype_coderunner_renderer extends qtype_renderer {
             // Class and data-fieldtype are so behat can find the filemanager in both boost and clean themes.
         }
 
-        // Initialise any JavaScript UI. Default is Ace unless uiplugin is explicitly
-        // set and is neither the empty string nor the value 'none'.
-        // Thanks to Ulrich Dangel for the original implementation of the Ace code editor.
-        $uiplugin = $question->uiplugin === null ? 'ace' : strtolower($question->uiplugin);
-        if ($uiplugin !== '' && $uiplugin !== 'none') {
-            qtype_coderunner_util::load_uiplugin_js($question, $responsefieldid);
-            if (!empty($question->acelang) && strpos($question->acelang, ',') != false) {
-                // For multilanguage questions, add javascript to switch the
-                // Ace language when the user changes the selected language.
-                $PAGE->requires->js_call_amd('qtype_coderunner/multilanguagequestion', 'initLangSelector', array($responsefieldid));
+        if ($review) {
+            $diffViewerParams = array(
+                trim($preload),
+                trim($currentanswer),
+                $preloadid
+            );
+            $PAGE->requires->js_call_amd('qtype_coderunner/userinterfacewrapper', 'diffViewer', $diffViewerParams);
+        }
+
+        if(!$review) {
+            // Initialise any JavaScript UI. Default is Ace unless uiplugin is explicitly
+            // set and is neither the empty string nor the value 'none'.
+            // Thanks to Ulrich Dangel for the original implementation of the Ace code editor.
+            $uiplugin = $question->uiplugin === null ? 'ace' : strtolower($question->uiplugin);
+            if ($uiplugin !== '' && $uiplugin !== 'none') {
+                qtype_coderunner_util::load_uiplugin_js($question, $responsefieldid);
+                if (!empty($question->acelang) && strpos($question->acelang, ',') != false) {
+                    // For multilanguage questions, add javascript to switch the
+                    // Ace language when the user changes the selected language.
+                    $PAGE->requires->js_call_amd('qtype_coderunner/multilanguagequestion', 'initLangSelector', array($responsefieldid));
+                }
+            } else {
+                $PAGE->requires->js_call_amd('qtype_coderunner/textareas', 'initQuestionTA', array($responsefieldid));
             }
-        } else {
-            $PAGE->requires->js_call_amd('qtype_coderunner/textareas', 'initQuestionTA', array($responsefieldid));
         }
 
         return $qtext;

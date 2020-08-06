@@ -108,7 +108,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 
-define(['jquery'], function($) {
+define(['jquery', 'qtype_coderunner/diff', 'qtype_coderunner/lib-esm/diff2html'], function($) {
 
     function InterfaceWrapper(uiname, textareaId) {
         // Constructor for a new user interface.
@@ -345,9 +345,34 @@ define(['jquery'], function($) {
         }
     }
 
+    /**
+     *  An external entry point from the PHP.
+     * @param string oldText, original file text for diff
+     * @param string newText, new file text for diff
+     * @param string textareaId
+     * @returns {userinterfacewrapperL#111.InterfaceWrapper}
+     */
+    function diffViewer(oldText, newText, textareaId) {
+        const Diff = require('qtype_coderunner/diff');
+        var diff = Diff.createTwoFilesPatch("file", "file", oldText, newText);
+        console.log(diff);
+        const Diff2Html = require('qtype_coderunner/lib-esm/diff2html');
+        var diffHtml = Diff2Html.html(diff, {
+            drawFileList: true,
+            matching: 'lines',
+            outputFormat: 'side-by-side',
+        });
+        // const diffHtml = Diff2Html.getPrettyHtml(diff,
+        //     { inputFormat: 'diff', showFiles: false, matching: 'lines', outputFormat: 'side-by-side' }
+        // );
+        // const diffJson = Diff2html.parse(diff);
+        // const diffHtml = Diff2html.html(diffJson, { drawFileList: true });
+        document.getElementById(textareaId).innerHTML = diffHtml;
+    }
 
     return {
         newUiWrapper: newUiWrapper,
+        diffViewer : diffViewer,
         InterfaceWrapper: InterfaceWrapper
     };
 });

@@ -234,7 +234,7 @@ class qtype_coderunner_edit_form extends question_edit_form {
         $expanded = !empty($this->question->options->answerpreload);
         $mform->setExpanded('answerpreloadhdr', $expanded);
         $attributes = array(
-            'rows' => 5,
+            'rows' => 10,
             'class' => 'preloadanswer edit_code',
             'data-params' => $this->twiggedparams,
             'data-lang' => $this->acelang);
