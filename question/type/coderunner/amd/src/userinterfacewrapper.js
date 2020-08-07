@@ -354,6 +354,10 @@ define(['jquery', 'qtype_coderunner/diff', 'qtype_coderunner/diff2htmlui'], func
      * @returns {userinterfacewrapperL#111.InterfaceWrapper}
      */
     function diffViewer(oldText, newText, textareaId, language) {
+        language = language.toLowerCase();
+        if(language.includes('python')) {
+            language = 'python';
+        }
         const targetElement = document.getElementById(textareaId);
         const configuration = {
             inputFormat: "json",
@@ -362,11 +366,9 @@ define(['jquery', 'qtype_coderunner/diff', 'qtype_coderunner/diff2htmlui'], func
             highlight: true,
             outputFormat: 'side-by-side',
         };
-        // const configuration = { inputFormat: 'json', drawFileList: true, matching: 'lines', highlight: true };
 
         const Diff = require('qtype_coderunner/diff');
         var diff = Diff.createTwoFilesPatch("Browser Submission", "Browser Submission", oldText, newText);
-        // var Diff2HtmlUIFactory = require('qtype_coderunner/lib-esm/ui/js/diff2html-ui');
         var Diff2HtmlUIFactory = require('qtype_coderunner/diff2htmlui');
         var diff2HtmlUI = new Diff2HtmlUIFactory.Diff2HtmlUI(targetElement, diff, configuration);
         diff2HtmlUI.draw();
@@ -376,18 +378,6 @@ define(['jquery', 'qtype_coderunner/diff', 'qtype_coderunner/diff2htmlui'], func
         fileWrapper.setAttribute('data-lang', language);
 
         diff2HtmlUI.highlightCode();
-
-        // var diffHtml = Diff2Html.html(diff, {
-        //     drawFileList: true,
-        //     matching: 'lines',
-        //     outputFormat: 'side-by-side',
-        // });
-        // const diffHtml = Diff2Html.getPrettyHtml(diff,
-        //     { inputFormat: 'diff', showFiles: false, matching: 'lines', outputFormat: 'side-by-side' }
-        // );
-        // const diffJson = Diff2html.parse(diff);
-        // const diffHtml = Diff2html.html(diffJson, { drawFileList: true });
-        // document.getElementById(textareaId).innerHTML = diffHtml;
     }
 
     return {
