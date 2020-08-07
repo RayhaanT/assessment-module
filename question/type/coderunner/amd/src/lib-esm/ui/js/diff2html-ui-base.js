@@ -9,7 +9,7 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-import { nodeStream, mergeStreams } from './highlight.js-helpers';
+import { nodeStream, mergeStreams } from './highlight-helpers';
 import { html, defaultDiff2HtmlConfig } from '../../diff2html';
 export var defaultDiff2HtmlUIConfig = __assign(__assign({}, defaultDiff2HtmlConfig), { synchronisedScroll: true, highlight: true, fileListToggle: true, fileListStartVisible: false, smartSelection: true });
 var Diff2HtmlUI = (function () {

@@ -108,7 +108,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 
-define(['jquery', 'qtype_coderunner/diff', 'qtype_coderunner/lib-esm/diff2html'], function($) {
+define(['jquery', 'qtype_coderunner/diff', 'qtype_coderunner/lib-esm/ui/js/diff2html-ui'], function($) {
 
     function InterfaceWrapper(uiname, textareaId) {
         // Constructor for a new user interface.
@@ -353,21 +353,35 @@ define(['jquery', 'qtype_coderunner/diff', 'qtype_coderunner/lib-esm/diff2html']
      * @returns {userinterfacewrapperL#111.InterfaceWrapper}
      */
     function diffViewer(oldText, newText, textareaId) {
-        const Diff = require('qtype_coderunner/diff');
-        var diff = Diff.createTwoFilesPatch("file", "file", oldText, newText);
-        console.log(diff);
-        const Diff2Html = require('qtype_coderunner/lib-esm/diff2html');
-        var diffHtml = Diff2Html.html(diff, {
+        const targetElement = document.getElementById(textareaId);
+        const configuration = {
+            inputFormat: "json",
             drawFileList: true,
-            matching: 'lines',
+            matching: "lines",
+            highlight: true,
             outputFormat: 'side-by-side',
-        });
+        };
+
+        const Diff = require('qtype_coderunner/diff');
+        var diff = Diff.createTwoFilesPatch("Browser Submission", "Browser Submission", oldText, newText);
+        console.log(diff);
+        var Diff2HtmlUIFactory = require('qtype_coderunner/lib-esm/ui/js/diff2html-ui');
+        console.log(Diff2HtmlUIFactory);
+        var diff2HtmlUI = new Diff2HtmlUIFactory.Diff2HtmlUI(targetElement, diff, configuration);
+        diff2HtmlUI.draw();
+        diff2HtmlUI.highlightCode();
+
+        // var diffHtml = Diff2Html.html(diff, {
+        //     drawFileList: true,
+        //     matching: 'lines',
+        //     outputFormat: 'side-by-side',
+        // });
         // const diffHtml = Diff2Html.getPrettyHtml(diff,
         //     { inputFormat: 'diff', showFiles: false, matching: 'lines', outputFormat: 'side-by-side' }
         // );
         // const diffJson = Diff2html.parse(diff);
         // const diffHtml = Diff2html.html(diffJson, { drawFileList: true });
-        document.getElementById(textareaId).innerHTML = diffHtml;
+        // document.getElementById(textareaId).innerHTML = diffHtml;
     }
 
     return {
