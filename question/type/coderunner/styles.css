@@ -567,11 +567,11 @@ li.bulktest.coderunner.context.quiz {
     direction: rtl;
 }
 .d2h-del {
-    background-color: #fee8e9;
+    background-color: #fee8e9 !important;
     border-color: #e9aeae;
 }
 .d2h-ins {
-    background-color: #dfd;
+    background-color: #dfd !important;
     border-color: #b4e2b4;
 }
 .d2h-info {

@@ -211,7 +211,8 @@ class qtype_coderunner_renderer extends qtype_renderer {
             $diffViewerParams = array(
                 trim($preload),
                 trim($currentanswer),
-                $preloadid
+                $preloadid,
+                ucwords($currentlanguage)
             );
             $PAGE->requires->js_call_amd('qtype_coderunner/userinterfacewrapper', 'diffViewer', $diffViewerParams);
         }

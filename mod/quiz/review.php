@@ -240,6 +240,8 @@ if ($options->overallfeedback && $feedback) {
 
 // Summary table end. ==============================================================================
 
+$PAGE->requires->css('/question/type/coderunner/github.css');
+
 if ($showall) {
     $slots = $attemptobj->get_slots();
     $lastpage = true;

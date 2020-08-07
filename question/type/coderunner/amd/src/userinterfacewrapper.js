@@ -108,7 +108,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 
-define(['jquery', 'qtype_coderunner/diff', 'qtype_coderunner/lib-esm/ui/js/diff2html-ui'], function($) {
+define(['jquery', 'qtype_coderunner/diff', 'qtype_coderunner/diff2htmlui'], function($) {
 
     function InterfaceWrapper(uiname, textareaId) {
         // Constructor for a new user interface.
@@ -350,9 +350,10 @@ define(['jquery', 'qtype_coderunner/diff', 'qtype_coderunner/lib-esm/ui/js/diff2
      * @param string oldText, original file text for diff
      * @param string newText, new file text for diff
      * @param string textareaId
+     * @param string language
      * @returns {userinterfacewrapperL#111.InterfaceWrapper}
      */
-    function diffViewer(oldText, newText, textareaId) {
+    function diffViewer(oldText, newText, textareaId, language) {
         const targetElement = document.getElementById(textareaId);
         const configuration = {
             inputFormat: "json",
@@ -361,14 +362,19 @@ define(['jquery', 'qtype_coderunner/diff', 'qtype_coderunner/lib-esm/ui/js/diff2
             highlight: true,
             outputFormat: 'side-by-side',
         };
+        // const configuration = { inputFormat: 'json', drawFileList: true, matching: 'lines', highlight: true };
 
         const Diff = require('qtype_coderunner/diff');
         var diff = Diff.createTwoFilesPatch("Browser Submission", "Browser Submission", oldText, newText);
-        console.log(diff);
-        var Diff2HtmlUIFactory = require('qtype_coderunner/lib-esm/ui/js/diff2html-ui');
-        console.log(Diff2HtmlUIFactory);
+        // var Diff2HtmlUIFactory = require('qtype_coderunner/lib-esm/ui/js/diff2html-ui');
+        var Diff2HtmlUIFactory = require('qtype_coderunner/diff2htmlui');
         var diff2HtmlUI = new Diff2HtmlUIFactory.Diff2HtmlUI(targetElement, diff, configuration);
         diff2HtmlUI.draw();
+
+        // Set the data-lang for the file
+        var fileWrapper = targetElement.querySelector('.d2h-file-wrapper');
+        fileWrapper.setAttribute('data-lang', language);
+
         diff2HtmlUI.highlightCode();
 
         // var diffHtml = Diff2Html.html(diff, {
