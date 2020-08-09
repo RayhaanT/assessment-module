@@ -202,5 +202,39 @@
         <KEY NAME="tagid" TYPE="foreign" FIELDS="tagid" REFTABLE="tag" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
+
+    <!-- Configuration data for module generation and life cycle management -->
+    <TABLE NAME="question_roles" COMMENT="Stores all roles for questions to be assigned to, in indexed order">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Name of the role"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="question_difficulties" COMMENT="Stores available question difficulties and life cycle retirement parameters">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Name of the difficulty level"/>
+        <FIELD NAME="listindex" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Index of the difficulty level for ordering purposes">
+        <FIELD NAME="range1" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Percentage of correct answeres given <500 responses after which the question will be retired">
+        <FIELD NAME="range2" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Percentage of correct answeres given 500<x<1000 responses after which the question will be retired">
+        <FIELD NAME="range3" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Percentage of correct answeres given 1000<x<2000 responses after which the question will be retired">
+        <FIELD NAME="range4" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Percentage of correct answeres given >2000 responses after which the question will be retired">
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="question_retirement_ranges" COMMENT="Stores all roles for questions to be assigned to, in indexed order">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="upperbound" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Upper bound of attempts to qualify for this range"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
   </TABLES>
 </XMLDB>

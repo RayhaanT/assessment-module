@@ -22,6 +22,22 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['roles'] = 'Roles';
+$string['addroles'] = 'Blanks for {no} more roles';
+$string['roleno'] = 'Role {$a} name';
+$string['difficultyno'] = 'Difficulty level {$a}';
+$string['difficulties'] = 'Difficulty Levels';
+$string['difficultyfield'] = 'Available difficulty levels';
+$string['difficultyfield_help'] = 'Levels are comma separated, in order of increasing complexity. Save changes to update life cycle fields.';
+$string['retirementpercentage'] = 'Retirement percentage for less than {$a} attempts';
+$string['retirementpercentagemore'] = 'Retirement percentage for more than {$a} attempts';
+$string['retirementrangeheader'] = 'Question retirement attempt ranges';
+$string['retirementpercentagestatic'] = 'The retirement percentage fields are used to temporarily or permanently retire questions that are answered correctly too frequently. 
+                                         Depending on the number of total attempts, if more than that percentage of answers are correct the question will be removed from circulation.';
+$string['upperboundfield'] = 'Upper bound of range {$a}';
+$string['difficultylifecycle'] = 'Retirement settings for difficulty levels';
+$string['retirementreason'] = 'What these fields are for:';
+
 $string['addmorechoiceblanks'] = 'Blanks for {no} more choices';
 $string['addcategory'] = 'Add category';
 $string['adminreport'] = 'Report on possible problems in your question database.';

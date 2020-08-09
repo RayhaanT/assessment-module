@@ -27,6 +27,7 @@ class generate_section_form extends moodleform {
     $repeatedoptions['highq']['default'] = 0;
     $repeatedoptions['mediumq']['default'] = 0;
     $repeatedoptions['lowq']['default'] = 0;
+    $repeatedoptions['lifecycle']['default'] = 1;
 
     return $repeated;
   }

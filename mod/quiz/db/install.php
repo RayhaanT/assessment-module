@@ -3,29 +3,52 @@
 defined('MOODLE_INTERNAL') || die;
 
 function xmldb_quiz_install() {
-  global $DB;
+    global $DB;
 
-  $dbman = $DB->get_manager();
+    $dbman = $DB->get_manager();
 
-  // Define fields to be added to question database
-  $table = new xmldb_table('question');
-  $topicField = new xmldb_field('topic', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'idnumber');
-  $difficultyField = new xmldb_field('difficulty', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'topic');
-  $roleField = new xmldb_field('role', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'difficulty');
-  $lifecycleexpiryField = new xmldb_field('lifecycleexpiry', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 'role');
+    // Define fields to be added to question database
+    $table = new xmldb_table('question');
+    $topicField = new xmldb_field('topic', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'idnumber');
+    $difficultyField = new xmldb_field('difficulty', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'topic');
+    $roleField = new xmldb_field('role', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'difficulty');
+    $lifecycleexpiryField = new xmldb_field('lifecycleexpiry', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 'role');
 
-  // Conditionally add new fields
-  if (!$dbman->field_exists($table, $topicField)) {
-    $dbman->add_field($table, $topicField);
-  }
-  if (!$dbman->field_exists($table, $difficultyField)) {
-    $dbman->add_field($table, $difficultyField);
-  }
-  if (!$dbman->field_exists($table, $roleField)) {
-    $dbman->add_field($table, $roleField);
-  }
-  if (!$dbman->field_exists($table, $lifecycleexpiryField)) {
-    $dbman->add_field($table, $lifecycleexpiryField);
-  }
+    // Conditionally add new fields
+    if (!$dbman->field_exists($table, $topicField)) {
+        $dbman->add_field($table, $topicField);
+    }
+    if (!$dbman->field_exists($table, $difficultyField)) {
+        $dbman->add_field($table, $difficultyField);
+    }
+    if (!$dbman->field_exists($table, $roleField)) {
+        $dbman->add_field($table, $roleField);
+    }
+    if (!$dbman->field_exists($table, $lifecycleexpiryField)) {
+        $dbman->add_field($table, $lifecycleexpiryField);
+    }
 
+    $role = new stdClass();
+    $role->name = 'Fresher';
+    $DB->insert_record('question_roles', $role);
+    $role->name = 'Mid-level';
+    $DB->insert_record('question_roles', $role);
+    $role->name = 'Senior';
+    $DB->insert_record('question_roles', $role);
+
+    $difficulty = new stdClass();
+    $difficulty->name = 'Easy'; $difficulty->index = 1;
+    $DB->insert_record('question_difficulties', $difficulty);
+    $difficulty->name = 'Medium'; $difficulty->index = 2;
+    $DB->insert_record('question_difficulties', $difficulty);
+    $difficulty->name = 'Hard'; $difficulty->index = 3;
+    $DB->insert_record('question_difficulties', $difficulty);
+
+    $range = new stdClass();
+    $range->upperbound = 500;
+    $DB->insert_record('question_retirement_ranges', $range);
+    $range->upperbound = 1000;
+    $DB->insert_record('question_retirement_ranges', $range);
+    $range->upperbound = 2000;
+    $DB->insert_record('question_retirement_ranges', $range);
 }
