@@ -34,10 +34,10 @@ class modulesettings_form extends moodleform
         $repeated[] = $mform->createElement('float', 'rate3', get_string('retirementpercentage', 'question', $upperbounds[2]));
         $repeated[] = $mform->createElement('float', 'rate4', get_string('retirementpercentagemore', 'question', $upperbounds[2]));        
 
-        $repeatedoptions['rate1']['default'] = 95;
-        $repeatedoptions['rate2']['default'] = 90;
-        $repeatedoptions['rate3']['default'] = 80;
-        $repeatedoptions['rate4']['default'] = 70;
+        // $repeatedoptions['rate1']['default'] = 95;
+        // $repeatedoptions['rate2']['default'] = 90;
+        // $repeatedoptions['rate3']['default'] = 80;
+        // $repeatedoptions['rate4']['default'] = 70;
 
         return $repeated;
     }
@@ -109,7 +109,8 @@ class modulesettings_form extends moodleform
             'adddifficulty',
             $rolesperclick,
             '',
-            true
+            true,
+            false
         );
         
         // Difficulty range options
