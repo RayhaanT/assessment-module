@@ -195,6 +195,42 @@ $question->formoptions->mustbeusable = (bool) $appendqnumstring;
 // Validate the question type.
 $PAGE->set_pagetype('question-type-' . $question->qtype);
 
+// Check for pair deletion and set up pair preloads
+$diffpairs = array();
+if(isset($question->difficulty)) {
+    if($question->difficulty) {
+        $rawdiffpairs = explode(',', $question->difficulty);
+        foreach($rawdiffpairs as $d) {
+            array_push($diffpairs, trim($d));
+        }
+    }
+}
+$deletedpairs = optional_param_array('deletediffpair', array(), PARAM_INT);
+$nopairs = count($diffpairs);
+if (count($deletedpairs)) {
+    foreach($deletedpairs as $key => $p) {
+        if($key < $nopairs) {
+            unset($diffpairs[$key]);
+        }
+        if($key <= $_POST['nodiffpairs']) {
+            unset($_POST['difficulty'][$key]);
+            unset($_POST['role'][$key]);
+            $_POST['difficulty'] = array_values($_POST['difficulty']);
+            $_POST['role'] = array_values($_POST['role']);
+        }
+        print_r($_POST);
+        $_POST['nodiffpairs']--;
+    }
+}
+$newdiffstring = '';
+foreach($diffpairs as $d) {
+    if($newdiffstring != '') {
+        $newdiffstring .= ',';
+    }
+    $newdiffstring .= $d;
+}
+$question->difficulty = $newdiffstring;
+
 // Create the question editing form.
 if ($wizardnow !== '') {
     $mform = $qtypeobj->next_wizard_form('question.php', $question, $wizardnow, $formeditable);
@@ -208,6 +244,41 @@ if ($formeditable && $id){
     $toform->categorymoveto = $toform->category;
 }
 
+// Add default data for difficulty settings
+$count = 0;
+$alldiffs = $DB->get_records('question_difficulties', null, 'listindex');
+$allroles = $DB->get_records('question_roles');
+$toform->difficulty = array();
+$toform->role = array();
+foreach($diffpairs as $diff) {
+    $pair = explode(':', $diff);
+    if(count($pair) == 1) {
+        foreach($alldiffs as $d) {
+            if($d->name == $pair[0]) {
+                $toform->difficulty[$count] = $d->listindex;
+                break;
+            }
+        }
+        // $toform->difficulty[$count] = $pair[0];
+    }
+    else {
+        $rolecount = 1;
+        foreach($allroles as $r) {
+            if($r->name == $pair[0]) {
+                $toform->role[$count] = $rolecount;
+                break;
+            }
+            $rolecount++;
+        }
+        foreach ($alldiffs as $d) {
+            if ($d->name == $pair[1]) {
+                $toform->difficulty[$count] = $d->listindex;
+                break;
+            }
+        }
+    }
+    $count++;
+}
 $toform->appendqnumstring = $appendqnumstring;
 $toform->returnurl = $originalreturnurl;
 $toform->makecopy = $makecopy;

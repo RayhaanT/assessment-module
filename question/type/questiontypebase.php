@@ -345,12 +345,6 @@ class question_type {
             $lowertopic = trim($form->topic);
             $question->topic = strtolower($lowertopic);
         }
-        if(isset($form->difficulty)) {
-            $question->difficulty = $form->difficulty;
-        }
-        if(isset($form->role)) {
-            $question->role = $form->role;
-        }
         if(isset($form->lifecycleexpiry)) {
             if(date("Y-m-d", time()) != date("Y-m-d", $form->lifecycleexpiry)) {
                 $question->lifecycleexpiry = $form->lifecycleexpiry;
@@ -358,6 +352,32 @@ class question_type {
             else {
                 $question->lifecycleexpiry = 0;
             }
+        }
+        $allroles = $DB->get_records('question_roles');
+        $alldiffs = $DB->get_records('question_difficulties', null, 'listindex');
+        $rolekeys = array_keys($allroles);
+        $diffkeys = array_keys($alldiffs);
+        if(isset($form->difficulty)) {
+            $diffstring = '';
+            for($x = 0; $x < count($form->difficulty); $x++) {
+                if($diffstring != '') {
+                    $diffstring .= ',';
+                }
+                $thisdiff = '';
+                if($form->difficulty[$x] != 0) {
+                    $thisdiff = $alldiffs[$diffkeys[$form->difficulty[$x] - 1]]->name;
+                }
+                if($form->role[$x] == 0) {
+                    $diffstring = $thisdiff;
+                    break;
+                }
+                $thisrole = $allroles[$rolekeys[$form->role[$x] - 1]]->name;
+                $diffstring .= $thisrole . ':' . $thisdiff;
+            }
+            $question->difficulty = $diffstring;
+        }
+        else  {
+            $question->difficulty = '';
         }
 
         // The trim call below has the effect of casting any strange values received,

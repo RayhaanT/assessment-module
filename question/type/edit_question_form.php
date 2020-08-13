@@ -113,6 +113,21 @@ abstract class question_edit_form extends question_wizard_form {
         parent::__construct($submiturl, null, 'post', '', null, $formeditable);
     }
 
+    private function getRoleDifficultyFields($mform, &$repeatedoptions, $difficulties, $roles) {
+        $repeated = array();
+        $selectfields = array();
+
+        $selectfields[] = $mform->createElement('select', 'difficulty', get_string('difficulty', 'quiz'), $difficulties);
+        $selectfields[] = $mform->createElement('select', 'role', get_string('role', 'quiz'), $roles);
+        $mform->registerNoSubmitButton('deletediffpair');
+        $selectfields[] = $mform->createElement('submit', 'deletediffpair', get_string('delete'));
+        $repeated[] = $mform->createElement('group', 'diffrolepair', get_string('diffrolepair', 'question'), $selectfields, null, false);
+
+        // $repeatedoptions['difficulty']['default'] = 1;
+
+        return $repeated;
+    }
+
     /**
      * Build the form definition.
      *
@@ -203,26 +218,42 @@ abstract class question_edit_form extends question_wizard_form {
 
 
         // Fields used by the assessment engine to poll the question bank
-        $difficulties = array(
-            'None',
-            'Low',
-            'Medium',
-            'High'
-        );
-        $roles = array(
-            'None',
-            'Fresher',
-            'Mid-level',
-            'Senior'
-        );
-        $mform->addElement('select', 'difficulty', get_string('difficulty', 'quiz'), $difficulties);
+        // $mform->addElement('select', 'difficulty', get_string('difficulty', 'quiz'), $difficulties);
 
         $mform->addElement('text', 'topic', get_string('topic', 'quiz'));
         $mform->setType('topic', PARAM_TEXT);
 
-        $mform->addElement('select', 'role', get_string('role', 'quiz'), $roles);
+        // $mform->addElement('select', 'role', get_string('role', 'quiz'), $roles);
 
         $mform->addElement('date_selector', 'lifecycleexpiry', get_string('lifeexpirydate', 'quiz'));
+
+        // Role based complexity fields
+        $difficulties = array('None');
+        $alldiffs = $DB->get_records('question_difficulties', null, 'listindex');
+        foreach ($alldiffs as $diff) {
+            array_push($difficulties, $diff->name);
+        }
+        $roles = array('All');
+        $allroles = $DB->get_records('question_roles');
+        foreach ($allroles as $role) {
+            array_push($roles, $role->name);
+        }
+        $repeatedoptions = array();
+        $repeated = $this->getRoleDifficultyFields($mform, $repeatedoptions, $difficulties, $roles);
+        $diffrolepairs = explode(',', $this->question->difficulty);
+        $repeatsatstart = count($diffrolepairs);
+        $fieldsperclick = 2;
+
+        $this->repeat_elements(
+            $repeated,
+            $repeatsatstart,
+            $repeatedoptions,
+            'nodiffpairs',
+            'adddiffpairs',
+            $fieldsperclick,
+            'Add ' . $fieldsperclick .' more difficulty settings',
+            true
+        );
 
         // Any questiontype specific fields.
         $this->definition_inner($mform);

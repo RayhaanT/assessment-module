@@ -14,26 +14,34 @@ class generate_section_form extends moodleform {
     parent::__construct($submiturl, null, 'post', '', null, $formeditable);
   }
 
-  private function getSubModuleFields($mform, &$repeatedoptions) {
+  private function getSubModuleFields($mform, &$repeatedoptions, $alldiffs) {
     $repeated = array();
     $repeated[] = $mform->createElement('text', 'topic', get_string('topic', 'quiz'));
     $repeated[] = $mform->createElement('checkbox', 'lifecycle', get_string('lifecycleenable', 'quiz'));
-    $repeated[] = $mform->createElement('static', 'complexityqlabel', 'Number of questions of different complexities:', '');
-    $repeated[] = $mform->createElement('float', 'highq', 'High complexity');
-    $repeated[] = $mform->createElement('float', 'mediumq', 'Medium complexity');
-    $repeated[] = $mform->createElement('float', 'lowq', 'Low complexity');
+    $repeated[] = $mform->createElement('static', 'complexityqlabel', 'Number of questions of different difficulty levels:', '');
+
+    foreach($alldiffs as $diff) {
+      $fieldname = str_replace(' ', '', $diff->name) . 'q';
+      $repeated[] = $mform->createElement('float', $fieldname, '&nbsp;&nbsp;&nbsp;&nbsp;' . $diff->name);
+      $repeatedoptions[$fieldname]['default'] = 0;
+    }
+    // $repeated[] = $mform->createElement('float', 'highq', 'High complexity');
+    // $repeated[] = $mform->createElement('float', 'mediumq', 'Medium complexity');
+    // $repeated[] = $mform->createElement('float', 'lowq', 'Low complexity');
+    // $repeatedoptions['mediumq']['default'] = 0;
+    // $repeatedoptions['lowq']['default'] = 0;
+    // $repeatedoptions['lifecycle']['default'] = 1;
 
     $repeatedoptions['topic']['type'] = PARAM_TEXT;
     $repeatedoptions['highq']['default'] = 0;
-    $repeatedoptions['mediumq']['default'] = 0;
-    $repeatedoptions['lowq']['default'] = 0;
-    $repeatedoptions['lifecycle']['default'] = 1;
-
+    
     return $repeated;
   }
 
   // Define the body of the form
   protected function definition() {
+    global $DB;
+
     $mform = $this->_form;
 
     $mform->addElement('header', 'generalheader', get_string("general", 'form'));
@@ -53,12 +61,11 @@ class generate_section_form extends moodleform {
     $mform->setType('name', PARAM_TEXT);
     $mform->setDefault('name', 'New Module');
 
-    $roles = array(
-      'None',
-      'Fresher',
-      'Mid-level',
-      'Senior'
-    );
+    $roles = array('None');
+    $allroles = $DB->get_records('question_roles');
+    foreach ($allroles as $role) {
+      array_push($roles, $role->name);
+    }
 
     $mform->addElement('select', 'role', get_string('role', 'quiz'), $roles);
 
@@ -66,9 +73,9 @@ class generate_section_form extends moodleform {
     $mform->addElement('header', 'submodulesheader', 'Submodules', '');
     $mform->setExpanded('submodulesheader', 1);
 
-    $answersoption = '';
     $repeatedoptions = array();
-    $repeated = $this->getSubModuleFields($mform, $repeatedoptions, $answersoption);
+    $alldiffs = $DB->get_records('question_difficulties', null, 'listindex');
+    $repeated = $this->getSubModuleFields($mform, $repeatedoptions, $alldiffs);
     $repeatsatstart = 1;
     $submodulesperclick = 1;
 

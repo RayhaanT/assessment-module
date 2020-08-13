@@ -37,6 +37,7 @@ $string['retirementpercentagestatic'] = 'The retirement percentage fields are us
 $string['upperboundfield'] = 'Upper bound of range {$a}';
 $string['difficultylifecycle'] = 'Retirement settings for difficulty levels';
 $string['retirementreason'] = 'What these fields are for:';
+$string['diffrolepair'] = 'Difficulty setting {no}';
 
 $string['addmorechoiceblanks'] = 'Blanks for {no} more choices';
 $string['addcategory'] = 'Add category';

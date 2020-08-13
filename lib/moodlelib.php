@@ -648,7 +648,7 @@ function optional_param($parname, $default, $type) {
     }
 
     if (is_array($param)) {
-        debugging('Invalid array parameter detected in required_param(): '.$parname);
+        // debugging('Invalid array parameter detected in required_param(): '.$parname);
         // TODO: switch to $default in Moodle 2.3.
         return optional_param_array($parname, $default, $type);
     }
