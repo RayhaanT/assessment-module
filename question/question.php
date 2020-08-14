@@ -218,7 +218,6 @@ if (count($deletedpairs)) {
             $_POST['difficulty'] = array_values($_POST['difficulty']);
             $_POST['role'] = array_values($_POST['role']);
         }
-        print_r($_POST);
         $_POST['nodiffpairs']--;
     }
 }

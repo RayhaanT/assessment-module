@@ -114,7 +114,15 @@ if ($mform->is_cancelled()) {
 	}
 
 	// Add questions to quiz via database and form data
-	$role = $fromform->role;
+	$roleindex = $fromform->role;
+	if($roleindex != 0) {
+		$allroles = $DB->get_records('question_roles');
+		$rolekeys = array_keys($allroles);
+		$role = $allroles[$rolekeys[$roleindex - 1]]->name;
+	}
+	else {
+		$role = '';
+	}
 	$timelimit = $fromform->timelimit;
 	$addqsection = 0;
 
@@ -143,13 +151,14 @@ if ($mform->is_cancelled()) {
 		} else {
 			$lifecycle = 0;
 		}
-		$highq = $fromform->highq[$m];
-		$midq = $fromform->mediumq[$m];
-		$lowq = $fromform->lowq[$m];
+		// $highq = $fromform->highq[$m];
+		// $midq = $fromform->mediumq[$m];
+		// $lowq = $fromform->lowq[$m];
 
 		$condition = '';
-		$condition = addSelectCondition($condition, 'role', $role);
-		$condition = addSelectCondition($condition, 'topic', $topic);
+		if($topic) {
+			$condition = addSelectCondition($condition, 'topic', $topic);
+		}
 		if ($condition != '' && $lifecycle) {
 			$condition .= ' AND ';
 		}
@@ -161,69 +170,106 @@ if ($mform->is_cancelled()) {
 		}
 		$condition .= 'parent = 0';
 
-		if($highq) {
-			$highcondition= addSelectCondition($condition, 'difficulty', 3);
-			$qpool = $DB->get_records_select('question', $highcondition);
+		$alldiffs = $DB->get_records('question_difficulties', null, 'listindex');
+		$difficultyfields = array();
+		foreach($alldiffs as $d) {
+			$difficultyfields[$d->name] = str_replace(' ', '', $d->name) . 'q';
+		}
+		foreach($difficultyfields as $diffname => $field) {
+			if ($selectquestions != '') {
+				$questionsinquiz = $DB->get_records_select('question', $selectquestions);
+			}
+			$qnum = $fromform->$field[$m];
+			if($role) {
+				$rolecondition = $condition . " AND difficulty REGEXP '" . $role . ':' . $diffname . "'";
+			} else {
+				$rolecondition = $condition . " AND difficulty REGEXP '" . $diffname . "'";
+			}
+			$rawcondition = addSelectCondition($condition, 'difficulty', $diffname);
+			$qpool = $DB->get_records_select('question', $rolecondition);
+			$qpool = array_merge($qpool, $DB->get_records_select('question', $rawcondition));
 			$qpool = filterDuplicates($qpool, $questionsinquiz);
+			print_r($qpool);
 			$maxindex = sizeof($qpool) - 1;
-			if ($maxindex + 1 < $highq) {
-				$highq = $maxindex + 1;
+			if($maxindex + 1 < $qnum) {
+				$qnum = $maxindex + 1;
 			}
 			$indexedpool = [];
 			foreach ($qpool as $q) {
 				array_push($indexedpool, $q);
 			}
-			for ($y = 0; $y < $highq; $y++) {
+			for ($y = 0; $y < $qnum; $y++) {
 				$newq = rand(0, $maxindex);
 				quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage, null, true);
 				array_splice($indexedpool, $newq, 1);
 				$maxindex--;
 			}
-		} else {$highq = 0;}
-
-		if ($midq) {
-			$midcondition = addSelectCondition($condition, 'difficulty', 2);
-			$qpool = $DB->get_records_select('question', $midcondition);
-			$qpool = filterDuplicates($qpool, $questionsinquiz);
-			$maxindex = sizeof($qpool) - 1;
-			if ($maxindex + 1 < $midq) {
-				$midq = $maxindex + 1;
-			}
-			$indexedpool = [];
-			foreach ($qpool as $q) {
-				array_push($indexedpool, $q);
-			}
-			for ($y = 0; $y < $midq; $y++) {
-				$newq = rand(0, $maxindex);
-				quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage, null, true);
-				array_splice($indexedpool, $newq, 1);
-				$maxindex--;
-			}
-		} else {$midq = 0;}
-
-		if ($lowq) {
-			$lowcondition = addSelectCondition($condition, 'difficulty', 1);
-			$qpool = $DB->get_records_select('question', $lowcondition);
-			$qpool = filterDuplicates($qpool, $questionsinquiz);
-			$maxindex = sizeof($qpool) - 1;
-			if ($maxindex + 1 < $lowq) {
-				$lowq = $maxindex + 1;
-			}
-			$indexedpool = [];
-			foreach ($qpool as $q) {
-				array_push($indexedpool, $q);
-			}
-			for ($y = 0; $y < $lowq; $y++) {
-				$newq = rand(0, $maxindex);
-				quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage, null, true);
-				array_splice($indexedpool, $newq, 1);
-				$maxindex--;
-			}
-		} else {
-			$lowq = 0;
+			$addqsection += $qnum;
 		}
 
-		$addqsection += $lowq + $midq + $highq;
+		// if($highq) {
+		// 	$highcondition= addSelectCondition($condition, 'difficulty', 3);
+		// 	$qpool = $DB->get_records_select('question', $highcondition);
+		// 	$qpool = filterDuplicates($qpool, $questionsinquiz);
+		// 	$maxindex = sizeof($qpool) - 1;
+		// 	if ($maxindex + 1 < $highq) {
+		// 		$highq = $maxindex + 1;
+		// 	}
+		// 	$indexedpool = [];
+		// 	foreach ($qpool as $q) {
+		// 		array_push($indexedpool, $q);
+		// 	}
+		// 	for ($y = 0; $y < $highq; $y++) {
+		// 		$newq = rand(0, $maxindex);
+		// 		quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage, null, true);
+		// 		array_splice($indexedpool, $newq, 1);
+		// 		$maxindex--;
+		// 	}
+		// } else {$highq = 0;}
+
+		// if ($midq) {
+		// 	$midcondition = addSelectCondition($condition, 'difficulty', 2);
+		// 	$qpool = $DB->get_records_select('question', $midcondition);
+		// 	$qpool = filterDuplicates($qpool, $questionsinquiz);
+		// 	$maxindex = sizeof($qpool) - 1;
+		// 	if ($maxindex + 1 < $midq) {
+		// 		$midq = $maxindex + 1;
+		// 	}
+		// 	$indexedpool = [];
+		// 	foreach ($qpool as $q) {
+		// 		array_push($indexedpool, $q);
+		// 	}
+		// 	for ($y = 0; $y < $midq; $y++) {
+		// 		$newq = rand(0, $maxindex);
+		// 		quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage, null, true);
+		// 		array_splice($indexedpool, $newq, 1);
+		// 		$maxindex--;
+		// 	}
+		// } else {$midq = 0;}
+
+		// if ($lowq) {
+		// 	$lowcondition = addSelectCondition($condition, 'difficulty', 1);
+		// 	$qpool = $DB->get_records_select('question', $lowcondition);
+		// 	$qpool = filterDuplicates($qpool, $questionsinquiz);
+		// 	$maxindex = sizeof($qpool) - 1;
+		// 	if ($maxindex + 1 < $lowq) {
+		// 		$lowq = $maxindex + 1;
+		// 	}
+		// 	$indexedpool = [];
+		// 	foreach ($qpool as $q) {
+		// 		array_push($indexedpool, $q);
+		// 	}
+		// 	for ($y = 0; $y < $lowq; $y++) {
+		// 		$newq = rand(0, $maxindex);
+		// 		quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage, null, true);
+		// 		array_splice($indexedpool, $newq, 1);
+		// 		$maxindex--;
+		// 	}
+		// } else {
+		// 	$lowq = 0;
+		// }
+
+		// $addqsection += $lowq + $midq + $highq;
 	}
 
 	// Repaginate to place all questions from section on same page

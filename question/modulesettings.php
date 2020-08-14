@@ -145,7 +145,6 @@ if ($mform->is_cancelled()) {
 
     for($x = 0; $x < count($fromform->difficultyname); $x++) {
         foreach($originaldiffs as $d) {
-            print_r($d);
             if($d->listindex == $x + 1) {
                 $diff = clone($d);
                 break;
