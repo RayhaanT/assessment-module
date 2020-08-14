@@ -222,6 +222,7 @@ abstract class question_edit_form extends question_wizard_form {
 
         $mform->addElement('text', 'topic', get_string('topic', 'quiz'));
         $mform->setType('topic', PARAM_TEXT);
+        $mform->addElement('float', 'techversion', get_string('techversion', 'question'));
 
         // $mform->addElement('select', 'role', get_string('role', 'quiz'), $roles);
 

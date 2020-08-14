@@ -1423,6 +1423,11 @@
         <FIELD NAME="createdby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="userid of person who created this question"/>
         <FIELD NAME="modifiedby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="userid of person who last edited this question"/>
         <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="topic" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Question topic for module generation purposes"/>
+        <FIELD NAME="difficulty" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Question difficulty level relative to roles, for module generation"/>
+        <FIELD NAME="lifecycleexpiry" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp after which question becomes deprecated"/>
+        <FIELD NAME="techversion" TYPE="float" LENGTH="10" NOTNULL="true" DEFAULT="-1" SEQUENCE="false" COMMENT="Current version of the question in relation to the topic. Used to selectively deprecate questions"/>
+        <FIELD NAME="retirementflags" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Flags questions that should not be pulled by modules. Bitmap: 0=>version, 1=>past date, 2=>time-based suspension 3=>frequency"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

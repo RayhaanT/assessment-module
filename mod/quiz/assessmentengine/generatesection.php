@@ -151,9 +151,6 @@ if ($mform->is_cancelled()) {
 		} else {
 			$lifecycle = 0;
 		}
-		// $highq = $fromform->highq[$m];
-		// $midq = $fromform->mediumq[$m];
-		// $lowq = $fromform->lowq[$m];
 
 		$condition = '';
 		if($topic) {
@@ -206,70 +203,6 @@ if ($mform->is_cancelled()) {
 			}
 			$addqsection += $qnum;
 		}
-
-		// if($highq) {
-		// 	$highcondition= addSelectCondition($condition, 'difficulty', 3);
-		// 	$qpool = $DB->get_records_select('question', $highcondition);
-		// 	$qpool = filterDuplicates($qpool, $questionsinquiz);
-		// 	$maxindex = sizeof($qpool) - 1;
-		// 	if ($maxindex + 1 < $highq) {
-		// 		$highq = $maxindex + 1;
-		// 	}
-		// 	$indexedpool = [];
-		// 	foreach ($qpool as $q) {
-		// 		array_push($indexedpool, $q);
-		// 	}
-		// 	for ($y = 0; $y < $highq; $y++) {
-		// 		$newq = rand(0, $maxindex);
-		// 		quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage, null, true);
-		// 		array_splice($indexedpool, $newq, 1);
-		// 		$maxindex--;
-		// 	}
-		// } else {$highq = 0;}
-
-		// if ($midq) {
-		// 	$midcondition = addSelectCondition($condition, 'difficulty', 2);
-		// 	$qpool = $DB->get_records_select('question', $midcondition);
-		// 	$qpool = filterDuplicates($qpool, $questionsinquiz);
-		// 	$maxindex = sizeof($qpool) - 1;
-		// 	if ($maxindex + 1 < $midq) {
-		// 		$midq = $maxindex + 1;
-		// 	}
-		// 	$indexedpool = [];
-		// 	foreach ($qpool as $q) {
-		// 		array_push($indexedpool, $q);
-		// 	}
-		// 	for ($y = 0; $y < $midq; $y++) {
-		// 		$newq = rand(0, $maxindex);
-		// 		quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage, null, true);
-		// 		array_splice($indexedpool, $newq, 1);
-		// 		$maxindex--;
-		// 	}
-		// } else {$midq = 0;}
-
-		// if ($lowq) {
-		// 	$lowcondition = addSelectCondition($condition, 'difficulty', 1);
-		// 	$qpool = $DB->get_records_select('question', $lowcondition);
-		// 	$qpool = filterDuplicates($qpool, $questionsinquiz);
-		// 	$maxindex = sizeof($qpool) - 1;
-		// 	if ($maxindex + 1 < $lowq) {
-		// 		$lowq = $maxindex + 1;
-		// 	}
-		// 	$indexedpool = [];
-		// 	foreach ($qpool as $q) {
-		// 		array_push($indexedpool, $q);
-		// 	}
-		// 	for ($y = 0; $y < $lowq; $y++) {
-		// 		$newq = rand(0, $maxindex);
-		// 		quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage, null, true);
-		// 		array_splice($indexedpool, $newq, 1);
-		// 		$maxindex--;
-		// 	}
-		// } else {
-		// 	$lowq = 0;
-		// }
-
-		// $addqsection += $lowq + $midq + $highq;
 	}
 
 	// Repaginate to place all questions from section on same page

@@ -613,6 +613,25 @@ class view {
         echo \html_writer::end_tag('form');
         echo \html_writer::end_div();
 
+        echo \html_writer::start_div('configureversions');
+        echo \html_writer::start_tag('form', array(
+            'method' => 'post',
+            'action' => new \moodle_url('/question/techversion.php', array('courseid' => $this->course->id)),
+            'id' => 'techversion',
+        ));
+        echo \html_writer::empty_tag('input', array(
+            'type' => 'hidden',
+            'name' => 'courseid',
+            'value' => $this->course->id
+        ));
+        echo \html_writer::empty_tag('input', array(
+            'type' => 'submit',
+            'class' => 'submitbutton btn btn-primary',
+            'value' => 'Configure version numbers'
+        ));
+        echo \html_writer::end_tag('form');
+        echo \html_writer::end_div();
+
         $this->display_options_form($showquestiontext);
 
         // Continues with list of questions.

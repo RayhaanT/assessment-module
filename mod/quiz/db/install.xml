@@ -236,5 +236,15 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
+    <TABLE NAME="question_versions" COMMENT="Stores the most up-to-date version number for question topics">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="topic" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Topic to which the version number applies"/>
+        <FIELD NAME="version" TYPE="float" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Version number of oldest acceptable questions with the given topic"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
   </TABLES>
 </XMLDB>

@@ -22,6 +22,10 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['versionheader'] = 'Acceptable Versions';
+$string['topicversiongroup'] = 'Version for topic: {$a}';
+$string['techversion'] = 'Version number';
+$string['techversion_help'] = 'Lowest acceptable version number for questions from this topic.';
 $string['roles'] = 'Roles';
 $string['addroles'] = 'Blanks for {no} more roles';
 $string['roleno'] = 'Role {$a} name';

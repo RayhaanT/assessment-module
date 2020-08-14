@@ -25,13 +25,7 @@ class generate_section_form extends moodleform {
       $repeated[] = $mform->createElement('float', $fieldname, '&nbsp;&nbsp;&nbsp;&nbsp;' . $diff->name);
       $repeatedoptions[$fieldname]['default'] = 0;
     }
-    // $repeated[] = $mform->createElement('float', 'highq', 'High complexity');
-    // $repeated[] = $mform->createElement('float', 'mediumq', 'Medium complexity');
-    // $repeated[] = $mform->createElement('float', 'lowq', 'Low complexity');
-    // $repeatedoptions['mediumq']['default'] = 0;
-    // $repeatedoptions['lowq']['default'] = 0;
-    // $repeatedoptions['lifecycle']['default'] = 1;
-
+    
     $repeatedoptions['topic']['type'] = PARAM_TEXT;
     $repeatedoptions['highq']['default'] = 0;
     

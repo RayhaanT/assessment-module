@@ -379,6 +379,9 @@ class question_type {
         else  {
             $question->difficulty = '';
         }
+        if(isset($form->techversion)) {
+            $question->techversion = $form->techversion;
+        }
 
         // The trim call below has the effect of casting any strange values received,
         // like null or false, to an appropriate string, so we only need to test for

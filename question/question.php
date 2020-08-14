@@ -278,6 +278,9 @@ foreach($diffpairs as $diff) {
     }
     $count++;
 }
+if($toform->techversion == -1) {
+    unset($toform->techversion);
+}
 $toform->appendqnumstring = $appendqnumstring;
 $toform->returnurl = $originalreturnurl;
 $toform->makecopy = $makecopy;
