@@ -5,7 +5,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir . '/formslib.php');
 
-class techversion_form extends moodleform
+class suspend_form extends moodleform
 {
 
     public function __construct($submiturl, $formeditable = true)
@@ -20,8 +20,8 @@ class techversion_form extends moodleform
 
         $mform = $this->_form;
 
-        // Roles
-        $mform->addElement('header', 'generalheader', get_string("versionheader", 'question'));
+        // Header
+        $mform->addElement('header', 'generalheader', get_string('suspension', 'question'));
 
         // Hidden fields
         $mform->addElement('hidden', 'courseid');
@@ -30,15 +30,10 @@ class techversion_form extends moodleform
         $mform->addElement('hidden', 'returnurl');
         $mform->setType('returnurl', PARAM_LOCALURL);
 
-        $sql = 'SELECT DISTINCT topic FROM moodle.mdl_question ORDER BY topic';
-        $alltopics = $DB->get_records_sql($sql);
+        $mform->addElement('hidden', 'id');
+        $mform->setType('id', PARAM_INT);
 
-        $count = 0;
-        foreach($alltopics as $t) {
-            $mform->addElement('float', 'version' . $count, get_string('topicversiongroup', 'question', $t->topic));
-            $mform->addHelpButton('version' . $count, 'techversion', 'question');
-            $count++;
-        }
+        $mform->addElement('date_selector', 'suspensionenddate', get_string('suspensionend', 'question'));
 
         $this->add_action_buttons();
     }

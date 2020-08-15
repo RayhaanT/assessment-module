@@ -180,7 +180,7 @@ class view {
                     'question_name_idnumber_tags_column', 'edit_menu_column',
                     'edit_action_column', 'copy_action_column', 'tags_action_column',
                     'preview_action_column', 'delete_action_column', 'export_xml_action_column',
-                    'creator_name_column', 'modifier_name_column');
+                    'creator_name_column', 'modifier_name_column', 'suspend_action_column');
         } else {
              $questionbankcolumns = explode(',', $CFG->questionbankcolumns);
         }

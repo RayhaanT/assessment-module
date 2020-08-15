@@ -22,6 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['suspensionend'] = 'Suspend question until:';
+$string['suspension'] = 'Suspend question in quiz modules';
 $string['versionheader'] = 'Acceptable Versions';
 $string['topicversiongroup'] = 'Version for topic: {$a}';
 $string['techversion'] = 'Version number';
