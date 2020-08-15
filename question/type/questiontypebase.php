@@ -367,6 +367,9 @@ class question_type {
                 if($form->difficulty[$x] != 0) {
                     $thisdiff = $alldiffs[$diffkeys[$form->difficulty[$x] - 1]]->name;
                 }
+                else {
+                    continue;
+                }
                 if($form->role[$x] == 0) {
                     $diffstring = $thisdiff;
                     break;
@@ -381,6 +384,9 @@ class question_type {
         }
         if(isset($form->techversion)) {
             $question->techversion = $form->techversion;
+        }
+        if(isset($form->overalldifficulty)) {
+            $question->overalldifficulty = $form->overalldifficulty;
         }
 
         // The trim call below has the effect of casting any strange values received,

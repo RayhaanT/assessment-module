@@ -218,13 +218,9 @@ abstract class question_edit_form extends question_wizard_form {
 
 
         // Fields used by the assessment engine to poll the question bank
-        // $mform->addElement('select', 'difficulty', get_string('difficulty', 'quiz'), $difficulties);
-
         $mform->addElement('text', 'topic', get_string('topic', 'quiz'));
         $mform->setType('topic', PARAM_TEXT);
         $mform->addElement('float', 'techversion', get_string('techversion', 'question'));
-
-        // $mform->addElement('select', 'role', get_string('role', 'quiz'), $roles);
 
         $mform->addElement('date_selector', 'lifecycleexpiry', get_string('lifeexpirydate', 'quiz'));
 
@@ -255,6 +251,9 @@ abstract class question_edit_form extends question_wizard_form {
             'Add ' . $fieldsperclick .' more difficulty settings',
             true
         );
+
+        $mform->addElement('select', 'overalldifficulty', get_string('overalldifficulty', 'question'), $difficulties);
+        $mform->addHelpButton('overalldifficulty', 'overalldifficulty', 'question');
 
         // Any questiontype specific fields.
         $this->definition_inner($mform);

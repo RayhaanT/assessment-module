@@ -12,12 +12,151 @@ function addSelectCondition($currentCondition, $column, $value) {
 }
 
 function filterDuplicates($questions, $existing) {
-	foreach($questions as $q) {
-		if (($key = array_search($q, $existing)) !== false) {
+	foreach($existing as $e) {
+		if (($key = array_search($e, $questions)) !== false) {
 			unset($questions[$key]);
 		}
 	}
 	return $questions;
+}
+
+function getAverageDifficulty($diffstring) {
+	global $DB;
+	$alldiffs = $DB->get_records('question_difficulties', null, 'listindex');
+	if(strpos($diffstring, ':') !== false) {
+		$diffpairs = explode(',', $diffstring);
+		$diffs = array();
+		foreach($diffpairs as $d) {
+			array_push($diffs, explode(':', $d)[1]);
+		}
+		$diffnumbers = array();
+		foreach($diffs as $d) {
+			foreach($alldiffs as $a) {
+				if($d == $a->name) {
+					array_push($diffnumbers, $a->listindex);
+					break;
+				}
+			}
+		}
+		$total = 0;
+		foreach($diffnumbers as $n) {
+			$total += $n;
+		}
+		$averageindex = ceil($total/count($diffnumbers));
+		foreach($alldiffs as $d) {
+			if($d->listindex == $averageindex) {
+				return $d->name;
+			}
+		}
+	}
+	else {
+		return $diffstring;
+	}
+	return null;
+}
+
+function filterAndEvaluateRetirement($questions) {
+	global $DB;
+	$filteredQuestions = array();
+	$ranges = $DB->get_records('question_retirement_ranges', null, 'upperbound');
+
+	foreach($questions as $q) {
+		$flags = '00000';
+		// If permanently removed for too many correct answers
+		if ($q->retirementflags > 15) {
+			continue;
+		}
+
+		// Question manually suspended
+		if ($q->suspensionend > time()) {
+			$flags[4] = '1';
+		}
+
+		// Question retired based on version
+		if ($version = $DB->get_record('question_versions', array('topic' => $q->topic))) {
+			if ($q->techversion != -1 && $q->techversion < $version->version) {
+				$flags[3] = '1';
+			}
+		}
+
+		// Question expired
+		if($q->lifecycleexpiry > 0 && $q->lifecycleexpiry < time()) {
+			$flags[2] = '1';
+		}
+
+		// Question retired/suspended because of too many correct answers
+		if($q->attempts > 40) {
+			$thisrange = 1;
+			foreach($ranges as $r) {
+				if($r->upperbound >= $q->attempts) {
+					break;
+				}
+				$thisrange++;
+			}
+			
+			if($q->overalldifficulty > 0) {
+				$thisdiff = $DB->get_record('question_difficulties', array('listindex' => $q->overalldifficulty));
+			}
+			else {
+				$diffname = getAverageDifficulty($q->difficulty);
+				$thisdiff = $DB->get_record('question_difficulties', array('name' => $diffname));
+			}
+
+			$rangename = 'range' . $thisrange;
+			if($q->attempts != 0) {
+				if($thisdiff->$rangename / 100 < $q->attemptaccuracy / $q->attempts) {
+					$flags[1] = '1';
+
+					// If its already been suspended
+					if($q->retirementflags > 7) {
+						$flags[0] = '1';
+					}
+					else {
+						// Suspend for a week
+						$q->suspensionend = time() + 604800;
+					}
+				}
+			}
+		}
+
+		$flagsdec = bindec($flags);
+		// Update permanent flags in db
+		if ($flagsdec != $q->retirementflags) {
+			$baseflags = 0;
+			if($q->retirementflags > 15 || $flagsdec > 15) {
+				$baseflags = 16;
+			}
+			else if($q->retirementflags > 7 || $flagsdec > 7) {
+				$baseflags = 8;
+			}
+			$variableflags = bindec(substr($flags, 2));
+			$q->retirementflags = $baseflags + $variableflags;
+		}
+		$DB->update_record('question', $q);
+		// If the current flags are all down, let it through
+		if ($flagsdec == 0) {
+			array_push($filteredQuestions, $q);
+		}
+	}
+
+	return $filteredQuestions;
+}
+
+function getQuestionsInQuiz($quiz) {
+	global $DB;
+
+	$questionslotsinquiz = $DB->get_records('quiz_slots', array('quizid' => $quiz->id));
+	$selectquestions = '';
+	foreach ($questionslotsinquiz as $q) {
+		if ($selectquestions != '') {
+			$selectquestions .= ' OR ';
+		}
+		$selectquestions .= "id = '" . $q->questionid . "'";
+	}
+	if ($selectquestions != '') {
+		return $DB->get_records_select('question', $selectquestions);
+	}
+	return array();
 }
 
 require_once(__DIR__ . '/../../../config.php');
@@ -127,18 +266,7 @@ if ($mform->is_cancelled()) {
 	$addqsection = 0;
 
 	// Get current quiz questions to remove duplicates
-	$questionslotsinquiz = $DB->get_records('quiz_slots', array('quizid' => $quiz->id));
-	$selectquestions = '';
-	foreach($questionslotsinquiz as $q) {
-		if($selectquestions != '') {
-			$selectquestions .= ' OR ';
-		}
-		$selectquestions .= "id = '" . $q->questionid . "'";
-	}
-	$questionsinquiz = array();
-	if($selectquestions != '') {
-		$questionsinquiz = $DB->get_records_select('question', $selectquestions);
-	}
+	$questionsinquiz = getQuestionsInQuiz($quiz);
 
 	for($m = 0; $m < $fromform->nosubmods; $m++) {
 		$lowertopic = strtolower($fromform->topic[$m]);
@@ -173,9 +301,8 @@ if ($mform->is_cancelled()) {
 			$difficultyfields[$d->name] = str_replace(' ', '', $d->name) . 'q';
 		}
 		foreach($difficultyfields as $diffname => $field) {
-			if ($selectquestions != '') {
-				$questionsinquiz = $DB->get_records_select('question', $selectquestions);
-			}
+			$questionsinquiz = getQuestionsInQuiz($quiz);
+
 			$qnum = $fromform->$field[$m];
 			if($role) {
 				$rolecondition = $condition . " AND difficulty REGEXP '" . $role . ':' . $diffname . "'";
@@ -186,7 +313,7 @@ if ($mform->is_cancelled()) {
 			$qpool = $DB->get_records_select('question', $rolecondition);
 			$qpool = array_merge($qpool, $DB->get_records_select('question', $rawcondition));
 			$qpool = filterDuplicates($qpool, $questionsinquiz);
-			print_r($qpool);
+			$qpool = filterAndEvaluateRetirement($qpool);
 			$maxindex = sizeof($qpool) - 1;
 			if($maxindex + 1 < $qnum) {
 				$qnum = $maxindex + 1;

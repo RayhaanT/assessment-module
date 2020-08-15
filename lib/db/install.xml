@@ -1425,9 +1425,10 @@
         <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="topic" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Question topic for module generation purposes"/>
         <FIELD NAME="difficulty" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Question difficulty level relative to roles, for module generation"/>
+        <FIELD NAME="overalldifficulty" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Average difficulty level used for determining accuracy-based retirement ranking. Relates to diff index in difficulties table."/>
         <FIELD NAME="lifecycleexpiry" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp after which question becomes deprecated"/>
         <FIELD NAME="techversion" TYPE="float" LENGTH="10" NOTNULL="true" DEFAULT="-1" SEQUENCE="false" COMMENT="Current version of the question in relation to the topic. Used to selectively deprecate questions"/>
-        <FIELD NAME="retirementflags" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Flags questions that should not be pulled by modules. Bitmap: 0=>time-based suspension, 1=>frequency, 2=>version 3=>expired"/>
+        <FIELD NAME="retirementflags" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Flags questions that should not be pulled by modules. Bitmap: 4=>time-based suspension, 3=>version 2=>expired, 1=>frequency-temporary 0=>frequency permanent"/>
         <FIELD NAME="suspensionend" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of the end of admin-assigned suspension"/>
         <FIELD NAME="attempts" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of times this question has been attempted"/>
         <FIELD NAME="attemptaccuracy" TYPE="float" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of correct responses to the question (decimals for partial correct answers)"/>
