@@ -37,7 +37,7 @@ var CSS = {
     SELECTOR = {
         ACTIONAREA: '.actions',
         ACTIONLINKTEXT: '.actionlinktext',
-        ACTIVITYACTION: 'a.cm-edit-action[data-action], a.editing_maxmark, a.editing_section, input.shuffle_questions',
+        ACTIVITYACTION: 'a.cm-edit-action[data-action], a.editing_maxmark, a.editing_section, input.shuffle_questions, a.editing_timelimit',
         ACTIVITYFORM: 'span.instancemaxmarkcontainer form',
         ACTIVITYINSTANCE: '.' + CSS.ACTIVITYINSTANCE,
         SECTIONINSTANCE: '.sectioninstance',
@@ -47,6 +47,7 @@ var CSS = {
         CONTENTAFTERLINK: 'div.contentafterlink',
         CONTENTWITHOUTLINK: 'div.contentwithoutlink',
         DELETESECTIONICON: 'a.editing_delete .icon',
+        FULLDELETESECTIONICON: 'a.editing_full_delete .icon',
         EDITMAXMARK: 'a.editing_maxmark',
         EDITSECTION: 'a.editing_section',
         EDITSECTIONICON: 'a.editing_section .icon',
@@ -58,6 +59,7 @@ var CSS = {
         INSTANCEMAXMARK: 'span.instancemaxmark',
         INSTANCESECTION: 'span.instancesection',
         INSTANCESECTIONAREA: 'div.section-heading',
+        INSTANCETIMELIMIT: 'span.instancetimelimit',
         MODINDENTDIV: '.mod-indent',
         MODINDENTOUTER: '.mod-indent-outer',
         NUMQUESTIONS: '.numberofquestions',
@@ -74,7 +76,8 @@ var CSS = {
         SELECTALL: '#questionselectall',
         SHOW: 'a.' + CSS.SHOW,
         SLOTLI: 'li.slot',
-        SUMMARKS: '.mod_quiz_summarks'
+        SUMMARKS: '.mod_quiz_summarks',
+        TIMELIMITFORM: '.instancetimelimitcontainer form'
     },
     BODY = Y.one(document.body);
 
@@ -744,6 +747,9 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
                     Y.Moodle.mod_quiz.util.page.remove(page, true);
                 }
                 this.reorganise_edit_page();
+                if (value === 2) {
+                    window.location.reload(true);
+                }
             }
         });
 
@@ -850,6 +856,8 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
      */
     editsectionevents: [],
 
+    editsectiontimelimitevents: [],
+
     /**
      * Initialize the section toolboxes module.
      *
@@ -907,6 +915,12 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
                 // The user is deleting the activity.
                 this.delete_section_with_confirmation(ev, node, activity, action);
                 break;
+            case 'fulldeletesection':
+                this.full_delete_section_with_confirmation(ev, node, activity, action);
+                break;
+            case 'editsectiontimelimit':
+                this.edit_section_time_limit(ev, node, activity, action);
+                break;
             default:
                 // Nothing to do here!
                 break;
@@ -949,6 +963,151 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
             });
 
         }, this);
+    },
+
+    full_delete_section_with_confirmation: function (ev, button, activity) {
+        // Prevent the default button action.
+        ev.preventDefault();
+
+        // Create the confirmation dialogue.
+        var confirm = new M.core.confirm({
+            question: 'Are you sure you want to remove all contents of the ' + activity.get('aria-label') + ' section?',
+            modal: true
+        });
+
+        // If it is confirmed.
+        confirm.on('complete-yes', function () {
+
+            var spinner = M.util.add_spinner(Y, activity.one(SELECTOR.ACTIONAREA));
+            var data = {
+                'class': 'sectionfull',
+                'action': 'DELETE',
+                'id': activity.get('id').replace('section-', '')
+            };
+            this.send_request(data, spinner, function (response) {
+                if (response.deleted) {
+                    window.location.reload(true);
+                }
+            });
+
+        }, this);
+    },
+
+    /**
+     * Function used to handle editing of section time limits
+     */
+    edit_section_time_limit: function (ev, button, activity) {
+        // Get the element we're working on
+        var activityid = activity.get('id').replace('section-', ''),
+            instancesection = activity.one(SELECTOR.INSTANCETIMELIMIT),
+            thisevent,
+            anchor = instancesection, // Grab the anchor so that we can swap it with the edit form.
+            data = {
+                'class': 'section',
+                'field': 'getsectiontimelimit',
+                'id': activityid
+            };
+
+        // Prevent the default actions.
+        ev.preventDefault();
+
+        this.send_request(data, null, function (response) {
+            // Try to retrieve the existing string from the server.
+            var oldtext = response.instancetimelimit;
+
+            // Create the editor and submit button.
+            var editform = Y.Node.create('<form action="#" />');
+            var editinstructions = Y.Node.create('<span class="' + CSS.EDITINSTRUCTIONS + '" id="id_editinstructions" />')
+                .set('innerHTML', M.util.get_string('edittitleinstructions', 'moodle'));
+            var editor = Y.Node.create('<input name="section" type="text" />').setAttrs({
+                'value': oldtext,
+                'autocomplete': 'off',
+                'aria-describedby': 'id_editinstructions',
+                'maxLength': '12'
+            });
+
+            // Clear the existing content and put the editor in.
+            editform.appendChild(editor);
+            editform.setData('anchor', anchor);
+            instancesection.insert(editinstructions, 'before');
+            anchor.replace(editform);
+
+            // Focus and select the editor text.
+            editor.focus().select();
+            // Cancel the edit if we lose focus or the escape key is pressed.
+            thisevent = editor.on('blur', this.edit_section_time_limit_cancel, this, activity, false);
+            this.editsectiontimelimitevents.push(thisevent);
+            thisevent = editor.on('key', this.edit_section_time_limit_cancel, 'esc', this, activity, true);
+            this.editsectiontimelimitevents.push(thisevent);
+
+            // Handle form submission.
+            thisevent = editform.on('submit', this.edit_section_time_limit_submit, this, activity, oldtext);
+            this.editsectiontimelimitevents.push(thisevent);
+        });
+    },
+
+    edit_section_time_limit_submit: function (ev, activity, oldtext) {
+        // We don't actually want to submit anything.
+        ev.preventDefault();
+        var newtext = Y.Lang.trim(activity.one(SELECTOR.TIMELIMITFORM + ' ' + SELECTOR.SECTIONINPUT).get('value'));
+        var spinner = M.util.add_spinner(Y, activity.one(SELECTOR.INSTANCESECTIONAREA));
+        this.edit_section_time_limit_clear(activity);
+        if (newtext !== null && newtext !== oldtext) {
+            activity.one(SELECTOR.INSTANCETIMELIMIT).setContent(newtext);
+            var data = {
+                'class': 'section',
+                'field': 'updatesectiontimelimit',
+                'newtimelimit': newtext,
+                'id': activity.get('id').replace('section-', '')
+            };
+            this.send_request(data, spinner, function (response) {
+                if (response) {
+                    activity.one(SELECTOR.INSTANCETIMELIMIT).setContent(response.instancetimelimit);
+                    activity.one(SELECTOR.EDITSECTIONICON).set('title',
+                        M.util.get_string('sectionheadingedit', 'quiz', response.instancetimelimit));
+                    activity.one(SELECTOR.EDITSECTIONICON).set('alt',
+                        M.util.get_string('sectionheadingedit', 'quiz', response.instancetimelimit));
+                    var deleteicon = activity.one(SELECTOR.DELETESECTIONICON);
+                    if (deleteicon) {
+                        deleteicon.set('title', M.util.get_string('sectionheadingremove', 'quiz', response.instancetimelimit));
+                        deleteicon.set('alt', M.util.get_string('sectionheadingremove', 'quiz', response.instancetimelimit));
+                    }
+                }
+            });
+        }
+    },
+
+    edit_section_time_limit_cancel: function (ev, activity, preventdefault) {
+        if (preventdefault) {
+            ev.preventDefault();
+        }
+        this.edit_section_time_limit_clear(activity);
+    },
+
+    edit_section_time_limit_clear: function (activity) {
+        // Detach all listen events to prevent duplicate triggers
+        new Y.EventHandle(this.editsectiontimelimitevents).detach();
+
+        var editform = activity.one(SELECTOR.TIMELIMITFORM),
+            instructions = activity.one('#id_editinstructions');
+        if (editform) {
+            editform.replace(editform.getData('anchor'));
+        }
+        if (instructions) {
+            instructions.remove();
+        }
+
+        // Refocus the link which was clicked originally so the user can continue using keyboard nav.
+        Y.later(100, this, function () {
+            activity.one(SELECTOR.EDITSECTION).focus();
+        });
+
+        // This hack is to keep Behat happy until they release a version of
+        // MinkSelenium2Driver that fixes
+        // https://github.com/Behat/MinkSelenium2Driver/issues/80.
+        if (!Y.one('input[name=section]')) {
+            Y.one('body').append('<input type="text" name="section" style="display: none">');
+        }
     },
 
     /**
@@ -1015,7 +1174,7 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
      * Handles the submit event when editing section heading.
      *
      * @protected
-     * @method edit_section_title_submiy
+     * @method edit_section_title_submit
      * @param {EventFacade} ev The event that triggered this.
      * @param {Node} activity The activity whose maxmark we are altering.
      * @param {String} oldtext The original maxmark the activity or resource had.
@@ -1045,6 +1204,11 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
                     if (deleteicon) {
                         deleteicon.set('title', M.util.get_string('sectionheadingremove', 'quiz', response.instancesection));
                         deleteicon.set('alt', M.util.get_string('sectionheadingremove', 'quiz', response.instancesection));
+                    }
+                    var fulldeleteicon = activity.one(SELECTOR.FULLDELETESECTIONICON);
+                    if (fulldeleteicon) {
+                        fulldeleteicon.set('title', M.util.get_string('sectionheadingremove', 'quiz', response.instancesection));
+                        fulldeleteicon.set('alt', M.util.get_string('sectionheadingremove', 'quiz', response.instancesection));
                     }
                 }
             });

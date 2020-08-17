@@ -92,3 +92,5 @@ theme/boost/amd/src/tether.js
 theme/boost/scss/fontawesome/
 
 question/type/coderunner/amd/
+mod/quiz/yui
+mod/quiz/amd

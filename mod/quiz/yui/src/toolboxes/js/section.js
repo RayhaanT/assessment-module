@@ -149,7 +149,7 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
 
         // Create the confirmation dialogue.
         var confirm = new M.core.confirm({
-            question: M.util.get_string('confirmdeletesection', 'quiz', activity.get('aria-label')),
+            question: 'Are you sure you want to remove all contents of the ' + activity.get('aria-label') + ' section?',
             modal: true
         });
 
@@ -235,12 +235,21 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
             var data = {
                 'class': 'section',
                 'field': 'updatesectiontimelimit',
-                'newheading': newtext,
+                'newtimelimit': newtext,
                 'id': activity.get('id').replace('section-', '')
             };
             this.send_request(data, spinner, function (response) {
                 if (response) {
                     activity.one(SELECTOR.INSTANCETIMELIMIT).setContent(response.instancetimelimit);
+                    activity.one(SELECTOR.EDITSECTIONICON).set('title',
+                        M.util.get_string('sectionheadingedit', 'quiz', response.instancetimelimit));
+                    activity.one(SELECTOR.EDITSECTIONICON).set('alt',
+                        M.util.get_string('sectionheadingedit', 'quiz', response.instancetimelimit));
+                    var deleteicon = activity.one(SELECTOR.DELETESECTIONICON);
+                    if (deleteicon) {
+                        deleteicon.set('title', M.util.get_string('sectionheadingremove', 'quiz', response.instancetimelimit));
+                        deleteicon.set('alt', M.util.get_string('sectionheadingremove', 'quiz', response.instancetimelimit));
+                    }
                 }
             });
         }
