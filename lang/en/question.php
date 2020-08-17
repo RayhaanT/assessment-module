@@ -37,14 +37,14 @@ $string['difficultyfield'] = 'Available difficulty levels';
 $string['difficultyfield_help'] = 'Levels are comma separated, in order of increasing complexity. Save changes to update life cycle fields. Names are case-sensitive.';
 $string['overalldifficulty'] = 'Overall difficulty level';
 $string['overalldifficulty_help'] = 'General difficulty level of the question regardless of the role. Used to suspend questions based on what percentage of students answer correctly.';
-$string['retirementpercentage'] = 'Retirement percentage for less than {$a} attempts';
-$string['retirementpercentagemore'] = 'Retirement percentage for more than {$a} attempts';
+$string['retirementpercentage'] = 'Less than {$a} attempts';
+$string['retirementpercentagemore'] = 'More than {$a} attempts';
 $string['retirementrangeheader'] = 'Question retirement attempt ranges';
-$string['retirementpercentagestatic'] = 'The retirement percentage fields are used to temporarily or permanently retire questions that are answered correctly too frequently. 
-                                         Depending on the number of total attempts, if more than that percentage of answers are correct the question will be removed from circulation.';
 $string['upperboundfield'] = 'Upper bound of range {$a}';
 $string['difficultylifecycle'] = 'Retirement settings for difficulty levels';
-$string['retirementreason'] = 'What these fields are for:';
+$string['retirementsubheading'] = 'Retirement percentages:';
+$string['retirementreason'] = 'The threshold for correct answers above which questions of this difficulty level will be temporarily suspended or removed from circulation';
+$string['retirementreason_help'] = 'The threshold for correct answers. Questions of this difficulty level with a higher percentage of correct answers will be temporarily suspended or removed from circulation.';
 $string['diffrolepair'] = 'Difficulty setting {no}';
 
 $string['addmorechoiceblanks'] = 'Blanks for {no} more choices';

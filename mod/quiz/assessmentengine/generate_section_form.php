@@ -17,12 +17,15 @@ class generate_section_form extends moodleform {
   private function getSubModuleFields($mform, &$repeatedoptions, $alldiffs) {
     $repeated = array();
     $repeated[] = $mform->createElement('text', 'topic', get_string('topic', 'quiz'));
-    $repeated[] = $mform->createElement('checkbox', 'lifecycle', get_string('lifecycleenable', 'quiz'));
     $repeated[] = $mform->createElement('static', 'complexityqlabel', 'Number of questions of different difficulty levels:', '');
 
     foreach($alldiffs as $diff) {
-      $fieldname = str_replace(' ', '', $diff->name) . 'q';
-      $repeated[] = $mform->createElement('float', $fieldname, '&nbsp;&nbsp;&nbsp;&nbsp;' . $diff->name);
+      $fieldname = str_replace(' ', '', $diff->name) . 'qnum';
+      $attributes = array();
+      if($diff != end($alldiffs)) {
+        $attributes['class'] = 'notlastqnum';
+      }
+      $repeated[] = $mform->createElement('float', $fieldname, '&nbsp;&nbsp;&nbsp;&nbsp;' . $diff->name, $attributes);
       $repeatedoptions[$fieldname]['default'] = 0;
     }
     

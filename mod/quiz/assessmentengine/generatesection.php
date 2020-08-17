@@ -182,6 +182,7 @@ if ($addbeforepage !== 0) {
 	$url->param('addbeforepage', $addbeforepage);
 }
 $PAGE->set_url($url);
+$PAGE->requires->css('/question/groupstyles.css');
 
 // Validate cmid
 if ($cmid) {
@@ -272,23 +273,10 @@ if ($mform->is_cancelled()) {
 		$lowertopic = strtolower($fromform->topic[$m]);
 		$topic = trim($lowertopic);
 		$topic = $fromform->topic[$m];
-		if(isset($fromform->lifecycle)) {
-			if(isset($fromform->lifecycle[$m])) {
-				$lifecycle = $fromform->lifecycle[$m];
-			}
-		} else {
-			$lifecycle = 0;
-		}
 
 		$condition = '';
 		if($topic) {
 			$condition = addSelectCondition($condition, 'topic', $topic);
-		}
-		if ($condition != '' && $lifecycle) {
-			$condition .= ' AND ';
-		}
-		if ($lifecycle) {
-			$condition .= '(lifecycleexpiry > ' . time() . ' OR lifecycleexpiry = 0)';
 		}
 		if ($condition != '') {
 			$condition .= ' AND ';
@@ -298,7 +286,7 @@ if ($mform->is_cancelled()) {
 		$alldiffs = $DB->get_records('question_difficulties', null, 'listindex');
 		$difficultyfields = array();
 		foreach($alldiffs as $d) {
-			$difficultyfields[$d->name] = str_replace(' ', '', $d->name) . 'q';
+			$difficultyfields[$d->name] = str_replace(' ', '', $d->name) . 'qnum';
 		}
 		foreach($difficultyfields as $diffname => $field) {
 			$questionsinquiz = getQuestionsInQuiz($quiz);

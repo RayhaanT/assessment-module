@@ -29,15 +29,13 @@ class modulesettings_form extends moodleform
 
         $repeatedoptions['difficultyname']['type'] = PARAM_TEXT;
 
+        $repeated[] = $mform->createElement('static', 'retirementsubheading', get_string('retirementsubheading', 'question'));
+        $repeatedoptions['retirementsubheading']['helpbutton'] = array('retirementreason', 'question');
+
         $repeated[] = $mform->createElement('float', 'rate1', get_string('retirementpercentage', 'question', $upperbounds[0]));
         $repeated[] = $mform->createElement('float', 'rate2', get_string('retirementpercentage', 'question', $upperbounds[1]));
         $repeated[] = $mform->createElement('float', 'rate3', get_string('retirementpercentage', 'question', $upperbounds[2]));
         $repeated[] = $mform->createElement('float', 'rate4', get_string('retirementpercentagemore', 'question', $upperbounds[2]));
-
-        // $repeatedoptions['rate1']['default'] = 95;
-        // $repeatedoptions['rate2']['default'] = 90;
-        // $repeatedoptions['rate3']['default'] = 80;
-        // $repeatedoptions['rate4']['default'] = 70;
 
         return $repeated;
     }
@@ -85,8 +83,6 @@ class modulesettings_form extends moodleform
         $mform->addHelpButton('difficultylist', 'difficultyfield', 'question');
 
         $mform->addElement('header', 'difficultylifecycleheader', get_string('difficultylifecycle', 'question'));
-
-        $mform->addElement('static', 'difficultyinfo', get_string('retirementreason', 'question'), get_string('retirementpercentagestatic', 'question'));
 
         $repeatedoptions = array();
         $ranges = $DB->get_records('question_retirement_ranges');

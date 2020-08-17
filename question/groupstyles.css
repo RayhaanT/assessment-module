@@ -1,0 +1,85 @@
+body#page-question-modulesettings div[id^=fitem_id_][id*=difficultyname_] {
+    background: #eee;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #bbb;
+    border-bottom: 0;
+}
+
+body#page-question-modulesettings div[id^=fitem_id_][id*=retirementsubheading_] {
+    background: #eee;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #bbb;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+body#page-question-modulesettings div[id^=fitem_id_][id*=rate1],
+body#page-question-modulesettings div[id^=fitem_id_][id*=rate2],
+body#page-question-modulesettings div[id^=fitem_id_][id*=rate3] {
+    background: #eee;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #bbb;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+body#page-question-modulesettings div[id^=fitem_id_][id*=rate4_] {
+    background: #eee;
+    margin-bottom: 2em;
+    margin-top: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #bbb;
+    border-top: 0;
+}
+
+body#page-mod-quiz-generatesection-generatesection div[id^=fitem_id_][id*=topic_] {
+    background: #eee;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #bbb;
+    border-bottom: 0;
+}
+
+body#page-mod-quiz-generatesection-generatesection div[id^=fitem_id_][id*=complexityqlabel_] {
+    background: #eee;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #bbb;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+body#page-mod-quiz-generatesection-generatesection div[id^=fitem_id_][id*=qnum][class*=notlastqnum] {
+    background: #eee;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #bbb;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+body#page-mod-quiz-generatesection-generatesection div[id^=fitem_id_][id*=qnum] {
+    background: #eee;
+    margin-bottom: 2em;
+    margin-top: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #bbb;
+    border-top: 0;
+}

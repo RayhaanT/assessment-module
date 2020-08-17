@@ -35,6 +35,7 @@ class techversion_form extends moodleform
 
         $count = 0;
         foreach($alltopics as $t) {
+            if(!$t->topic) {continue;} 
             $mform->addElement('float', 'version' . $count, get_string('topicversiongroup', 'question', $t->topic));
             $mform->addHelpButton('version' . $count, 'techversion', 'question');
             $count++;

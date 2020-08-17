@@ -179,6 +179,8 @@ if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
 
+$PAGE->requires->css('/question/groupstyles.css');
+
 $PAGE->set_title('Module settings');
 $PAGE->set_heading($COURSE->fullname);
 $PAGE->navbar->add('Configure module settings');
