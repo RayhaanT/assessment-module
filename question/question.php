@@ -278,7 +278,7 @@ foreach($diffpairs as $diff) {
     }
     $count++;
 }
-if($toform->techversion == -1) {
+if(!$toform->techversion) {
     unset($toform->techversion);
 }
 $toform->appendqnumstring = $appendqnumstring;

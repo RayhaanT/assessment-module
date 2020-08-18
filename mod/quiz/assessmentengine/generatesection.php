@@ -74,7 +74,7 @@ function filterAndEvaluateRetirement($questions) {
 
 		// Question retired based on version
 		if ($version = $DB->get_record('question_versions', array('topic' => $q->topic))) {
-			if ($q->techversion != -1 && $q->techversion < $version->version) {
+			if ($q->techversion > 0 && $q->techversion < $version->version) {
 				$flags[3] = '1';
 			}
 		}

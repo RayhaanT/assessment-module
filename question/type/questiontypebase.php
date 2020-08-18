@@ -360,16 +360,15 @@ class question_type {
         if(isset($form->difficulty)) {
             $diffstring = '';
             for($x = 0; $x < count($form->difficulty); $x++) {
+                if(!$form->difficulty[$x]) {
+                    continue;
+                }
+
                 if($diffstring != '') {
                     $diffstring .= ',';
                 }
                 $thisdiff = '';
-                if($form->difficulty[$x] != 0) {
-                    $thisdiff = $alldiffs[$diffkeys[$form->difficulty[$x] - 1]]->name;
-                }
-                else {
-                    continue;
-                }
+                $thisdiff = $alldiffs[$diffkeys[$form->difficulty[$x] - 1]]->name;
                 if($form->role[$x] == 0) {
                     $diffstring = $thisdiff;
                     break;
@@ -385,8 +384,16 @@ class question_type {
         if(isset($form->techversion)) {
             $question->techversion = $form->techversion;
         }
+
         if(isset($form->overalldifficulty)) {
             $question->overalldifficulty = $form->overalldifficulty;
+        }
+        else if(strpos($question->difficulty, ',') === false) {
+            foreach($alldiffs as $d) {
+                if($d->name == $question->difficulty) {
+                    $question->overalldifficulty = $d->listindex;
+                }
+            }
         }
 
         // The trim call below has the effect of casting any strange values received,

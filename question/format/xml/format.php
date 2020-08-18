@@ -193,6 +193,23 @@ class qformat_xml extends qformat_default {
         return $itemid;
     }
 
+    public function import_module_settings($qo, $question) {  
+        // Module polling data
+        $qo->overalldifficulty = $this->getpath($question,
+                array('#', 'overalldifficulty', 0, '#'), $qo->overalldifficulty);
+        $qo->lifecycleexpiry = $this->getpath($question,
+                array('#', 'lifecycleexpiry', 0, '#'), $qo->lifecycleexpiry);
+        $qo->techversion = $this->getpath($question,
+                array('#', 'techversion', 0, '#'), $qo->techversion);
+        // Using clean_question_name as a generic text cleaner function
+        $qo->topic = $this->clean_question_name($this->getpath($question,
+                array('#', 'topic', 0, '#'), $qo->topic));
+        $qo->difficulty = $this->clean_question_name($this->getpath($question,
+                array('#', 'difficulty', 0, '#'), $qo->difficulty));
+
+        return $qo;
+    }
+
     /**
      * import parts of question common to all types
      * @param $question array question question array from xml tree
@@ -203,6 +220,9 @@ class qformat_xml extends qformat_default {
 
         // This routine initialises the question object.
         $qo = $this->defaultquestion();
+
+        // Module polling fields
+        $qo = $this->import_module_settings($qo, $question);
 
         // Question name.
         $qo->name = $this->clean_question_name($this->getpath($question,
@@ -501,6 +521,8 @@ class qformat_xml extends qformat_default {
         if (!empty($questiontext['itemid'])) {
             $qo->questiontextitemid = $questiontext['itemid'];
         }
+
+        $qo = $this->import_module_settings($qo, $question);
 
         // Backwards compatibility, deal with the old image tag.
         $filedata = $this->getpath($question, array('#', 'image_base64', '0', '#'), null, false);
@@ -1233,6 +1255,13 @@ class qformat_xml extends qformat_default {
         $expout .= "    <penalty>{$question->penalty}</penalty>\n";
         $expout .= "    <hidden>{$question->hidden}</hidden>\n";
         $expout .= "    <idnumber>{$question->idnumber}</idnumber>\n";
+
+        // Module polling data
+        $expout .= "    <topic>{$question->topic}</topic>\n";
+        $expout .= "    <difficulty>{$question->difficulty}</difficulty>\n";
+        $expout .= "    <overalldifficulty>{$question->overalldifficulty}</overalldifficulty>\n";
+        $expout .= "    <lifecycleexpiry>{$question->lifecycleexpiry}</lifecycleexpiry>\n";
+        $expout .= "    <techversion>{$question->techversion}</techversion>\n";
 
         // The rest of the output depends on question type.
         switch($question->qtype) {
