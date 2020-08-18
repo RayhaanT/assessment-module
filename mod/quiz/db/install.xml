@@ -217,11 +217,11 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Name of the difficulty level"/>
-        <FIELD NAME="listindex" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Index of the difficulty level for ordering purposes">
-        <FIELD NAME="range1" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Percentage of correct answeres given <500 responses after which the question will be retired">
-        <FIELD NAME="range2" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Percentage of correct answeres given 500<x<1000 responses after which the question will be retired">
-        <FIELD NAME="range3" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Percentage of correct answeres given 1000<x<2000 responses after which the question will be retired">
-        <FIELD NAME="range4" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Percentage of correct answeres given >2000 responses after which the question will be retired">
+        <FIELD NAME="listindex" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Index of the difficulty level for ordering purposes"/>
+        <FIELD NAME="range1" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Percentage of correct answeres given less than 500 responses after which the question will be retired"/>
+        <FIELD NAME="range2" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Percentage of correct answeres given 500-1000 responses after which the question will be retired"/>
+        <FIELD NAME="range3" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Percentage of correct answeres given 1000-2000 responses after which the question will be retired"/>
+        <FIELD NAME="range4" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Percentage of correct answeres given more than 2000 responses after which the question will be retired"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

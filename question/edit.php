@@ -43,6 +43,8 @@ $context = $contexts->lowest();
 $streditingquestions = get_string('editquestions', 'question');
 $PAGE->set_title($streditingquestions);
 $PAGE->set_heading($COURSE->fullname);
+$PAGE->requires->css('/question/groupstyles.css');
+
 echo $OUTPUT->header();
 
 // Print horizontal nav if needed.

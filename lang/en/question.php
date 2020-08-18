@@ -32,6 +32,7 @@ $string['roles'] = 'Roles';
 $string['addroles'] = 'Blanks for {no} more roles';
 $string['roleno'] = 'Role {$a} name';
 $string['difficultyno'] = 'Difficulty level {$a}';
+$string['difficultyname_help'] = 'Renaming the difficulty level here will update all questions already assigned this difficulty level to use the new name.';
 $string['difficulties'] = 'Difficulty Levels';
 $string['difficultyfield'] = 'Available difficulty levels';
 $string['difficultyfield_help'] = 'Levels are comma separated, in order of increasing complexity. Save changes to update life cycle fields. Names are case-sensitive.';

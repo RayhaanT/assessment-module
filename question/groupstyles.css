@@ -83,3 +83,12 @@ body#page-mod-quiz-generatesection-generatesection div[id^=fitem_id_][id*=qnum] 
     border: 1px solid #bbb;
     border-top: 0;
 }
+
+.configuremodule {
+    padding-top: 5px;
+    padding-bottom: 10px;
+}
+
+.configureversions {
+    padding-bottom: 10px;
+}

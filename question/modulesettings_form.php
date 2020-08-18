@@ -16,7 +16,12 @@ class modulesettings_form extends moodleform
     private function getRoleFields($mform, &$repeatedoptions)
     {
         $repeated = array();
-        $repeated[] = $mform->createElement('text', 'rolename', get_string('roleno', 'question', '{no}'));
+        $rolefields = array();
+
+        $rolefields[] = $mform->createElement('text', 'rolename', '');
+        $mform->registerNoSubmitButton('deleterole');
+        $rolefields[] = $mform->createElement('submit', 'deleterole', get_string('delete'));
+        $repeated[] = $mform->createElement('group', 'rolebuttonpair', get_string('roleno', 'question', '{no}'), $rolefields, null, false);
 
         $repeatedoptions['rolename']['type'] = PARAM_TEXT;
 
@@ -28,6 +33,7 @@ class modulesettings_form extends moodleform
         $repeated[] = $mform->createElement('text', 'difficultyname', get_string('difficultyno', 'question', '{no}'));
 
         $repeatedoptions['difficultyname']['type'] = PARAM_TEXT;
+        $repeatedoptions['difficultyname']['helpbutton'] = array('difficultyname', 'question');
 
         $repeated[] = $mform->createElement('static', 'retirementsubheading', get_string('retirementsubheading', 'question'));
         $repeatedoptions['retirementsubheading']['helpbutton'] = array('retirementreason', 'question');

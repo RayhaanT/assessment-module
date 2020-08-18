@@ -28,6 +28,24 @@ $toform->returnurl = $url;
 $toform->courseid = $courseid;
 
 $allroles = $DB->get_records('question_roles');
+$rolekeys = array_keys($allroles);
+
+$deletedroles = optional_param_array('deleterole', array(), PARAM_INT);
+$noroles = count($allroles);
+if (count($deletedroles)) {
+    foreach ($deletedroles as $key => $r) {
+        if ($key < $noroles) {
+            $DB->delete_records('question_roles', array('id' => $allroles[$rolekeys[$key]]->id));
+            unset($allroles[$rolekeys[$key]]);
+        }
+        if ($key <= $_POST['noroles']) {
+            unset($_POST['rolename'][$key]);
+            $_POST['rolename'] = array_values($_POST['rolename']);
+        }
+        $_POST['noroles']--;
+    }
+}
+
 $count = 0;
 foreach($allroles as $role) {
     $toform->rolename[$count] = $role->name;
@@ -152,12 +170,49 @@ if ($mform->is_cancelled()) {
         }
         unset($diff->listindex);
 
-        $diff->range1 = $fromform->rate1[$x];
-        $diff->range2 = $fromform->rate2[$x];
-        $diff->range3 = $fromform->rate3[$x];
-        $diff->range4 = $fromform->rate4[$x];
+        if($fromform->rate1[$x]) {
+            $diff->range1 = $fromform->rate1[$x];
+        }
+        if ($fromform->rate2[$x]) {
+            $diff->range2 = $fromform->rate2[$x];
+        }
+        if ($fromform->rate3[$x]) {
+            $diff->range3 = $fromform->rate3[$x];
+        }
+        if ($fromform->rate4[$x]) {
+            $diff->range4 = $fromform->rate4[$x];
+        }
 
-        if ($fromform->difficultyname[$x]) {
+        if ($fromform->difficultyname[$x] && $fromform->difficultyname[$x] != $diff->name) {
+
+            $newdiffname = $fromform->difficultyname[$x];
+            $affectedquestions = $DB->get_records_select('question', "difficulty REGEXP '" . $diff->name ."'");
+
+            foreach($affectedquestions as $q) {
+                if(strpos($q->difficulty, ':') !== false) {
+                    $pairs = explode(',', $q->difficulty);
+
+                    for($p = 0; $p < count($pairs); $p++) {
+                        $rolediff = explode(':', $pairs[$p]);
+                        if($rolediff[1] == $diff->name) {
+                            $newpair = $rolediff[0] . ':' . $newdiffname;
+                            $pairs[$p] = $newpair;
+                        }
+                    }
+                    $compileddiff = '';
+                    foreach($pairs as $p) {
+                        if($compileddiff != '') {
+                            $compileddiff .= ',';
+                        }
+                        $compileddiff .= $p;
+                    }
+                    $q->difficulty = $compileddiff;
+                }
+                else {
+                    $q->difficulty = $newdiffname;
+                }
+                $DB->update_record('question', $q);
+            }
             $diff->name = $fromform->difficultyname[$x];
         }
         $DB->update_record('question_difficulties', $diff);
