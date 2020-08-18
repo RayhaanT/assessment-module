@@ -30,7 +30,8 @@ foreach($alltopics as $t) {
     }
     $fieldname = 'version' . $count;
     if($thisversion = $DB->get_record('question_versions', array('topic' => $t->topic))) {
-        $toform->$fieldname = $thisversion->version;
+        // Equivalent to float cast, removes trailing zeroes
+        $toform->$fieldname = $thisversion->version + 0;
     } else {
         $toform->$fieldname = 0;
         $newversion = new stdClass();
@@ -59,6 +60,9 @@ if ($mform->is_cancelled()) {
 
     $count = 0;
     foreach($alltopics as $t) {
+        if (!$t->topic) {
+            continue;
+        }
         if($versionentry = $DB->get_record('question_versions', array('topic' => $t->topic))) {
             $fieldname = 'version' . $count;
             $versionentry->version = $fromform->$fieldname;
