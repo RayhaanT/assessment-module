@@ -372,6 +372,7 @@ define(['jquery', 'qtype_coderunner/diff', 'qtype_coderunner/diff2htmlui'], func
         var Diff2HtmlUIFactory = require('qtype_coderunner/diff2htmlui');
         var diff2HtmlUI = new Diff2HtmlUIFactory.Diff2HtmlUI(targetElement, diff, configuration);
         diff2HtmlUI.draw();
+        targetElement.setAttribute('name', 'loaded');
 
         // Set the data-lang for the file
         var fileWrapper = targetElement.querySelector('.d2h-file-wrapper');
@@ -380,9 +381,117 @@ define(['jquery', 'qtype_coderunner/diff', 'qtype_coderunner/diff2htmlui'], func
         diff2HtmlUI.highlightCode();
     }
 
+    /**
+     *  An external entry point from the PHP.
+     * @param string preload, original file text for first diff
+     * @param array answers, array of answer text for diffs
+     * @param array passedTests, array indicating the number of tests passed by each attempt (-1 = error)
+     * @param int noTests, number of total tests for this question
+     * @param string textareaId
+     * @param string language
+     * @returns {userinterfacewrapperL#111.InterfaceWrapper}
+    */
+    function multiAnswerDiffViewer(preload, answers, passedTests, noTests, textareaId, language) {
+        language = language.toLowerCase();
+        if (language.includes('python')) {
+            language = 'python';
+        }
+        const targetElement = document.getElementById(textareaId);
+        const configuration = {
+            inputFormat: "json",
+            drawFileList: false,
+            matching: "lines",
+            highlight: true,
+            outputFormat: 'side-by-side',
+        };
+
+        const Diff = require('qtype_coderunner/diff');
+        let diff = '';
+        for (let x = 0; x < answers.length; x++) {
+            let firstfile = x > 0 ? answers[x - 1] : preload;
+            let name = x == answers.length - 1 ? 'Final submission' : 'Submission ' + (x + 1);
+
+            if (passedTests[x] == -1) {
+                name += ': This code caused an error when tests were run';
+            }
+            else {
+                if (passedTests[x] == noTests) {
+                    name += ': Passed all tests';
+                }
+                else {
+                    name += ': Passed ' + passedTests[x] + ' out of ' + noTests + ' tests'; 
+                }
+            }
+
+            diff += Diff.createTwoFilesPatch(name, name, firstfile, answers[x]);
+        }
+        var Diff2HtmlUIFactory = require('qtype_coderunner/diff2htmlui');
+        var diff2HtmlUI = new Diff2HtmlUIFactory.Diff2HtmlUI(targetElement, diff, configuration);
+        diff2HtmlUI.draw();
+        targetElement.setAttribute('name', 'loaded');
+
+        // Set the data-lang for the file
+        var fileWrapper = targetElement.querySelector('.d2h-file-wrapper');
+        fileWrapper.setAttribute('data-lang', language);
+
+        diff2HtmlUI.highlightCode();
+    }
+
+    function singleToMulti(buttonId, preload, answers, passedTests, noTests, singleId, multiId, language) {
+        var toggleButton = $('[id="' + buttonId + '"]');
+
+        var toHide = $('[id="' + singleId + '"]');
+        toHide.hide();
+        var target = $('[id="' + multiId + '"]');
+        if (target.attr('name') != 'loaded') {
+            multiAnswerDiffViewer(preload, answers, passedTests, noTests, multiId, language);
+        }
+        else {
+            target.show();
+        }
+
+        toggleButton.on("click", function() {
+            multiToSingle(buttonId, preload, answers, passedTests, noTests, singleId, multiId, language)
+        });
+        toggleButton.attr('value', 'Hide intermediate code submissions');
+    }
+
+    function multiToSingle(buttonId, preload, answers, passedTests, noTests, singleId, multiId, language) {
+        var toggleButton = $('[id="' + buttonId + '"]');
+
+        var toHide = $('[id="' + multiId + '"]');
+        toHide.hide();
+        var target = $('[id="'  + singleId + '"]');
+        if(target.attr('name') != 'loaded') {
+            diffViewer(preload, answers[answers.length - 1], singleId, language);
+        }
+        else {
+            target.show();
+        }
+
+        toggleButton.on("click", function() {
+            singleToMulti(buttonId, preload, answers, passedTests, noTests, singleId, multiId, language)
+        });
+        toggleButton.attr('value', 'Show all code submissions');
+    }
+
+    function initDiffToggleButton(buttonId, preload, answers, passedTests, noTests, singleId, multiId, language) {
+        var toggleButton = $('[id="' + buttonId + '"]');
+        toggleButton.css({
+            "margin-left":"1em"
+        });
+
+        // toggleButton.on("click", multiToSingle(buttonId, preload, answers, passedTests, noTests, textareaId, language));
+        toggleButton.on("click", function() {
+            singleToMulti(buttonId, preload, answers, passedTests, noTests, singleId, multiId, language);
+        });
+    }
+
     return {
         newUiWrapper: newUiWrapper,
         diffViewer : diffViewer,
+        multiAnswerDiffViewer : multiAnswerDiffViewer,
+        initDiffToggleButton : initDiffToggleButton,
         InterfaceWrapper: InterfaceWrapper
     };
 });

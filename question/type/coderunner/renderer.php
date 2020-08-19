@@ -49,6 +49,7 @@ class qtype_coderunner_renderer extends qtype_renderer {
     public function formulation_and_controls(question_attempt $qa, question_display_options $options) {
         global $CFG, $PAGE;
         global $USER;
+        global $DB;
 
         $question = $qa->get_question();
         $qid = $question->id;
@@ -160,6 +161,54 @@ class qtype_coderunner_renderer extends qtype_renderer {
             $review = true;
         }
 
+        // Get all submission steps between preload and final, number of tests passed per step, and output toggle button for displaying steps
+        $allanswers = array();
+        $passedTests = array();
+        $totaltests = 0;
+        if($review) {
+            $alloutcomes = array();
+            $attemptsteps = $DB->get_records('question_attempt_steps', array('questionattemptid' => $qa->get_database_id()));
+            foreach($attemptsteps as $step) {
+                if($newanswer = $DB->get_record('question_attempt_step_data', array('attemptstepid' => $step->id, 'name' => 'answer'))) {
+                    array_push($allanswers, $newanswer->value);
+                    if ($newoutcome = $DB->get_record('question_attempt_step_data', array('attemptstepid' => $step->id, 'name' => '_testoutcome'))) {
+                        array_push($alloutcomes, unserialize($newoutcome->value));
+                    }
+                }
+            }
+
+            if(count($alloutcomes) != count($allanswers)) {
+                throw new moodle_exception('Something went wrong. Not every attempt has a test outcome.');
+            }
+
+            foreach($alloutcomes as $o) {
+                if($o->status != 1) {
+                    array_push($passedTests, -1);
+                    continue;
+                }
+                $passed = 0;
+                foreach($o->testresults as $r) {
+                    if($r->iscorrect) {
+                        $passed++;
+                    }
+                }
+                array_push($passedTests, $passed);
+            }
+
+            $totaltests = count($DB->get_records('question_coderunner_tests', array('questionid' => $qa->get_question_id())));
+
+            $diffToggleParams = array(
+                trim($preload),
+                $allanswers,
+                $passedTests,
+                $totaltests,
+                $responsefieldid . '_preload_single',
+                $responsefieldid . '_preload_multi',
+                ucwords($currentlanguage)
+            );
+            $qtext .= self::toggle_all_attempts_rendering($qa, $diffToggleParams);
+        }
+
         $rows = isset($question->answerboxlines) ? $question->answerboxlines : 18;
         $taattributes = array(
                 'class' => 'coderunner-answer edit_code',
@@ -175,10 +224,12 @@ class qtype_coderunner_renderer extends qtype_renderer {
 
         if($review) {
             $preloadattributes = $taattributes;
-            $preloadid = $responsefieldid . '_preload';
+            $preloadid = $responsefieldid . '_preload_single';
             $preloadattributes['id'] = $preloadid;
             $preloadattributes['name'] = $responsefieldname . '_preload';
             $qtext .= html_writer::tag('div', s($preload), $preloadattributes);
+            $preloadattributes['id'] = $responsefieldid . '_preload_multi';
+            $qtext .= html_writer::tag('div', '', $preloadattributes);
         }
         else {
             if ($options->readonly) {
@@ -235,6 +286,23 @@ class qtype_coderunner_renderer extends qtype_renderer {
         }
 
         return $qtext;
+    }
+
+    protected static function toggle_all_attempts_rendering($qa, $jsparams) {
+        global $PAGE;
+        $buttonid = $qa->get_behaviour_field_name('diffviewertoggle');
+        array_unshift($jsparams, $buttonid);
+        $attributes = array(
+            'type' => 'button',
+            'id' => $buttonid,
+            'name' => $buttonid,
+            'value' => 'Show all code submissions',
+            'class' => 'answer_reset_btn btn btn-secondary');
+        $html = html_writer::empty_tag('input', $attributes);
+
+        $PAGE->requires->js_call_amd('qtype_coderunner/userinterfacewrapper', 'initDiffToggleButton', $jsparams);
+
+        return $html;
     }
 
 
