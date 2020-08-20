@@ -67,9 +67,21 @@ function filterAndEvaluateRetirement($questions) {
 			continue;
 		}
 
-		// Question manually suspended
+		// Question manually suspended or in suspension cycle
 		if ($q->suspensionend > time()) {
 			$flags[4] = '1';
+		}
+		if($q->disableperiod && $q->enableperiod && $flags[4] != '1') {
+			$timenow = time();
+			while($timenow - $q->lastcycle > ($q->cyclesuspended ? $q->disableperiod : $q->enableperiod)) {
+				echo 'flip ' . $q->lastcycle . ' ' . $q->cyclesuspended . '<br>';
+				$q->lastcycle += $q->cyclesuspended ? $q->disableperiod : $q->enableperiod;
+				$q->cyclesuspended = $q->cyclesuspended ? 0 : 1;
+				echo 'flipped ' . $q->lastcycle . ' ' . $q->cyclesuspended . '<br>';
+			}
+			if($q->cyclesuspended) {
+				$flags[4] = '1';
+			}
 		}
 
 		// Question retired based on version

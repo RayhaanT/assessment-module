@@ -23,7 +23,12 @@
  */
 
 $string['suspensionend'] = 'Suspend question until:';
-$string['suspension'] = 'Suspend question in quiz modules';
+$string['onetimesuspension'] = 'One-time suspension';
+$string['periodicsuspension'] = 'Periodic suspension';
+$string['enabledperiod'] = 'Enabled period length';
+$string['disabledperiod'] = 'Disabled period length';
+$string['periodicsuspension_help'] = 'The question will cycle between being disabled and enabled for the given periods of time. The cycle begins with the question disabled.';
+$string['suspensioncyclestarttime'] = 'Time when the cycle will begin';
 $string['versionheader'] = 'Acceptable Versions';
 $string['topicversiongroup'] = 'Version for topic: {$a}';
 $string['techversion'] = 'Version number';

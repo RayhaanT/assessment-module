@@ -570,7 +570,7 @@ class view {
      * @param array $tagids current list of selected tags.
      */
     public function display($tabname, $page, $perpage, $cat,
-            $recurse, $showhidden, $showquestiontext, $tagids = []) {
+            $recurse, $showhidden, $showquestiontext, $tagids = [], $showmodulesettings = true) {
         global $PAGE, $CFG;
 
         if ($this->process_actions_needing_ui()) {
@@ -594,43 +594,45 @@ class view {
         array_unshift($this->searchconditions, new \core_question\bank\search\category_condition(
                 $cat, $recurse, $editcontexts, $this->baseurl, $this->course));
 
-        echo \html_writer::start_div('configuremodule');
-        echo \html_writer::start_tag('form', array(
-            'method' => 'post',
-            'action' => new \moodle_url('/question/modulesettings.php', array('courseid' => $this->course->id)),
-            'id' => 'modulesettings',
-        ));
-        echo \html_writer::empty_tag('input', array(
-            'type' => 'hidden',
-            'name' => 'courseid',
-            'value' => $this->course->id
-        ));
-        echo \html_writer::empty_tag('input', array(
-            'type' => 'submit',
-            'class' => 'submitbutton btn btn-primary',
-            'value' => 'Configure module settings'
-        ));
-        echo \html_writer::end_tag('form');
-        echo \html_writer::end_div();
+        if($showmodulesettings) {
+            echo \html_writer::start_div('configuremodule');
+            echo \html_writer::start_tag('form', array(
+                'method' => 'post',
+                'action' => new \moodle_url('/question/modulesettings.php', array('courseid' => $this->course->id)),
+                'id' => 'modulesettings',
+            ));
+            echo \html_writer::empty_tag('input', array(
+                'type' => 'hidden',
+                'name' => 'courseid',
+                'value' => $this->course->id
+            ));
+            echo \html_writer::empty_tag('input', array(
+                'type' => 'submit',
+                'class' => 'submitbutton btn btn-primary',
+                'value' => 'Configure module settings'
+            ));
+            echo \html_writer::end_tag('form');
+            echo \html_writer::end_div();
 
-        echo \html_writer::start_div('configureversions');
-        echo \html_writer::start_tag('form', array(
-            'method' => 'post',
-            'action' => new \moodle_url('/question/techversion.php', array('courseid' => $this->course->id)),
-            'id' => 'techversion',
-        ));
-        echo \html_writer::empty_tag('input', array(
-            'type' => 'hidden',
-            'name' => 'courseid',
-            'value' => $this->course->id
-        ));
-        echo \html_writer::empty_tag('input', array(
-            'type' => 'submit',
-            'class' => 'submitbutton btn btn-primary',
-            'value' => 'Configure version numbers'
-        ));
-        echo \html_writer::end_tag('form');
-        echo \html_writer::end_div();
+            echo \html_writer::start_div('configureversions');
+            echo \html_writer::start_tag('form', array(
+                'method' => 'post',
+                'action' => new \moodle_url('/question/techversion.php', array('courseid' => $this->course->id)),
+                'id' => 'techversion',
+            ));
+            echo \html_writer::empty_tag('input', array(
+                'type' => 'hidden',
+                'name' => 'courseid',
+                'value' => $this->course->id
+            ));
+            echo \html_writer::empty_tag('input', array(
+                'type' => 'submit',
+                'class' => 'submitbutton btn btn-primary',
+                'value' => 'Configure version numbers'
+            ));
+            echo \html_writer::end_tag('form');
+            echo \html_writer::end_div();
+        }
 
         $this->display_options_form($showquestiontext);
 

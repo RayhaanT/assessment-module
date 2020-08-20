@@ -1429,7 +1429,11 @@
         <FIELD NAME="lifecycleexpiry" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp after which question becomes deprecated"/>
         <FIELD NAME="techversion" TYPE="float" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Current version of the question in relation to the topic. Used to selectively deprecate questions"/>
         <FIELD NAME="retirementflags" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Flags questions that should not be pulled by modules. Bitmap: 4=>time-based suspension, 3=>version 2=>expired, 1=>frequency-temporary 0=>frequency permanent"/>
-        <FIELD NAME="suspensionend" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of the end of admin-assigned suspension"/>
+        <FIELD NAME="suspensionend" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of the end of admin-assigned one-time suspension"/>
+        <FIELD NAME="enableperiod" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Length of time that the question is enabled for in a suspension cycle"/>
+        <FIELD NAME="disableperiod" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Length of time that the question is disabled for in a suspension cycle"/>
+        <FIELD NAME="lastcycle" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Last time that the cycle flipped states. Used to determine when the next flip should occur"/>
+        <FIELD NAME="cyclesuspended" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether the question is currently enabled or disabled according to its suspension cycle (1 = suspended)"/>
         <FIELD NAME="attempts" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of times this question has been attempted"/>
         <FIELD NAME="attemptaccuracy" TYPE="float" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of correct responses to the question (decimals for partial correct answers)"/>
       </FIELDS>

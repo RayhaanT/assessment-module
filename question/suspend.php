@@ -22,6 +22,14 @@ $toform = new stdClass();
 $toform->courseid = $courseid;
 $toform->id = $id;
 $toform->returnurl = $url;
+
+if(!$question = $DB->get_record('question', array('id' => $id))) {
+    throw new moodle_exception('This question does not exist');
+}
+$toform->disabledperiod = $question->disableperiod;
+$toform->enabledperiod = $question->enableperiod;
+$toform->suspensionend = $question->suspensionend;
+
 $mform = new suspend_form('suspend.php');
 $mform->set_data($toform);
 
@@ -40,6 +48,14 @@ if ($mform->is_cancelled()) {
 
     $question = $DB->get_record('question', array('id' => $id));
     $question->suspensionend = $fromform->suspensionenddate;
+
+    if($fromform->enabledperiod && $fromform->disabledperiod) {
+        $question->enableperiod = $fromform->enabledperiod;
+        $question->disableperiod = $fromform->disabledperiod;
+        $question->lastcycle = $fromform->cyclestarttime;
+        $question->cyclesuspended = 1;
+    }
+
     $DB->update_record('question', $question);
 
     redirect($returnurl);
