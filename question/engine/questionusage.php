@@ -378,7 +378,6 @@ class question_usage_by_activity {
         foreach($this->questionattempts as $qa) {
             $qid = $qa->get_question_id();
             $question = $DB->get_record('question', array('id' => $qid));
-            print_r($question);
             $question->attempts++;
             $question->attemptaccuracy += $qa->get_mark()/$qa->get_max_mark();
             $DB->update_record('question', $question);

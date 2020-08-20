@@ -217,6 +217,7 @@ class qtype_coderunner extends question_type {
             $testcase->hiderestiffail = isset($question->hiderestiffail[$i]);
             $testcase->mark = trim($question->mark[$i]) == '' ? 1.0 : floatval($question->mark[$i]);
             $testcase->ordering = intval($question->ordering[$i]);
+            $testcase->skillarea = trim($question->skillarea[$i]);
             $testcases[] = $testcase;
         }
 

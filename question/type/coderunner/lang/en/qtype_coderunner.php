@@ -22,6 +22,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['skillarea'] = 'Skill area';
+$string['skillimprovement'] = 'The following skill areas need improvement:';
+
 $string['aborted'] = 'Testing was aborted due to error.';
 $string['ace_ui_notready'] = 'Ace editor not ready. Perhaps reload page?';
 $string['addingcoderunner'] = 'Adding a new CodeRunner Question';

@@ -309,6 +309,8 @@ class qtype_coderunner_edit_form extends question_edit_form {
         $repeated[] = $mform->createElement('textarea', 'extra',
                 get_string('extra', 'qtype_coderunner'),
                 array('rows' => 3, 'class' => 'testcaseresult edit_code'));
+        $group[] = $mform->createElement('text', 'skillarea',
+                get_string('skillarea', 'qtype_coderunner'));
         $group[] = $mform->createElement('checkbox', 'useasexample', null,
                 get_string('useasexample', 'qtype_coderunner'));
 
@@ -350,6 +352,7 @@ class qtype_coderunner_edit_form extends question_edit_form {
         $repeatedoptions['mark']['type'] = PARAM_FLOAT;
         $repeatedoptions['ordering']['type'] = PARAM_INT;
         $repeatedoptions['testtype']['type'] = PARAM_RAW;
+        $repeatedoptions['skillarea']['type'] = PARAM_TEXT;
 
         foreach (array('testcode', 'stdin', 'expected', 'extra', 'testcasecontrols', 'testtype') as $field) {
             $repeatedoptions[$field]['helpbutton'] = array($field, 'qtype_coderunner');
@@ -402,6 +405,7 @@ class qtype_coderunner_edit_form extends question_edit_form {
                 $question->display[] = $tc->display;
                 $question->hiderestiffail[] = $tc->hiderestiffail;
                 $question->mark[] = sprintf("%.3f", $tc->mark);
+                $question->skillarea[] = $tc->skillarea;
             }
 
             // The customise field isn't listed as an extra-question-field so also

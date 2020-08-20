@@ -69,6 +69,7 @@
         <FIELD NAME="display" TYPE="char" LENGTH="30" NOTNULL="true" DEFAULT="SHOW" SEQUENCE="false" COMMENT="Controls display of this testcase to the students. One of SHOW, HIDE, HIDE_IF_FAIL, HIDE_IF_SUCCEED"/>
         <FIELD NAME="hiderestiffail" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If this test fails, hide all subsequent tests regardless of their display settings"/>
         <FIELD NAME="mark" TYPE="number" LENGTH="8" NOTNULL="true" DEFAULT="1.0" SEQUENCE="false" DECIMALS="3" COMMENT="Mark for this testcase (only if not an all_or_nothing question)"/>
+        <FIELD NAME="skillarea" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Area of skill being tested by this test. Used in the report to highlight areas of weakness."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

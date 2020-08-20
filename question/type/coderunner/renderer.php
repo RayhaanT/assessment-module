@@ -168,10 +168,14 @@ class qtype_coderunner_renderer extends qtype_renderer {
         if($review) {
             $alloutcomes = array();
             $attemptsteps = $DB->get_records('question_attempt_steps', array('questionattemptid' => $qa->get_database_id()));
-            foreach($attemptsteps as $step) {
-                if($newanswer = $DB->get_record('question_attempt_step_data', array('attemptstepid' => $step->id, 'name' => 'answer'))) {
+            $attemptstepkeys = array_keys($attemptsteps);
+            for($x = 0; $x < count($attemptsteps); $x++) {
+                if($newanswer = $DB->get_record('question_attempt_step_data', array('attemptstepid' => $attemptsteps[$attemptstepkeys[$x]]->id, 'name' => 'answer'))) {
                     array_push($allanswers, $newanswer->value);
-                    if ($newoutcome = $DB->get_record('question_attempt_step_data', array('attemptstepid' => $step->id, 'name' => '_testoutcome'))) {
+                    if ($newoutcome = $DB->get_record('question_attempt_step_data', array('attemptstepid' => $attemptsteps[$attemptstepkeys[$x]]->id, 'name' => '_testoutcome'))) {
+                        array_push($alloutcomes, unserialize($newoutcome->value));
+                    }
+                    else if($newoutcome = $DB->get_record('question_attempt_step_data', array('attemptstepid' => $attemptsteps[$attemptstepkeys[$x + 1]]->id, 'name' => '_testoutcome'))) {
                         array_push($alloutcomes, unserialize($newoutcome->value));
                     }
                 }
@@ -408,6 +412,9 @@ class qtype_coderunner_renderer extends qtype_renderer {
 
             $fb .= $this->build_feedback_summary($qa, $outcome);
         }
+
+        $fb .= $this->build_skill_area_feedback($q, $outcome);
+
         $fb .= html_writer::end_tag('div');
 
         return $fb;
@@ -498,6 +505,34 @@ class qtype_coderunner_renderer extends qtype_renderer {
         return $fb;
     }
 
+
+    protected function build_skill_area_feedback(qtype_coderunner_question $q, qtype_coderunner_testing_outcome $outcome) {
+        global $DB;
+        $lines = array();
+        $testresults = $outcome->testresults;
+
+        // Find all failed skill areas
+        $skills = array();
+        foreach($testresults as $t) {
+            if(!$t->iscorrect) {
+                if($dbtest = $DB->get_record('question_coderunner_tests', array('id' => $t->id))) {
+                    if($dbtest->skillarea) {
+                        array_push($skills, $dbtest->skillarea);
+                    }
+                }
+            }
+        }
+        $skills = array_unique($skills);
+
+        if(count($skills)) {
+            $lines[] = get_string('skillimprovement', 'qtype_coderunner');
+            foreach($skills as $s) {
+                $lines[] = str_repeat('&emsp;', 4) . '- ' . $s;
+            }
+        }
+
+        return qtype_coderunner_util::make_html_para($lines);
+    }
 
     // Compute the HTML feedback summary for this test outcome.
     // Should not be called if there were any syntax or sandbox errors.

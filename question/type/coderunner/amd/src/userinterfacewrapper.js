@@ -361,7 +361,7 @@ define(['jquery', 'qtype_coderunner/diff', 'qtype_coderunner/diff2htmlui'], func
         const targetElement = document.getElementById(textareaId);
         const configuration = {
             inputFormat: "json",
-            drawFileList: true,
+            drawFileList: false,
             matching: "lines",
             highlight: true,
             outputFormat: 'side-by-side',
@@ -437,6 +437,18 @@ define(['jquery', 'qtype_coderunner/diff', 'qtype_coderunner/diff2htmlui'], func
         diff2HtmlUI.highlightCode();
     }
 
+    /**
+    *  A button action function. Switches from single diff viewer to all diff viewer.
+    * @param string buttonId, id of the button triggering the function
+    * @param string preload, original file text for first diff
+    * @param array answers, array of answer text for diffs
+    * @param array passedTests, array indicating the number of tests passed by each attempt (-1 = error)
+    * @param int noTests, number of total tests for this question
+    * @param string singleId, id of the div containing the single diff viewer
+    * @param string multiId, id of the div containing the diff viewer with all attempts
+    * @param string language, language used in the question
+    * @returns {userinterfacewrapperL#111.InterfaceWrapper}
+    */
     function singleToMulti(buttonId, preload, answers, passedTests, noTests, singleId, multiId, language) {
         var toggleButton = $('[id="' + buttonId + '"]');
 
@@ -456,6 +468,18 @@ define(['jquery', 'qtype_coderunner/diff', 'qtype_coderunner/diff2htmlui'], func
         toggleButton.attr('value', 'Hide intermediate code submissions');
     }
 
+    /**
+    *  A button action function. Switches from all diff viewer to single diff viewer.
+    * @param string buttonId, id of the button triggering the function
+    * @param string preload, original file text for first diff
+    * @param array answers, array of answer text for diffs
+    * @param array passedTests, array indicating the number of tests passed by each attempt (-1 = error)
+    * @param int noTests, number of total tests for this question
+    * @param string singleId, id of the div containing the single diff viewer
+    * @param string multiId, id of the div containing the diff viewer with all attempts
+    * @param string language, language used in the question
+    * @returns {userinterfacewrapperL#111.InterfaceWrapper}
+    */
     function multiToSingle(buttonId, preload, answers, passedTests, noTests, singleId, multiId, language) {
         var toggleButton = $('[id="' + buttonId + '"]');
 
@@ -475,6 +499,18 @@ define(['jquery', 'qtype_coderunner/diff', 'qtype_coderunner/diff2htmlui'], func
         toggleButton.attr('value', 'Show all code submissions');
     }
 
+    /**
+    *  PHP entry point to set up the button to toggle between diff viewers
+    * @param string buttonId, id of the toggle button
+    * @param string preload, original file text for first diff
+    * @param array answers, array of answer text for diffs
+    * @param array passedTests, array indicating the number of tests passed by each attempt (-1 = error)
+    * @param int noTests, number of total tests for this question
+    * @param string singleId, id of the div containing the single diff viewer
+    * @param string multiId, id of the div containing the diff viewer with all attempts
+    * @param string language, language used in the question
+    * @returns {userinterfacewrapperL#111.InterfaceWrapper}
+    */
     function initDiffToggleButton(buttonId, preload, answers, passedTests, noTests, singleId, multiId, language) {
         var toggleButton = $('[id="' + buttonId + '"]');
         toggleButton.css({
