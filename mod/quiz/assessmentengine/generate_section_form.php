@@ -53,6 +53,9 @@ class generate_section_form extends moodleform {
     $mform->addElement('hidden', 'returnurl');
     $mform->setType('returnurl', PARAM_LOCALURL);
 
+    $mform->addElement('hidden', 'category');
+    $mform->setType('category', PARAM_INT);
+
     // General fields
     $mform->addElement('text', 'name', get_string('modulenamefield', 'quiz'));
     $mform->setType('name', PARAM_TEXT);

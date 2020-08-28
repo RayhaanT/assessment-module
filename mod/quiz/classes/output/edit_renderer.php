@@ -687,7 +687,8 @@ class edit_renderer extends \plugin_renderer_base {
         // Generate a new section of questions from the assessment engine
         $generationParams = array(
             'returnurl' => $returnurl->out_as_local_url(false),
-            'cmid' => $structure->get_cmid(), 'addbeforepage' => $page
+            'cmid' => $structure->get_cmid(), 'addbeforepage' => $page,
+            'category' => $questioncategoryid
         );
         $actions['addgeneratedsection'] = new \action_menu_link_secondary(
             new \moodle_url('/mod/quiz/assessmentengine/generatesection.php', $generationParams),
@@ -792,8 +793,8 @@ class edit_renderer extends \plugin_renderer_base {
         $output .= html_writer::div('', 'mod-indent');
 
         // Display the link to the question (or do nothing if question has no url).
-        if ($structure->get_question_type_for_slot($slot) == 'random') {
-            $questionname = $this->random_question($structure, $slot, $pageurl);
+        if ($structure->get_question_type_for_slot($slot) == 'random' || $structure->get_question_type_for_slot($slot) == 'modtemplate') {
+            $questionname = $this->random_question($structure, $slot, $pageurl, $structure->get_question_type_for_slot($slot) == 'modtemplate');
         } else {
             $questionname = $this->question_name($structure, $slot, $pageurl);
         }
@@ -1017,13 +1018,19 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \moodle_url $pageurl the canonical URL of this page.
      * @return string HTML to output.
      */
-    public function random_question(structure $structure, $slotnumber, $pageurl) {
+    public function random_question(structure $structure, $slotnumber, $pageurl, $modtemplate = false) {
 
         $question = $structure->get_question_in_slot($slotnumber);
         $slot = $structure->get_slot_by_number($slotnumber);
         $slottags = $structure->get_slot_tags_for_slot_id($slot->id);
-        $editurl = new \moodle_url('/mod/quiz/editrandom.php',
+        if(!$modtemplate) {
+            $editurl = new \moodle_url('/mod/quiz/editrandom.php',
+                    array('returnurl' => $pageurl->out_as_local_url(), 'slotid' => $slot->id));
+        }
+        else {
+            $editurl = new \moodle_url('/mod/quiz/editmodtemplate.php',
                 array('returnurl' => $pageurl->out_as_local_url(), 'slotid' => $slot->id));
+        }
 
         $temp = clone($question);
         $temp->questiontext = '';

@@ -168,6 +168,10 @@ class mod_quiz_mod_form extends moodleform_mod {
         // -------------------------------------------------------------------------------
         $mform->addElement('header', 'interactionhdr', get_string('questionbehaviour', 'quiz'));
 
+        // Adaptive questions
+        $mform->addElement('selectyesno', 'useadaptivequestions', get_string('adaptivequestions', 'quiz'));
+        $mform->addHelpButton('useadaptivequestions', 'adaptivequestions', 'quiz');
+
         // Shuffle within questions.
         $mform->addElement('selectyesno', 'shuffleanswers', get_string('shufflewithin', 'quiz'));
         $mform->addHelpButton('shuffleanswers', 'shufflewithin', 'quiz');

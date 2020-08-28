@@ -1,187 +1,18 @@
 <?php
 
-function addSelectCondition($currentCondition, $column, $value) {
-    if (!$value) {
-        return $currentCondition;
-    }
-    if ($currentCondition != '') {
-        $currentCondition .= ' AND ';
-    }
-    $currentCondition .= $column . " = '" . $value . "'";
-    return $currentCondition;
-}
-
-function filterDuplicates($questions, $existing) {
-	foreach($existing as $e) {
-		if (($key = array_search($e, $questions)) !== false) {
-			unset($questions[$key]);
-		}
-	}
-	return $questions;
-}
-
-function getAverageDifficulty($diffstring) {
-	global $DB;
-	$alldiffs = $DB->get_records('question_difficulties', null, 'listindex');
-	if(strpos($diffstring, ':') !== false) {
-		$diffpairs = explode(',', $diffstring);
-		$diffs = array();
-		foreach($diffpairs as $d) {
-			array_push($diffs, explode(':', $d)[1]);
-		}
-		$diffnumbers = array();
-		foreach($diffs as $d) {
-			foreach($alldiffs as $a) {
-				if($d == $a->name) {
-					array_push($diffnumbers, $a->listindex);
-					break;
-				}
-			}
-		}
-		$total = 0;
-		foreach($diffnumbers as $n) {
-			$total += $n;
-		}
-		$averageindex = ceil($total/count($diffnumbers));
-		foreach($alldiffs as $d) {
-			if($d->listindex == $averageindex) {
-				return $d->name;
-			}
-		}
-	}
-	else {
-		return $diffstring;
-	}
-	return null;
-}
-
-function filterAndEvaluateRetirement($questions) {
-	global $DB;
-	$filteredQuestions = array();
-	$ranges = $DB->get_records('question_retirement_ranges', null, 'upperbound');
-
-	foreach($questions as $q) {
-		$flags = '00000';
-		// If permanently removed for too many correct answers
-		if ($q->retirementflags > 15) {
-			continue;
-		}
-
-		// Question manually suspended or in suspension cycle
-		if ($q->suspensionend > time()) {
-			$flags[4] = '1';
-		}
-		if($q->disableperiod && $q->enableperiod && $flags[4] != '1') {
-			$timenow = time();
-			while($timenow - $q->lastcycle > ($q->cyclesuspended ? $q->disableperiod : $q->enableperiod)) {
-				echo 'flip ' . $q->lastcycle . ' ' . $q->cyclesuspended . '<br>';
-				$q->lastcycle += $q->cyclesuspended ? $q->disableperiod : $q->enableperiod;
-				$q->cyclesuspended = $q->cyclesuspended ? 0 : 1;
-				echo 'flipped ' . $q->lastcycle . ' ' . $q->cyclesuspended . '<br>';
-			}
-			if($q->cyclesuspended) {
-				$flags[4] = '1';
-			}
-		}
-
-		// Question retired based on version
-		if ($version = $DB->get_record('question_versions', array('topic' => $q->topic))) {
-			if ($q->techversion > 0 && $q->techversion < $version->version) {
-				$flags[3] = '1';
-			}
-		}
-
-		// Question expired
-		if($q->lifecycleexpiry > 0 && $q->lifecycleexpiry < time()) {
-			$flags[2] = '1';
-		}
-
-		// Question retired/suspended because of too many correct answers
-		if($q->attempts > 40) {
-			$thisrange = 1;
-			foreach($ranges as $r) {
-				if($r->upperbound >= $q->attempts) {
-					break;
-				}
-				$thisrange++;
-			}
-			
-			if($q->overalldifficulty > 0) {
-				$thisdiff = $DB->get_record('question_difficulties', array('listindex' => $q->overalldifficulty));
-			}
-			else {
-				$diffname = getAverageDifficulty($q->difficulty);
-				$thisdiff = $DB->get_record('question_difficulties', array('name' => $diffname));
-			}
-
-			$rangename = 'range' . $thisrange;
-			if($q->attempts != 0) {
-				if($thisdiff->$rangename / 100 < $q->attemptaccuracy / $q->attempts) {
-					$flags[1] = '1';
-
-					// If its already been suspended
-					if($q->retirementflags > 7) {
-						$flags[0] = '1';
-					}
-					else {
-						// Suspend for a week
-						$q->suspensionend = time() + 604800;
-					}
-				}
-			}
-		}
-
-		$flagsdec = bindec($flags);
-		// Update permanent flags in db
-		if ($flagsdec != $q->retirementflags) {
-			$baseflags = 0;
-			if($q->retirementflags > 15 || $flagsdec > 15) {
-				$baseflags = 16;
-			}
-			else if($q->retirementflags > 7 || $flagsdec > 7) {
-				$baseflags = 8;
-			}
-			$variableflags = bindec(substr($flags, 2));
-			$q->retirementflags = $baseflags + $variableflags;
-		}
-		$DB->update_record('question', $q);
-		// If the current flags are all down, let it through
-		if ($flagsdec == 0) {
-			array_push($filteredQuestions, $q);
-		}
-	}
-
-	return $filteredQuestions;
-}
-
-function getQuestionsInQuiz($quiz) {
-	global $DB;
-
-	$questionslotsinquiz = $DB->get_records('quiz_slots', array('quizid' => $quiz->id));
-	$selectquestions = '';
-	foreach ($questionslotsinquiz as $q) {
-		if ($selectquestions != '') {
-			$selectquestions .= ' OR ';
-		}
-		$selectquestions .= "id = '" . $q->questionid . "'";
-	}
-	if ($selectquestions != '') {
-		return $DB->get_records_select('question', $selectquestions);
-	}
-	return array();
-}
-
 require_once(__DIR__ . '/../../../config.php');
 require_once(__DIR__ . '/../../../question/editlib.php');
 require_once(__DIR__ . '/generate_section_form.php');
 require_once($CFG->libdir . '/filelib.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once($CFG->libdir . '/formslib.php');
+require_once(__DIR__ . '/modulelib.php');
 
 // GET properties
 $returnurl = optional_param('returnurl', 0, PARAM_LOCALURL);
 $cmid = optional_param('cmid', 0, PARAM_INT);
 $addbeforepage = optional_param('addbeforepage', 0, PARAM_INT);
+$category = optional_param('category', 0, PARAM_INT);
 
 $url = new moodle_url('/mod/quiz/generatesection/generatesection.php');
 if ($returnurl !== 0) {
@@ -219,6 +50,7 @@ $mform = NULL;
 $toform = new stdClass();
 $toform->returnurl = $url;
 $toform->addbeforepage = $addbeforepage;
+$toform->category = $category;
 if ($cm !== null) {
 	$toform->cmid = $cm->id;
 	$toform->courseid = $cm->course;
@@ -241,8 +73,7 @@ if ($mform->is_cancelled()) {
 	$returnurl->param('cmid', $cmid);
 
 	// Get quiz data objects
-	list($thispageurl, $contexts, $cmid, $cm, $quiz, $pagevars) =
-		question_edit_setup('editq', '/mod/quiz/assessmentengine/generatesection.php', true);
+	list($quiz, $cm) = get_module_from_cmid($cmid);
 	$course = $DB->get_record('course', array('id' => $quiz->course), '*', MUST_EXIST);
 	$quizobj = new quiz($quiz, $cm, $course);
 	$structure = $quizobj->get_structure();
@@ -301,32 +132,73 @@ if ($mform->is_cancelled()) {
 			$difficultyfields[$d->name] = str_replace(' ', '', $d->name) . 'qnum';
 		}
 		foreach($difficultyfields as $diffname => $field) {
-			$questionsinquiz = getQuestionsInQuiz($quiz);
+			// $questionsinquiz = getQuestionsInQuiz($quiz);
+
+			// $qnum = $fromform->$field[$m];
+			// if($role) {
+			// 	$rolecondition = $condition . " AND difficulty REGEXP '" . $role . ':' . $diffname . "'";
+			// } else {
+			// 	$rolecondition = $condition . " AND difficulty REGEXP '" . $diffname . "'";
+			// }
+			// $rawcondition = addSelectCondition($condition, 'difficulty', $diffname);
+			// $qpool = $DB->get_records_select('question', $rolecondition);
+			// $qpool = array_merge($qpool, $DB->get_records_select('question', $rawcondition));
+			// $qpool = filterDuplicates($qpool, $questionsinquiz);
+			// $qpool = filterAndEvaluateRetirement($qpool);
+			// $maxindex = sizeof($qpool) - 1;
+			// if($maxindex + 1 < $qnum) {
+			// 	$qnum = $maxindex + 1;
+			// }
+			// $indexedpool = [];
+			// foreach ($qpool as $q) {
+			// 	array_push($indexedpool, $q);
+			// }
+			// for ($y = 0; $y < $qnum; $y++) {
+			// 	$newq = rand(0, $maxindex);
+			// 	quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage, null, true);
+			// 	array_splice($indexedpool, $newq, 1);
+			// 	$maxindex--;
+			// }
+			// $addqsection += $qnum;
 
 			$qnum = $fromform->$field[$m];
+			if($qnum < 1) {
+				continue;
+			}
+			$newTemplate = generateBlankQuestion();
+			$newTemplate->qtype = 'modtemplate';
+			$newTemplate->category = $category;
+			$newTemplate->name = $diffname . ' ';
+			if($topic) {
+				$newTemplate->topic = $topic;
+				$newTemplate->name .= $topic . ' ';
+			}
+			$newTemplate->name .= 'question template';
 			if($role) {
-				$rolecondition = $condition . " AND difficulty REGEXP '" . $role . ':' . $diffname . "'";
-			} else {
-				$rolecondition = $condition . " AND difficulty REGEXP '" . $diffname . "'";
+				$newTemplate->difficulty = $role . ':' . $diffname;
+				if($role[sizeof($role) - 1] == 's') {
+					$newTemplate->name .= ' for ' . $role;
+				}
+				else {
+					$newTemplate->name .= ' for ' . $role . 's';
+				}
 			}
-			$rawcondition = addSelectCondition($condition, 'difficulty', $diffname);
-			$qpool = $DB->get_records_select('question', $rolecondition);
-			$qpool = array_merge($qpool, $DB->get_records_select('question', $rawcondition));
-			$qpool = filterDuplicates($qpool, $questionsinquiz);
-			$qpool = filterAndEvaluateRetirement($qpool);
-			$maxindex = sizeof($qpool) - 1;
-			if($maxindex + 1 < $qnum) {
-				$qnum = $maxindex + 1;
+			else {
+				$newTemplate->difficulty = $diffname;
 			}
-			$indexedpool = [];
-			foreach ($qpool as $q) {
-				array_push($indexedpool, $q);
+
+			$pendingTemplates = array();
+			for($z = 0; $z < $qnum; $z++) {
+				array_push($pendingTemplates, $newTemplate);
+			}
+			$templateDiff = validateTemplates($quiz, $pendingTemplates);
+			if($templateDiff !== true) {
+				$qnum -= $templateDiff;
 			}
 			for ($y = 0; $y < $qnum; $y++) {
-				$newq = rand(0, $maxindex);
-				quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage, null, true);
-				array_splice($indexedpool, $newq, 1);
-				$maxindex--;
+				$newq = $DB->insert_record('question', $newTemplate);
+				$DB->set_field('question', 'version', make_unique_id_code(), array('id' => $question->id));
+				quiz_add_quiz_question($newq, $quiz, $addbeforepage, null, true);
 			}
 			$addqsection += $qnum;
 		}
@@ -341,7 +213,7 @@ if ($mform->is_cancelled()) {
 		for ($x = 0; $x < $addqsection - 1; $x++) {
 			$repage->repaginate_slots($lastslot + $x + 2, 1);
 		}
-	} 
+	}
 	else {
 		// Move all questions from later pages down a page
 		$condition = "page > '" . $addbeforepage . "'" . " AND " . "quizid = '" . $quiz->id . "'";

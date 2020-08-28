@@ -937,7 +937,7 @@ class structure {
         }
 
         $qtype = $DB->get_field('question', 'qtype', array('id' => $slot->questionid));
-        if ($qtype === 'random') {
+        if ($qtype === 'random' || $qtype == 'modtemplate') {
             // This function automatically checks if the question is in use, and won't delete if it is.
             question_delete_question($slot->questionid);
         }

@@ -69,6 +69,7 @@ define('QUIZ_NAVMETHOD_SEQ',  'sequential');
 define('QUIZ_EVENT_TYPE_OPEN', 'open');
 define('QUIZ_EVENT_TYPE_CLOSE', 'close');
 
+// Enables/disables section time limits and adaptive questions
 function update_section_time_limits($quiz) {
     global $DB;
 
@@ -91,6 +92,11 @@ function update_section_time_limits($quiz) {
     else {
         $quiz->usesectiontimelimits = 0;
     }
+
+    if($quiz->useadaptivequestions) {
+        $quiz->navmethod = 'sequential';
+    }
+
     $DB->update_record('quiz', $quiz);
     return $quiz;
 }
