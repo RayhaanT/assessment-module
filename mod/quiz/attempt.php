@@ -114,11 +114,6 @@ if (!$attemptobj->set_currentpage($page)) {
 
 $updatedcurrentpage = $DB->get_record('quiz_attempts', array('id' => $attemptobj->get_attemptid()))->currentpage;
 if($oldpage < $updatedcurrentpage) {
-    $x = fullclone($attemptobj);
-    unset($x->quizobj);
-    unset($x->quba);
-    print_r($x);
-
     $firstslot = $attemptobj->get_pagelayout()[$updatedcurrentpage][0];
     $secnumber = 0;
     foreach($attemptobj->get_sections() as $sec) {

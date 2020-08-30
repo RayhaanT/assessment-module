@@ -597,13 +597,13 @@ class quiz_attempt {
     const MAX_SLOTS_FOR_DEFAULT_REVIEW_SHOW_ALL = 50;
 
     /** @var quiz object containing the quiz settings. */
-    public $quizobj;
+    protected $quizobj;
 
     /** @var stdClass the quiz_attempts row. */
     protected $attempt;
 
     /** @var question_usage_by_activity the question usage for this quiz attempt. */
-    public $quba;
+    protected $quba;
 
     /**
      * @var array of slot information. These objects contain ->slot (int),
