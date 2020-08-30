@@ -867,6 +867,9 @@ class view {
         $questionsrs = $this->load_page_questions($page, $perpage);
         $questions = [];
         foreach ($questionsrs as $question) {
+            if($question->qtype == 'modtemplate') {
+                continue;
+            }
             $questions[$question->id] = $question;
         }
         $questionsrs->close();

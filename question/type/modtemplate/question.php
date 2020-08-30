@@ -39,7 +39,7 @@ require_once($CFG->dirroot . '/question/type/questionbase.php');
  * @copyright  2009 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_missingtype_question extends question_definition
+class qtype_modtemplate_question extends question_definition
         implements question_automatically_gradable {
     public function get_expected_data() {
         return array();
@@ -82,13 +82,11 @@ class qtype_missingtype_question extends question_definition
     }
 
     public function start_attempt(question_attempt_step $step, $variant) {
-        throw new coding_exception('This question is of a type that is not installed ' .
-                'on your system. No processing is possible.');
+        parent::start_attempt($step, $variant);
     }
 
     public function grade_response(array $response) {
-        throw new coding_exception('This question is of a type that is not installed ' .
-                'on your system. No processing is possible.');
+        
     }
 
     public function get_hint($hintnumber, question_attempt $qa) {

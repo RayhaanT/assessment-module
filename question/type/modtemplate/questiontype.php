@@ -239,10 +239,6 @@ class qtype_modtemplate extends question_type {
         return $questionids;
     }
 
-    public function make_question($questiondata) {
-        return $this->choose_other_question($questiondata, array());
-    }
-
     /**
      * Load the definition of another question picked randomly by this question.
      * @param object       $questiondata the data defining a random question.

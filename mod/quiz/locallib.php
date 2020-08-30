@@ -39,6 +39,7 @@ require_once($CFG->dirroot . '/mod/quiz/attemptlib.php');
 require_once($CFG->libdir . '/completionlib.php');
 require_once($CFG->libdir . '/filelib.php');
 require_once($CFG->libdir . '/questionlib.php');
+require_once($CFG->dirroot . '/mod/quiz/assessmentengine/modulelib.php');
 
 
 /**
@@ -171,6 +172,7 @@ function quiz_start_new_attempt($quizobj, $quba, $attempt, $attemptnumber, $time
 
     // First load all the non-random questions.
     $randomfound = false;
+    $templatefound = false;
     $slot = 0;
     $questions = array();
     $maxmark = array();
@@ -182,6 +184,12 @@ function quiz_start_new_attempt($quizobj, $quba, $attempt, $attemptnumber, $time
         if ($questiondata->qtype == 'random') {
             $randomfound = true;
             continue;
+        }
+        if($questiondata->qtype == 'modtemplate') {
+            $templatefound = true;
+        }
+        if ($questiondata->qtype == 'multianswer') {
+            print_r($questiondata);
         }
         if (!$quizobj->get_quiz()->shuffleanswers) {
             $questiondata->options->shuffleanswers = false;
@@ -244,6 +252,11 @@ function quiz_start_new_attempt($quizobj, $quba, $attempt, $attemptnumber, $time
         }
     }
 
+    if ($templatefound) {
+        // Call function to replace templates with real questions
+        execute_module_templates($quizobj, $quba, $attempt, $timenow, 0, false);
+    }
+
     // Start all the questions.
     $variantstrategy = new core_question\engine\variants\least_used_strategy($quba, $qubaids);
 
@@ -301,6 +314,79 @@ function quiz_start_new_attempt($quizobj, $quba, $attempt, $attemptnumber, $time
     $attempt->layout = implode(',', $layout);
 
     return $attempt;
+}
+
+/**
+ * Replaces module templates with acutal questions according to the template parameters.
+ *
+ * @param quiz      $quizobj
+ * @param question_usage_by_activity $quba
+ * @param object    $attempt
+ * @param int       $page - page number on which to remove templates
+ *
+ * @throws moodle_exception
+ * @return object   modified attempt object
+ */
+function execute_module_templates($quizObj, $quba, $attempt, $timeNow, $section, $startQuestions = true) {
+    global $DB;
+    $slotnums = $quba->get_slots();
+
+    $sections = $quizObj->get_sections();
+    foreach ($sections as $i => $sec) {
+        if (isset($sections[$i + 1])) {
+            $sections[$i]->lastslot = $sections[$i + 1]->firstslot - 1;
+        } else {
+            $sections[$i]->lastslot = count($slotnums);
+        }
+    }
+
+    $templateSlots = array();
+    $allQuestions = array();
+    foreach($slotnums as $slot) {
+        $question = $quba->get_question($slot);
+        if (get_class($question->qtype) == 'qtype_modtemplate') {
+            if ($slot >= $sections[$section]->firstslot && $slot <= $sections[$section]->lastslot) {
+                $templateSlots[$slot] = $question;
+            }
+        }
+        $allQuestions[$slot] = $question;
+    }
+
+    foreach($templateSlots as $slot => $temp) {
+        unset($allQuestions[$slot]);
+        $pull = fillTemplate($temp, $allQuestions);
+        // if ($pull->qtype == 'multianswer') {
+        //     // echo 'xxxxxx';
+        //     // print_r($pullObj);
+        //     $subQuestions = $DB->get_records('question', array('parent' => $pull->id));
+        //     $pull->options->questions = [];
+
+        //     foreach($subQuestions as $s) {
+        //         $pull->options->questons[] = $s;
+        //     }
+        // }
+        print_r($pull);
+        get_question_options($pull);
+        $maxMark = $pull->maxmark;
+        $pullObj = question_bank::make_question($pull);
+        $allQuestions[$slot] = $pullObj;
+
+        $newSlot = $quba->replace_question($pullObj, $maxMark, $slot);
+        if($newSlot != $slot) {
+            throw new coding_exception('Slot numbers have got confused.');
+        }
+
+        if($startQuestions) {
+            $qubaIds = new \mod_quiz\question\qubaids_for_users_attempts(
+                $quizObj->get_quizid(),
+                $attempt->userid
+            );
+            $variantStrategy = new core_question\engine\variants\least_used_strategy($quba, $qubaIds);
+            $qa = $quba->get_question_attempt($slot);
+            $variant = $qa->select_variant($variantStrategy);
+            $quba->start_question($slot, $variant, $timeNow);
+        }
+    }
 }
 
 /**

@@ -1,7 +1,6 @@
 <?php
 
-function addSelectCondition($currentCondition, $column, $value)
-{
+function addSelectCondition($currentCondition, $column, $value) {
     if (!$value) {
         return $currentCondition;
     }
@@ -12,8 +11,7 @@ function addSelectCondition($currentCondition, $column, $value)
     return $currentCondition;
 }
 
-function filterDuplicates($questions, $existing)
-{
+function filterDuplicates($questions, $existing) {
     foreach ($existing as $e) {
         if (($key = array_search($e, $questions)) !== false) {
             unset($questions[$key]);
@@ -22,8 +20,7 @@ function filterDuplicates($questions, $existing)
     return $questions;
 }
 
-function getAverageDifficulty($diffstring)
-{
+function getAverageDifficulty($diffstring) {
     global $DB;
     $alldiffs = $DB->get_records('question_difficulties', null, 'listindex');
     if (strpos($diffstring, ':') !== false) {
@@ -57,8 +54,7 @@ function getAverageDifficulty($diffstring)
     return null;
 }
 
-function generateBlankQuestion()
-{
+function generateBlankQuestion() {
     global $USER;
 
     $q = new stdClass();
@@ -73,8 +69,7 @@ function generateBlankQuestion()
     return $q;
 }
 
-function objectArrayUnique($array)
-{
+function objectArrayUnique($array) {
     $duplicate_keys = array();
     $tmp = array();
 
@@ -97,8 +92,7 @@ function objectArrayUnique($array)
     return $array;
 }
 
-function validateTemplates($quiz, $pendingTemplates = null)
-{
+function validateTemplates($quiz, $pendingTemplates = null) {
     global $DB;
     $questions = getQuestionsInQuiz($quiz);
 
@@ -203,8 +197,7 @@ function validateTemplates($quiz, $pendingTemplates = null)
     return true;
 }
 
-function filterAndEvaluateRetirement($questions)
-{
+function filterAndEvaluateRetirement($questions) {
     global $DB;
     $filteredQuestions = array();
     $ranges = $DB->get_records('question_retirement_ranges', null, 'upperbound');
@@ -298,8 +291,7 @@ function filterAndEvaluateRetirement($questions)
     return $filteredQuestions;
 }
 
-function getQuestionsInQuiz($quiz)
-{
+function getQuestionsInQuiz($quiz) {
     global $DB;
 
     $questionslotsinquiz = $DB->get_records('quiz_slots', array('quizid' => $quiz->id));
@@ -314,4 +306,82 @@ function getQuestionsInQuiz($quiz)
         return $DB->get_records_select('question', $selectquestions);
     }
     return array();
+}
+
+// Returns array of 2 conditions
+function getTemplateSQLConditions($topic, $difficulty) {
+    $condition = "qtype != 'modtemplate'";
+    if ($topic) {
+        $condition = addSelectCondition($condition, 'topic', $topic);
+    }
+    if ($condition != '') {
+        $roleCondition = $condition . " AND ";
+    }
+    $roleCondition .= "difficulty REGEXP '" . $difficulty . "'";
+
+    if (strpos($difficulty, ':') !== false) {
+        $diffname = explode(':', $difficulty)[1];
+    } else {
+        $diffname = $difficulty;
+    }
+    $rawCondition = addSelectCondition($condition, 'difficulty', $diffname);
+
+    return [$roleCondition, $rawCondition];
+}
+
+// Accepts question_definition objects as parameters
+function fillTemplate($templateObj, $existing) {
+    global $DB;
+    $templateObjs = array();
+    $usedObjs = array();
+
+    foreach($existing as $e) {
+        if($e->qtype == 'modtemplate') {
+            $templateObjs[] = $e;
+        }
+        else {
+            $usedObjs[] = $e;
+        }
+    }
+
+    $condition = "id = $templateObj->id";
+    foreach($templateObjs as $t) {
+        $condition .= " OR id = $t->id";
+    }
+    $templates = $DB->get_records_select('question', $condition);
+    $condition = '';
+    foreach($usedObjs as $u) {
+        if($condition != '') {
+            $condition .= " OR ";
+        }
+        $condition .= "id = $u->id";
+    }
+    $used = $DB->get_records_select('question', $condition);
+    $temp = $DB->get_record('question', array('id' => $templateObj->id));
+
+    $pullPool = array();
+    $conditions = getTemplateSQLConditions($temp->topic, $temp->difficulty);
+    $pullPool = $DB->get_records_select('question', $conditions[0]);
+    $pullPool = array_merge($pullPool, $DB->get_records_select('question', $conditions[1]));
+    $pullPool = filterDuplicates($pullPool, $used);
+    $noOverlap = fullclone($pullPool);
+
+    foreach($templates as $t) {
+        $conditions = getTemplateSQLConditions($temp->topic, $temp->difficulty);
+        $newPool = $DB->get_records_select('question', $conditions[0]);
+        $newPool = array_merge($newPool, $DB->get_records_select('question', $conditions[1]));
+        $noOverlap = filterDuplicates($noOverlap, $newPool);
+
+        /* For when we figure out an algorithm to optimize picking order
+        // // Only process it if there is overlap
+        // if(array_intersect(array_keys($pullPool), array_keys($newPool))) {
+
+        // }
+        */
+    }
+
+    if(sizeof($noOverlap) > 0) {
+        return $noOverlap[array_rand($noOverlap)];
+    }
+    return $pullPool[array_rand($pullPool)];
 }

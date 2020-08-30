@@ -172,6 +172,15 @@ class question_usage_by_activity {
         return $qa->get_slot();
     }
 
+    public function replace_question(question_definition $question, $maxmark, $slot) {
+        unset($this->questionattempts[$slot]);
+        $qa = new question_attempt($question, $this->get_id(), $this->observer, $maxmark);
+        $qa->set_slot($slot);
+        $this->questionattempts[$slot] = $qa;
+        $this->observer->notify_attempt_added($qa);
+        return $qa->get_slot();
+    }
+
     /**
      * Add another question to this usage, in the place of an existing slot.
      * The question_attempt that was in that slot is moved to the end at a new
