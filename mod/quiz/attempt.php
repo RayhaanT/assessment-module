@@ -107,8 +107,27 @@ if (empty($slots)) {
 }
 
 // Update attempt page, redirecting the user if $page is not valid.
+$oldpage = $attemptobj->get_currentpage();
 if (!$attemptobj->set_currentpage($page)) {
     redirect($attemptobj->start_attempt_url(null, $attemptobj->get_currentpage()));
+}
+
+$updatedcurrentpage = $DB->get_record('quiz_attempts', array('id' => $attemptobj->get_attemptid()))->currentpage;
+if($oldpage < $updatedcurrentpage) {
+    $x = fullclone($attemptobj);
+    unset($x->quizobj);
+    unset($x->quba);
+    print_r($x);
+
+    $firstslot = $attemptobj->get_pagelayout()[$updatedcurrentpage][0];
+    $secnumber = 0;
+    foreach($attemptobj->get_sections() as $sec) {
+        if($firstslot <= $sec->lastslot && $firstslot >= $sec->firstslot) {
+            break;
+        }
+        $secnumber++;
+    }
+    execute_module_templates($attemptobj->quizobj, $attemptobj->quba, $attemptobj, time(), $secnumber, true);
 }
 
 // Initialise the JavaScript.

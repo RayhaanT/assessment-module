@@ -597,13 +597,13 @@ class quiz_attempt {
     const MAX_SLOTS_FOR_DEFAULT_REVIEW_SHOW_ALL = 50;
 
     /** @var quiz object containing the quiz settings. */
-    protected $quizobj;
+    public $quizobj;
 
     /** @var stdClass the quiz_attempts row. */
     protected $attempt;
 
     /** @var question_usage_by_activity the question usage for this quiz attempt. */
-    protected $quba;
+    public $quba;
 
     /**
      * @var array of slot information. These objects contain ->slot (int),
@@ -815,6 +815,14 @@ class quiz_attempt {
     /** @return int the course id. */
     public function get_courseid() {
         return $this->quizobj->get_courseid();
+    }
+
+    public function get_pagelayout() {
+        return $this->pagelayout;
+    }
+
+    public function get_sections() {
+        return $this->sections;
     }
 
     /**
@@ -2052,6 +2060,19 @@ class quiz_attempt {
         question_engine::save_questions_usage_by_activity($this->quba);
 
         $this->attempt->timemodified = $timestamp;
+
+        $dbquiz = $DB->get_record('quiz', array('id' =>$this->get_quizid()));
+        if($dbquiz->useadaptivequestions) {
+            echo 'CURRENT: '; echo $this->get_currentpage();
+            $nextpage = $this->get_currentpage() + 2;
+            $slots = $DB->get_records_select('quiz_slots', "quizid = $dbquiz->id AND page < $nextpage");
+            foreach($slots as $s) {
+                $this->quba->finish_question($s->slot);
+            }
+            print_r($slots);
+        }
+
+        $this->attempt->sumgrades = $this->quba->get_total_mark();
         if ($this->attempt->state == self::FINISHED) {
             $this->attempt->sumgrades = $this->quba->get_total_mark();
         }
