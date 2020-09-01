@@ -132,35 +132,6 @@ if ($mform->is_cancelled()) {
 			$difficultyfields[$d->name] = str_replace(' ', '', $d->name) . 'qnum';
 		}
 		foreach($difficultyfields as $diffname => $field) {
-			// $questionsinquiz = getQuestionsInQuiz($quiz);
-
-			// $qnum = $fromform->$field[$m];
-			// if($role) {
-			// 	$rolecondition = $condition . " AND difficulty REGEXP '" . $role . ':' . $diffname . "'";
-			// } else {
-			// 	$rolecondition = $condition . " AND difficulty REGEXP '" . $diffname . "'";
-			// }
-			// $rawcondition = addSelectCondition($condition, 'difficulty', $diffname);
-			// $qpool = $DB->get_records_select('question', $rolecondition);
-			// $qpool = array_merge($qpool, $DB->get_records_select('question', $rawcondition));
-			// $qpool = filterDuplicates($qpool, $questionsinquiz);
-			// $qpool = filterAndEvaluateRetirement($qpool);
-			// $maxindex = sizeof($qpool) - 1;
-			// if($maxindex + 1 < $qnum) {
-			// 	$qnum = $maxindex + 1;
-			// }
-			// $indexedpool = [];
-			// foreach ($qpool as $q) {
-			// 	array_push($indexedpool, $q);
-			// }
-			// for ($y = 0; $y < $qnum; $y++) {
-			// 	$newq = rand(0, $maxindex);
-			// 	quiz_add_quiz_question($indexedpool[$newq]->id, $quiz, $addbeforepage, null, true);
-			// 	array_splice($indexedpool, $newq, 1);
-			// 	$maxindex--;
-			// }
-			// $addqsection += $qnum;
-
 			$qnum = $fromform->$field[$m];
 			if($qnum < 1) {
 				continue;
@@ -191,7 +162,7 @@ if ($mform->is_cancelled()) {
 			for($z = 0; $z < $qnum; $z++) {
 				array_push($pendingTemplates, $newTemplate);
 			}
-			$templateDiff = validateTemplates($quiz, $pendingTemplates);
+			$templateDiff = validateTemplatesWithQuiz($quiz, $pendingTemplates);
 			if($templateDiff !== true) {
 				$qnum -= $templateDiff;
 			}

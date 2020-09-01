@@ -188,9 +188,6 @@ function quiz_start_new_attempt($quizobj, $quba, $attempt, $attemptnumber, $time
         if($questiondata->qtype == 'modtemplate') {
             $templatefound = true;
         }
-        if ($questiondata->qtype == 'multianswer') {
-            print_r($questiondata);
-        }
         if (!$quizobj->get_quiz()->shuffleanswers) {
             $questiondata->options->shuffleanswers = false;
         }
@@ -317,6 +314,178 @@ function quiz_start_new_attempt($quizobj, $quba, $attempt, $attemptnumber, $time
 }
 
 /**
+ * Updates questions to higher difficulties based on student performance
+ *
+ * @param quiz_attempt      $attempt
+ * @param int               $lastSlot The slot number of the last question in the previous section
+ * @param int               $nextLastSlot The slot number of the last question in this section
+ */
+function adapt_questions(&$attempt, $lastSlot, $nextLastSlot) {
+    if($lastSlot < 1) {
+        return;
+    }
+
+    global $DB;
+
+    $currentGrade = $attempt->get_attempt()->sumgrades;
+    $quba = &$attempt->get_quba();
+    $slots = $quba->get_slots();
+    $questionAttempts = array();
+    $adaptableSlots = array();
+    $allQuestions = array();
+    $quizObj = $attempt->get_quizobj();
+
+    foreach($slots as $s) {
+        $question = $DB->get_record('question', array('id' => $quba->get_question($s)->id));
+        $allQuestions[$s] = $question;
+        if($s > $nextLastSlot) {
+            continue;
+        }
+        else if($s > $lastSlot) {
+            if ($question->qtype == 'modtemplate') {
+                $adaptableSlots[$s] = $question;
+            }
+            continue;
+        }
+        $questionAttempts[] = $quba->get_question_attempt($s);
+    }
+    $maxMark = 0;
+    foreach($questionAttempts as $qa) {
+        $maxMark += $qa->get_max_mark();
+    }
+
+    echo 'Current: ' . $currentGrade . '<br>';
+    echo 'Max: ' . $maxMark . '<br>';
+
+    if($currentGrade / $maxMark < 0.9 && $currentGrade / $maxMark > 0.5) {
+        return;
+    }
+
+    $diffObjs = $DB->get_records('question_difficulties', null, 'listindex');
+    $allDiffs = array();
+    foreach($diffObjs as $d){
+        $allDiffs[] = $d->name;
+    }
+
+    if($currentGrade / $maxMark >= 0.9) {
+        foreach($adaptableSlots as $s => $q) {
+            $holdQuestion = fullclone($allQuestions[$s]);
+            unset($allQuestions[$s]);
+            $diffString = $q->difficulty;
+            $diff = '';
+            $role = '';
+            if(strpos($diffString, ':') !== false) {
+                $exploded = explode(':', $diffString);
+                $role = $exploded[0];
+                $diff = $exploded[1];
+            }
+            else {
+                $diff = $diffString;
+            }
+            $diffIndex = array_search($diff, $allDiffs);
+            if($diffIndex == sizeof($allDiffs) - 1) {
+                continue;
+            }
+            $diff = $allDiffs[$diffIndex + 1];
+            if($role) {
+                $newDiffString = $role . ':' . $diff;
+            }
+            else {
+                $newDiffString = $diff;
+            }
+            $q->difficulty = $newDiffString;
+
+            if(validateTemplates($allQuestions, array($q)) !== true) {
+                $allQuestions[$s] = $holdQuestion;
+            }
+            else {
+                unset($q->id);
+                $q->adaptedforattempt = $attempt->get_attempt()->id;
+                $newQuestion = $DB->insert_record('question', $q);
+                $q->id = $newQuestion;
+
+                $qObj = question_bank::make_question($q);
+                $newSlot = $quba->replace_question($qObj, 0, $s);
+                if($s != $newSlot) {
+                    throw new coding_exception('Slot numbers have got confused.');
+                }
+
+                $qubaIds = new \mod_quiz\question\qubaids_for_users_attempts(
+                    $quizObj->get_quizid(),
+                    $attempt->userid
+                );
+                $variantStrategy = new core_question\engine\variants\least_used_strategy($quba, $qubaIds);
+                $qa = $quba->get_question_attempt($s);
+                $variant = $qa->select_variant($variantStrategy);
+                $quba->start_question($s, $variant, time());
+
+                $dm = new question_engine_data_mapper();
+                $stepdata = array();
+                $stepdata[] = $dm->insert_question_attempt($qa, $quba->get_owning_context());
+                $dm->insert_all_step_data($dm->combine_step_data($stepdata));
+            }
+        }
+    }
+    else if($currentGrade / $maxMark <= 0.5) {
+        foreach ($adaptableSlots as $s => $q) {
+            $holdQuestion = fullclone($allQuestions[$s]);
+            unset($allQuestions[$s]);
+            $diffString = $q->difficulty;
+            $diff = '';
+            $role = '';
+            if (strpos($diffString, ':') !== false) {
+                $exploded = explode(':', $diffString);
+                $role = $exploded[0];
+                $diff = $exploded[1];
+            } else {
+                $diff = $diffString;
+            }
+            $diffIndex = array_search($diff, $allDiffs);
+            if ($diffIndex == 0) {
+                continue;
+            }
+            $diff = $allDiffs[$diffIndex - 1];
+            if ($role) {
+                $newDiffString = $role . ':' . $diff;
+            } else {
+                $newDiffString = $diff;
+            }
+            $q->difficulty = $newDiffString;
+
+            if (validateTemplates($allQuestions, array($q)) !== true) {
+                $allQuestions[$s] = $holdQuestion;
+            } else {
+                // The difficulty is not being preserved here, update the database with the new diff
+                unset($q->id);
+                $q->adaptedforattempt = $attempt->get_attempt()->id;
+                $newQuestion = $DB->insert_record('question', $q);
+                $q->id = $newQuestion;
+                
+                $qObj = question_bank::make_question($q);
+                $newSlot = $quba->replace_question($qObj, 0, $s);
+                if ($s != $newSlot) {
+                    throw new coding_exception('Slot numbers have got confused.');
+                }
+
+                $qubaIds = new \mod_quiz\question\qubaids_for_users_attempts(
+                    $quizObj->get_quizid(),
+                    $attempt->get_attempt()->userid
+                );
+                $variantStrategy = new core_question\engine\variants\least_used_strategy($quba, $qubaIds);
+                $qa = $quba->get_question_attempt($s);
+                $variant = $qa->select_variant($variantStrategy);
+                $quba->start_question($s, $variant, time());
+
+                $dm = new question_engine_data_mapper();
+                $stepdata = array();
+                $stepdata[] = $dm->insert_question_attempt($qa, $quba->get_owning_context());
+                $dm->insert_all_step_data($dm->combine_step_data($stepdata));
+            }
+        }
+    }
+}
+
+/**
  * Replaces module templates with acutal questions according to the template parameters.
  *
  * @param quiz      $quizobj
@@ -327,7 +496,7 @@ function quiz_start_new_attempt($quizobj, $quba, $attempt, $attemptnumber, $time
  * @throws moodle_exception
  * @return object   modified attempt object
  */
-function execute_module_templates($quizObj, $quba, $attempt, $timeNow, $section, $startQuestions = true) {
+function execute_module_templates($quizObj, &$quba, $attempt, $timeNow, $section, $startQuestions = true) {
     global $DB;
     $slotnums = $quba->get_slots();
 
@@ -353,19 +522,12 @@ function execute_module_templates($quizObj, $quba, $attempt, $timeNow, $section,
     }
 
     foreach($templateSlots as $slot => $temp) {
+        $oldQA = $quba->get_question_attempt($slot);
         unset($allQuestions[$slot]);
         $pull = fillTemplate($temp, $allQuestions);
-        // if ($pull->qtype == 'multianswer') {
-        //     // echo 'xxxxxx';
-        //     // print_r($pullObj);
-        //     $subQuestions = $DB->get_records('question', array('parent' => $pull->id));
-        //     $pull->options->questions = [];
-
-        //     foreach($subQuestions as $s) {
-        //         $pull->options->questons[] = $s;
-        //     }
-        // }
-        print_r($pull);
+        if($pull === false) {
+            throw new moodle_exception('There are too few questions to fill the templates');
+        }
         get_question_options($pull);
         $maxMark = $pull->maxmark;
         $pullObj = question_bank::make_question($pull);
@@ -385,8 +547,35 @@ function execute_module_templates($quizObj, $quba, $attempt, $timeNow, $section,
             $qa = $quba->get_question_attempt($slot);
             $variant = $qa->select_variant($variantStrategy);
             $quba->start_question($slot, $variant, $timeNow);
+
+            $dm = new question_engine_data_mapper();
+            $stepdata = array();
+            $stepdata[] = $dm->insert_question_attempt($qa, $quba->get_owning_context());
+            $dm->insert_all_step_data($dm->combine_step_data($stepdata));
         }
     }
+}
+
+/**
+ * Deletes all data assosciated with a question attempt in the database.
+ *
+ * @param question_attempt $qa
+ *
+ * @throws moodle_exception
+ */
+function delete_question_attempt_data($qa) {
+    global $DB;
+
+    $attemptID = $qa->get_database_id();
+    if(!$qa = $DB->get_record('question_attempts', array('id' => $attemptID))) {
+        return;
+    }
+    $steps = $DB->get_records('question_attempt_steps', array('questionattemptid' => $attemptID));
+    foreach($steps as $s) {
+        $DB->delete_records('question_attempt_step_data', array('attemptstepid' => $s->id));
+        $DB->delete_records('question_attempt_steps', array('id' => $s->id));
+    }
+    $DB->delete_records('question_attempts', array('id' => $attemptID));
 }
 
 /**

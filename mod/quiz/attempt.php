@@ -116,13 +116,23 @@ $updatedcurrentpage = $DB->get_record('quiz_attempts', array('id' => $attemptobj
 if($oldpage < $updatedcurrentpage) {
     $firstslot = $attemptobj->get_pagelayout()[$updatedcurrentpage][0];
     $secnumber = 0;
+
+    $lastSlot = 0;
+    $nextLastSlot = 0;
     foreach($attemptobj->get_sections() as $sec) {
         if($firstslot <= $sec->lastslot && $firstslot >= $sec->firstslot) {
+            $lastSlot = $sec->firstslot - 1;
+            $nextLastSlot = $sec->lastslot;
             break;
         }
         $secnumber++;
     }
-    execute_module_templates($attemptobj->quizobj, $attemptobj->quba, $attemptobj, time(), $secnumber, true);
+    if ($attemptobj->get_quiz()->useadaptivequestions) {
+        adapt_questions($attemptobj, $lastSlot, $nextLastSlot);
+    }
+
+    $attemptData = $attemptobj->get_attempt();
+    execute_module_templates($attemptobj->get_quizobj(), $attemptobj->get_quba(), $attemptData, time(), $secnumber, true);
 }
 
 // Initialise the JavaScript.

@@ -825,6 +825,10 @@ class quiz_attempt {
         return $this->sections;
     }
 
+    public function get_quba() {
+        return $this->quba;
+    }
+
     /**
      * Get the course settings object.
      *
@@ -2063,7 +2067,6 @@ class quiz_attempt {
 
         $dbquiz = $DB->get_record('quiz', array('id' =>$this->get_quizid()));
         if($dbquiz->useadaptivequestions) {
-            echo 'CURRENT: '; echo $this->get_currentpage();
             $nextpage = $this->get_currentpage() + 2;
             $slots = $DB->get_records_select('quiz_slots', "quizid = $dbquiz->id AND page < $nextpage");
             foreach($slots as $s) {
@@ -2465,6 +2468,7 @@ class quiz_attempt {
             } else {
                 $this->process_finish($timenow, !$toolate);
             }
+            $DB->delete_records('question', array('adaptedforattempt' => $this->attempt->id));
 
         } catch (question_out_of_sequence_exception $e) {
             throw new moodle_exception('submissionoutofsequencefriendlymessage', 'question',

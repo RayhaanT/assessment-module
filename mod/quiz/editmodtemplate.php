@@ -133,12 +133,12 @@ if ($mform->is_cancelled()) {
     }
 
     $DB->update_record('question', $question);
-    if(validateTemplates($quiz) !== true) {
+    if(validateTemplatesWithQuiz($quiz) !== true) {
         $DB->update_record('question', $oldquestion);
     }
 
     $returnurl->param('lastchanged', $question->id);
-    // redirect($returnurl);
+    redirect($returnurl);
 }
 
 $qtypeobj = question_bank::get_qtype('modtemplate');

@@ -92,6 +92,11 @@ function objectArrayUnique($array) {
     return $array;
 }
 
+function validateTemplatesWithQuiz($quiz, $pendingTemplates = null) {
+    $questions = getQuestionsInQuiz($quiz);
+    return validateTemplates($questions, $pendingTemplates);
+}
+
 function validateTemplates($quiz, $pendingTemplates = null) {
     global $DB;
     $questions = getQuestionsInQuiz($quiz);
@@ -378,6 +383,10 @@ function fillTemplate($templateObj, $existing) {
 
         // }
         */
+    }
+
+    if(sizeof($noOverlap) == 0 && sizeof($pullPool) == 0) {
+        return false;
     }
 
     if(sizeof($noOverlap) > 0) {

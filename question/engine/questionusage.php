@@ -173,11 +173,17 @@ class question_usage_by_activity {
     }
 
     public function replace_question(question_definition $question, $maxmark, $slot) {
+        // Remove old qa
+        $oldQA = $this->questionattempts[$slot];
+        delete_question_attempt_data($oldQA);
         unset($this->questionattempts[$slot]);
+
+        // Insert new one
         $qa = new question_attempt($question, $this->get_id(), $this->observer, $maxmark);
         $qa->set_slot($slot);
         $this->questionattempts[$slot] = $qa;
         $this->observer->notify_attempt_added($qa);
+
         return $qa->get_slot();
     }
 
