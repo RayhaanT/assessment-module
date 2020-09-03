@@ -5,7 +5,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir . '/formslib.php');
 
-class generate_section_form extends moodleform {
+class generate_module_form extends moodleform {
 
   protected $contexts;
 

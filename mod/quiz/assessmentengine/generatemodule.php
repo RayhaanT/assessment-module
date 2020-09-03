@@ -2,7 +2,7 @@
 
 require_once(__DIR__ . '/../../../config.php');
 require_once(__DIR__ . '/../../../question/editlib.php');
-require_once(__DIR__ . '/generate_section_form.php');
+require_once(__DIR__ . '/generate_module_form.php');
 require_once($CFG->libdir . '/filelib.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once($CFG->libdir . '/formslib.php');
@@ -14,7 +14,7 @@ $cmid = optional_param('cmid', 0, PARAM_INT);
 $addbeforepage = optional_param('addbeforepage', 0, PARAM_INT);
 $category = optional_param('category', 0, PARAM_INT);
 
-$url = new moodle_url('/mod/quiz/generatesection/generatesection.php');
+$url = new moodle_url('/mod/quiz/assessmentengine/generatemodule.php');
 if ($returnurl !== 0) {
 	$url->param('returnurl', $returnurl);
 }
@@ -56,7 +56,7 @@ if ($cm !== null) {
 	$toform->courseid = $cm->course;
 }
 
-$mform = new generate_section_form('generatesection.php', $contexts);
+$mform = new generate_module_form('generatemodule.php', $contexts);
 $mform->set_data($toform);
 
 // Process form data

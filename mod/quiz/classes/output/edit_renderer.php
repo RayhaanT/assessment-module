@@ -666,7 +666,7 @@ class edit_renderer extends \plugin_renderer_base {
         static $str;
         if (!isset($str)) {
             $str = get_strings(array('addasection', 'addaquestion', 'addarandomquestion',
-                    'addarandomselectedquestion', 'questionbank', 'addgeneratedsection'), 'quiz');
+                    'addarandomselectedquestion', 'questionbank', 'addgeneratedmodule'), 'quiz');
         }
 
         // Get section, page, slotnumber and maxmark.
@@ -690,9 +690,9 @@ class edit_renderer extends \plugin_renderer_base {
             'cmid' => $structure->get_cmid(), 'addbeforepage' => $page,
             'category' => $questioncategoryid
         );
-        $actions['addgeneratedsection'] = new \action_menu_link_secondary(
-            new \moodle_url('/mod/quiz/assessmentengine/generatesection.php', $generationParams),
-            $icon, $str->addgeneratedsection
+        $actions['addgeneratedmodule'] = new \action_menu_link_secondary(
+            new \moodle_url('/mod/quiz/assessmentengine/generatemodule.php', $generationParams),
+            $icon, $str->addgeneratedmodule
         );
 
         // Call question bank.
@@ -1058,9 +1058,11 @@ class edit_renderer extends \plugin_renderer_base {
 
         // If this is a random question, display a link to show the questions
         // selected from in the question bank.
-        $qbankurl = new \moodle_url('/question/edit.php', $qbankurlparams);
-        $qbanklink = ' ' . \html_writer::link($qbankurl,
-                get_string('seequestions', 'quiz'), array('class' => 'mod_quiz_random_qbank_link'));
+        if(!$modtemplate) {
+            $qbankurl = new \moodle_url('/question/edit.php', $qbankurlparams);
+            $qbanklink = ' ' . \html_writer::link($qbankurl,
+                    get_string('seequestions', 'quiz'), array('class' => 'mod_quiz_random_qbank_link'));
+        }
 
         return html_writer::link($editurl, $icon . $editicon, array('title' => $configuretitle)) .
                 ' ' . $instancename . ' ' . $qbanklink;
