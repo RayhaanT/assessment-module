@@ -1,0 +1,294 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_iprimed/header
+
+    Page header template
+
+    Example context (json): {}
+}}
+{{#logintoken }}
+<div class="navbar-upper navbar-blue">
+    <div class="float-right">
+        <div class="row sidebar">
+            <div class="col-md-5">
+                <span class="contact-mail"><i class="fa fa-envelope"></i>  <a href="mailto:info@iprimed.com" style="color: #fff;"> info@iprimed.com </a></span> 
+            </div>
+            <div class="col-md-1">
+                <span class="contact-mail">  | </span> 
+            </div>
+            <div class="col-md-6 social">
+                <ul>
+                  {{#facebook}}
+                    <li>
+                      <a href="{{{facebook}}}" target="_blank" class="facebook">
+                        <i class="fa fa-facebook"></i>
+                      </a>
+                    </li>
+                  {{/facebook}}
+
+                  {{#twitter}}
+                    <li>
+                      <a href="{{{twitter}}}" target="_blank" class="twitter">
+                        <i class="fa fa-twitter"></i>
+                      </a>
+                    </li>
+                  {{/twitter}}
+
+                  {{#googleplus}}
+                    <li>
+                      <a href="{{{googleplus}}}" target="_blank" class="googleplus">
+                        <i class="fa fa-gplus"></i>
+                      </a>
+                    </li>
+                  {{/googleplus}}
+
+                  {{#linkedin}}
+                    <li>
+                      <a href="{{{linkedin}}}" target="_blank" class="linkedin">
+                        <i class="fa fa-linkedin"></i>
+                      </a>
+                    </li>
+                  {{/linkedin}}
+				  
+                  {{#instagram}}
+                    <li>
+                      <a href="{{{instagram}}}" target="_blank" class="instagram">
+                        <i class="fa fa-instagram"></i>
+                      </a>
+                    </li>
+                  {{/instagram}}
+				  
+                  {{#youtube}}
+                    <li>
+                      <a href="{{{youtube}}}" target="_blank" class="youtube">
+                        <i class="fa fa-youtube"></i>
+                      </a>
+                    </li>
+                  {{/youtube}}
+				</ul>
+            </div>       
+        </div>
+    </div>
+</div>
+<br>
+{{/logintoken }}
+
+
+{{^logintoken }}
+<nav class="fixed-top navbar navbar-light navbar-expand moodle-has-zindex" style="top:0px !important;">
+	
+	<div class="row" style="width:10%;padding:30px !important;" >
+		
+		<div class="col-md-1" >
+			{{#hasdrawertoggle}}
+				<div data-region="drawer-toggle" class="d-inline-block mr-3 drawer-toggle" style="padding-top:20px !important;">
+					<button aria-expanded="{{#navdraweropen}}true{{/navdraweropen}}{{^navdraweropen}}false{{/navdraweropen}}" aria-controls="nav-drawer" type="button" class="btn nav-link float-sm-left mr-1 btn-secondary" data-action="toggle-drawer" data-side="left" data-preference="drawer-open-nav">{{#pix}}i/menubars{{/pix}}<span class="sr-only">{{#str}}sidepanel, core{{/str}}</span></button>
+				</div>
+			{{/hasdrawertoggle}}
+		</div>
+	</div>
+	<div class="row" style="width:50%;padding:30px !important; padding-left:50px !important;" >
+		<div class="col-md-3" >
+			  <a class="navbar-brand" href="{{{ config.wwwroot }}}/?redirect=0" >
+				<img src="{{output.get_logo}}" width="183" height="67" alt="iPRIMED">
+			  </a>
+		</div>
+	</div>	
+	<div class="row" style="width:40%;padding:0px !important;">
+		<div class="row" style="width:80%;padding:0px !important;">
+			<div class="col-md-6" >
+				<div class="d-none d-lg-block" style="padding-bottom:85px !important;">			
+					{{{ output.search_box }}}
+				</div>
+			</div>	
+			
+		</div>
+		<div class="row" style="width:20%;padding:0px !important;padding-top:15px !important;">
+			<ul class="nav navbar-nav ml-auto" >
+				<li class="nav-item lang-menu" >
+				{{{ output.render_lang_menu }}}
+				</li>
+				<li class="nav-item d-flex align-items-right" >
+				{{{ output.navbar_plugin_output }}}
+
+				{{{ output.user_menu }}}         
+				</li>
+			</ul>
+		</div>
+	</div>
+</nav>
+{{/logintoken }}
+
+{{#logintoken }}
+<nav class="fixed-top navbar navbar-light navbar-expand moodle-has-zindex" style="top:40px !important;">
+
+    <div class="row" style="width:100%;">
+		<div class="col-md-1">
+			{{#hasdrawertoggle}}
+				<div data-region="drawer-toggle" class="d-inline-block mr-3 drawer-toggle">
+					<button aria-expanded="{{#navdraweropen}}true{{/navdraweropen}}{{^navdraweropen}}false{{/navdraweropen}}" aria-controls="nav-drawer" type="button" class="btn nav-link float-sm-left mr-1 btn-secondary" data-action="toggle-drawer" data-side="left" data-preference="drawer-open-nav">{{#pix}}i/menubars{{/pix}}<span class="sr-only">{{#str}}sidepanel, core{{/str}}</span></button>
+				</div>
+			{{/hasdrawertoggle}}
+		</div>
+		
+		<div class="header-logo col-md-2" >
+		  <a class="navbar-brand" href="{{{ config.wwwroot }}}/?redirect=0">
+			<img src="{{output.get_logo}}" width="183" height="67" alt="iPRIMED">
+		  </a>
+		</div>
+
+		{{^ logintoken }}
+			<div class="col-md-3"> 
+			</div> 
+		{{/ logintoken }}
+
+		{{# logintoken }}
+			<div class="col-md-2"> 
+			</div>    
+			<div class="col-md-2">
+				<div class="collapse navbar-collapse" id="navbarNavDropdown">
+					<ul class="navbar-nav">		
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Corporate</a>
+							<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+								<a class="dropdown-item" href="#myModal" data-toggle="modal">Bespoke Training</a>
+								<a class="dropdown-item" href="https://www.iprimed.com/content.php" target="_blank" data-toggle="tooltip" data-placement="bottom" title="If you have a learning program/course in mind and need help with rendering it digitally, we are there to help">Bespoke Content Development</a> 
+								<!-- <span class="tooltiptext"></span> -->
+							</div>
+						</li>
+						<li class="nav-item dropdown" style="padding-left:20px;">
+							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Courses</a>
+							<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+								<a class="dropdown-item" href="https://iprimed.com/standard.php" target="_blank">Standard Technical Training Programs</a>
+								<a class="dropdown-item" href="https://iprimed.com/employability.php" target="_blank">Employability Skills</a>
+							</div>
+						</li>
+					</ul>
+				</div> 
+			</div>
+		{{/ logintoken }}   
+
+		<div class="col-md-3" style="width:150px !important;padding:0 0 !important;margin:0 0 !important;padding-bottom:10px !important;"">
+			<div class="d-none d-lg-block">
+			{{{ output.search_box }}}
+			</div>	
+			
+		</div>
+		<div class="col-md-1"> 
+			</div> 
+		<div class="col-md-1" style="width:150px !important;padding:0 0 !important;margin:0 0 !important;padding-bottom:10px !important;">
+			<ul class="nav navbar-nav ml-auto" >
+				<li class="nav-item lang-menu">
+				{{{ output.render_lang_menu }}}
+				</li>
+				<li class="nav-item d-flex align-items-right" >
+				{{{ output.navbar_plugin_output }}}
+
+				{{{ output.user_menu }}}         
+				</li>
+			</ul>
+		</div>
+
+
+	</div>	
+</nav>
+{{/logintoken }}
+
+<div id="myModal1" class="modal fade">
+	<div class="modal-dialog modal-login">
+		<div class="modal-content">
+			<form action="/examples/actions/confirmation.php" method="post">
+				<div class="mt-5">
+					<h4>Access your Learning program.
+						Only for registered users</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label>Username</label>
+						<input type="text" class="form-control" required="required">
+					</div>
+					<div class="form-group">
+						<div class="clearfix">
+							<label>Password</label>
+						</div>
+						<input type="password" class="form-control" required="required">
+						<input type="submit" class="btn btn-primary mt-4" value="Login">
+					</div>
+				</div>
+				<div class="modal-foot">
+					<p>If you’s like a program created for you, do reach out us at <a
+							href="mailto:info@iprimed.com">info@iprimed.com</a> </p>
+					<a href="https://iprimedlvds.com/login/forgot_password.php">Forgotten your
+						username or password?</a>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+
+
+
+
+<div id="myModal" class="modal fade">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header " data-region="header">
+                <h5 id="0-modal-title" class="modal-title" data-region="title">Log in</h5>
+                
+                <a href="#" class="close" data-dismiss="modal" aria-label="close">
+                  <button type="button" class="close" data-action="hide" aria-label="Close">
+                      <span aria-hidden="true">×</span>
+                  </button>
+                </a>
+
+                
+            </div>
+            <div class="modal-body" data-region="body" style="" id="yui_3_17_2_1_1590835710651_214">
+              
+				<form action="{{ wwwroot }}/login/login_action.php" method="post" id="login">
+                    
+                    <h4>Access your Learning program.Only for registered users</h4>
+                    
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" name="username" id="username" class="form-control" value="" placeholder="Username"  required="required" >
+                        </div>
+                        <div class="form-group">
+                            <div class="clearfix">
+                                <label>Password</label>
+                            </div>
+                            <input type="password" name="password" id="password" class="form-control" placeholder="Password"  required="required">
+                            
+                            <input type="submit" class="btn btn-primary mt-4" value="Login" id="loginbtn">
+                        </div>
+                    </div>
+                    <div class="modal-foot">
+                        <p>If you’s like a program created for you, do reach out us at <a href="mailto:info@iprimed.com">info@iprimed.com</a> </p>
+                        <a href="https://iprimedlvds.com/login/forgot_password.php">Forgotten your
+                            username or password?</a>
+                    </div>
+                </form>
+
+            </div>			
+        </div>
+    </div>
+</div>

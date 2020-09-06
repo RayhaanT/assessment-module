@@ -1,0 +1,48 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_iprimed/footer
+
+    Footer template
+
+    Example context (json): {}
+}}
+<div id="top-footer">
+  <div class="container-fluid">
+      
+{{# logintoken }}
+      <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 pt-2 partners text-center">
+                <a class="edexcellogo float-left" href="https://qualifications.pearson.com/en/about-us/qualification-brands/edexcel.html" target="_blank">
+                    <img class="m-3" src="{{{ footer1icon }}}"></a>
+                <a class="nsdclogo text-center float-left" href="https://nsdcindia.org/" target="_blank"><img class="m-3" src="{{{ footer2icon }}}"></a>
+                <a class="nasscomlogo float-left" href="https://www.nasscom.in/" target="_blank"><img class="m-3" src="{{{ footer3icon }}}"></a>
+
+                <a class="athenalogo float-right" href="https://www.iprimedathena.com" target="_blank"><img class="img-fluid m-3" src="{{{ footer1lefticon }}}"></a>
+            </div>
+        </div>
+        {{/ logintoken }}
+          <div class="clearfix"></div>
+    <div class="row">
+      <div class="col-md-12">
+        <center> Copyright 2020 iPRIMED Education Solutions Pvt Ltd. All Rights Reserved </center>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{{ output.standard_end_of_body_html }}}

@@ -1,0 +1,22 @@
+[18-May-2020 19:19:00 Asia/Kolkata] PHP Warning:  mysqli::query(): MySQL server has gone away in /home/u432533118/domains/cognizancelearning.com/public_html/iprimed/lib/dml/mysqli_native_moodle_database.php on line 1246
+[18-May-2020 19:19:00 Asia/Kolkata] PHP Warning:  mysqli::query(): Error reading result set's header in /home/u432533118/domains/cognizancelearning.com/public_html/iprimed/lib/dml/mysqli_native_moodle_database.php on line 1246
+[20-May-2020 23:02:04 Asia/Kolkata] PHP Warning:  require_once(/home/u432533118/domains/cognizancelearning.com/public_html/iprimed/local/intelliboard/locallib.php): failed to open stream: No such file or directory in /home/u432533118/domains/cognizancelearning.com/public_html/iprimed/blocks/intelliboard/ajax.php on line 30
+[20-May-2020 23:02:04 Asia/Kolkata] PHP Fatal error:  require_once(): Failed opening required '/home/u432533118/domains/cognizancelearning.com/public_html/iprimed/local/intelliboard/locallib.php' (include_path='/home/u432533118/domains/cognizancelearning.com/public_html/iprimed/lib/pear:.:/opt/alt/php72/usr/share/pear') in /home/u432533118/domains/cognizancelearning.com/public_html/iprimed/blocks/intelliboard/ajax.php on line 30
+[15-Jun-2020 20:07:24 Asia/Kolkata] Default exception handler: Course or activity not accessible. Debug: You are not logged in
+Error code: requireloginerror
+* line 2711 of /lib/moodlelib.php: require_login_exception thrown
+* line 32 of /blocks/intelliboard/ajax.php: call to require_login()
+
+[16-Jun-2020 02:05:24 Asia/Kolkata] PHP Notice:  Trying to get property 'completed' of non-object in /home/u432533118/domains/cognizancelearning.com/public_html/iprimed/blocks/intelliboard/ajax.php on line 103
+[16-Jun-2020 02:05:24 Asia/Kolkata] PHP Notice:  Trying to get property 'enrolled' of non-object in /home/u432533118/domains/cognizancelearning.com/public_html/iprimed/blocks/intelliboard/ajax.php on line 103
+[16-Jun-2020 02:05:24 Asia/Kolkata] PHP Warning:  Division by zero in /home/u432533118/domains/cognizancelearning.com/public_html/iprimed/blocks/intelliboard/ajax.php on line 103
+[16-Jun-2020 02:05:24 Asia/Kolkata] PHP Notice:  Trying to get property 'enrolled' of non-object in /home/u432533118/domains/cognizancelearning.com/public_html/iprimed/blocks/intelliboard/ajax.php on line 116
+[16-Jun-2020 02:05:24 Asia/Kolkata] PHP Notice:  Trying to get property 'completed' of non-object in /home/u432533118/domains/cognizancelearning.com/public_html/iprimed/blocks/intelliboard/ajax.php on line 121
+[16-Jun-2020 02:05:24 Asia/Kolkata] PHP Notice:  Trying to get property 'enrolled' of non-object in /home/u432533118/domains/cognizancelearning.com/public_html/iprimed/blocks/intelliboard/ajax.php on line 125
+[16-Jun-2020 02:05:24 Asia/Kolkata] PHP Notice:  Trying to get property 'completed' of non-object in /home/u432533118/domains/cognizancelearning.com/public_html/iprimed/blocks/intelliboard/ajax.php on line 125
+[16-Jun-2020 16:34:38 Asia/Kolkata] Default exception handler: Course or activity not accessible. Debug: You are not logged in
+Error code: requireloginerror
+* line 2711 of /lib/moodlelib.php: require_login_exception thrown
+* line 32 of /blocks/intelliboard/ajax.php: call to require_login()
+
+[27-Jun-2020 23:22:20 Asia/Kolkata] PHP Notice:  Undefined variable: canupdate in /home/u432533118/domains/cognizancelearning.com/public_html/iprimed/blocks/intelliboard/ajax.php on line 299

@@ -1,0 +1,112 @@
+/************************* Slick Slider *************************/
+.slick-arrow {
+    z-index: 100;
+    box-shadow: none;
+    width: 1.5em;
+    height: 1.5em;
+    font-size: 1.5em;
+}
+
+.slick-next {
+    right: 9px;
+}
+
+.slick-prev {
+    left: 5px;
+}
+
+.slick-prev:before, .slick-next:before {
+    font-size: 120%;
+}
+
+.slick-dots li button {
+    box-shadow: none;
+}
+
+.slick-dots {
+    margin: 0 0 0 0;
+}
+/************************* Course slider *************************/
+.coursesliderp, .coursesliderp-nav {
+    visibility: hidden;
+}
+
+.coursesliderp-visible, .coursesliderp-nav-visible {
+    visibility: visible;
+}
+/************************* Course *************************/
+.coursesliderp-course {
+    position: relative;
+    padding: 1em;
+    margin: 0.5em;
+    text-align: center;
+    -webkit-transition: all .5s ease-in-out;
+    -moz-transition: all .5s ease-in-out;
+    -o-transition: all .5s ease-in-out;
+    transition: all .5s ease-in-out;
+}
+
+.coursesliderp-course-nav {
+    text-align: center;
+    padding: 0.5em;
+    margin: 0.5em;
+}
+/************************* Course Anchor*************************/
+.coursesliderp-course-anchor:hover {
+    text-decoration: none;
+}
+/************************* Course Summary *************************/
+.coursesliderp-course-summary {
+    text-align: center;
+    padding: 1em;
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    display: none;
+}
+
+.coursesliderp-course-summary-hovered {
+    display: block;
+}
+/************************* Course Image *************************/
+.coursesliderp-course-image-div {
+    margin: 0.5em auto;
+    position: relative;
+}
+
+.coursesliderp-course-image {
+    position: absolute;
+    margin: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.coursesliderp-course-image-hovered {
+    opacity: 0.2;
+}
+/************************* Course Name *************************/
+.coursesliderp-course-name-hovered {
+    opacity: 0.2;
+}
+
+.coursesliderp-course-name .coursesliderp-course-name-hovered {
+    text-decoration: none;
+}
+
+.coursesliderp-course-name {
+    display: block;
+    text-align: center;
+    padding: 0.5em 0.5em;
+    margin: 0.5em auto;
+}
+/************************* Course Truncate *************************/
+.coursesliderp-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

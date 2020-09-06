@@ -1,0 +1,170 @@
+#page-blocks-fn_myprogress-listactivities table.fnmarkingblock td {
+    border: 1px solid #555555;
+}
+#page-blocks-fn_myprogress-listactivities table.fnmarkingblock tr.normal {
+    background-color: #FFFFFF;
+}
+#page-blocks-fn_myprogress-listactivities table.fnmarkingblock tr.normal {
+    background-color: #FFFFFF;
+}
+#page-blocks-fn_myprogress-listactivities table.fnmarkingblock tr.total {
+    background-color: #FFA3B1;
+}
+#page-blocks-fn_myprogress-listactivities table.fnmarkingblock th.header {
+    background: none;
+    margin-left: 0;
+    margin-right: 0;
+    text-align: center;
+}
+#page-blocks-fn_myprogress-listactivities table.fnmarkingblock th.topline {
+    background-color: #787878;
+    color: #FFFFFF;
+    border-left: 1px solid #555555;
+    border-right: 1px solid #555555;
+    border-top: 1px solid #555555;
+}
+#page-blocks-fn_myprogress-listactivities table.fnmarkingblock th.bottomline {
+    border-left: 1px solid #555555;
+    border-right: 1px solid #555555;
+    border-bottom: 1px solid #555555;
+    padding-left:0;
+    padding-right:0;
+}
+#page-blocks-fn_myprogress-listactivities span.fn_summaries {
+    font-size:0.9em;
+}
+#page-blocks-fn_myprogress-listactivities .sideblock .content hr {
+    line-height:5px;
+    vertical-align:middle;
+}
+
+
+/**** overright***/
+#page-blocks-fn_myprogress-listactivities #mark-interface {
+    width:760px;
+    margin:0 auto;
+}
+#page-blocks-fn_myprogress-listactivities  #mark-interface table.markingcontainer td.left-sec {
+    padding:15px 15px 0 15px;
+    width:160px;
+}
+#page-blocks-fn_myprogress-listactivities  #mark-interface table.markingcontainer td.right-sec {
+    padding:10px 15px 0 0;
+    width:555px;
+}
+#page-blocks-fn_myprogress-listactivities table.markingcontainer td.right-sec .paging {
+    margin:0 0 10px 0;
+}
+#page-blocks-fn_myprogress-listactivities table.markingcontainer td.right-sec .saprate-table {
+    background:#c7e1fe;
+    border:1px solid #a7a7a7;
+    margin-bottom:30px;
+}
+#page-blocks-fn_myprogress-listactivities table.saprate-table td.marking-head {
+    background:#749511;
+}
+#page-blocks-fn_myprogress-listactivities table.saprate-table td.rightBRD {
+    border-right:1px solid #fff;
+}
+#page-blocks-fn_myprogress-listactivities td.marking-head .name-date {
+    margin:0;
+}
+#page-blocks-fn_myprogress-listactivities td.marking-head .name-date td {
+    padding:0;
+    font-weight:bold;
+    color:#FFF;
+}
+#page-blocks-fn_myprogress-listactivities td.marking-head .name-date td.leftSide {
+    font-size:15px;
+}
+#page-blocks-fn_myprogress-listactivities td.marking-head .name-date td.rightSide {
+    font-size:11px;
+}
+#page-blocks-fn_myprogress-listactivities table.saprate-table td.marking-headB {
+    background:#749511;
+}
+#page-blocks-fn_myprogress-listactivities table.saprate-table td.marking-headB table.resourse-tab {
+    margin:0;
+    background:#ffff66;
+}
+#page-blocks-fn_myprogress-listactivities .activity-name {
+    text-align:center;
+    font-weight: bold;
+    padding:0px 5px 10px 5px;
+}
+#page-blocks-fn_myprogress-listactivities table.saprate-table .grade-filter {
+    margin:0.5em 0 0.3em 0;
+}
+#page-blocks-fn_myprogress-listactivities table.saprate-table .teacher-comments {
+    background:#304c8a;
+    margin-bottom:0.5em;
+}
+#page-blocks-fn_myprogress-listactivities table.saprate-table .teacher-comments .comment-boxs textarea {
+    width:100%;
+}
+#page-blocks-fn_myprogress-listactivities .singleselect {
+    display:inline-block;
+}
+#page-blocks-fn_myprogress-listactivities .fnmarkingblock thead, .fnmarkingblock tbody td {
+    border:1px solid #555555 !important;
+}
+#page-blocks-fn_myprogress-listactivities .no-assign {
+    text-align:center;
+    padding-top:20px;
+}
+#page-blocks-fn_myprogress-listactivities table.markingcontainer td.right-sec .headTxt {
+    text-align:center;
+}
+#page-blocks-fn_myprogress-listactivities table.not-submitted {
+    background:#C7E1FE;
+    border:1px solid #A7A7A7;
+}
+#page-blocks-fn_myprogress-listactivities table.not-submitted td {
+    border:1px solid #A7A7A7;
+}
+#page-blocks-fn_myprogress-listactivities table.not-submitted td.rightName {
+    font-size:15px;
+    font-weight:bold;
+}
+#page-blocks-fn_myprogress-listactivities h4.head-title {
+    padding:10px 10px 0;
+    text-align:center;
+}
+#page-blocks-fn_myprogress-listactivities .markingcontainerList {
+    background: #ffffff;
+}
+#page-blocks-fn_myprogress-listactivities .markingcontainerList .intd {
+    padding:0;
+}
+#page-blocks-fn_myprogress-listactivities .markingcontainerList table {
+    margin-bottom:0;
+    border:1px solid #DDDDDD;
+    border-collapse:separate;
+    border-radius:6px;
+    -moz-border-radius:6px;
+}
+#page-blocks-fn_myprogress-listactivities .markingcontainerList table td {
+    margin-bottom:0;
+    border-left:1px solid #DDDDDD;
+    border-top:1px solid #DDDDDD;
+    padding: 10px;
+}
+#page-blocks-fn_myprogress-listactivities .markingcontainerList table td:first-child {
+    border-left: none;
+}
+#page-blocks-fn_myprogress-listactivities .markingcontainerList table th {
+    background-color: #eeeeee;
+    border-top: none;
+    border-left:1px solid #DDDDDD;
+    color: #333333;
+    font-size: 15px;
+    padding: 10px;
+}
+/**** overright***/
+
+#page-blocks-fn_myprogress-listactivities .markingcontainer td.generalbox {
+    background-color: #9dbb61;
+}
+#page-blocks-fn_myprogress-listactivities .markingcontainer td.generalbox2 {
+    background-color: #C5EFFF;
+}

@@ -1,0 +1,84 @@
+<div class="frontpage-sponsors" style="width:100%!important;">
+    {{#sponsorsfrontpage}}
+        <h2>{{{sponsorstitle}}}</h2>
+        <p>{{{sponsorssubtitle}}}</p>
+        <div class="row">
+            {{#sponsors}}
+            <div class="item">
+                <a href="{{{url}}}">
+                    <img src="{{{image}}}" title="{{{url}}}"/>
+                </a>
+            </div>
+            {{/sponsors}}
+        </div>
+
+        <hr />
+    {{/sponsorsfrontpage}}
+
+    {{#clientsfrontpage}}
+        <h2 style="padding-bottom: 2px;">{{{clientstitle}}}</h2>
+        <hr style="border-top: 2px solid #ccc; width: 8%; margin-top: 0px; margin-bottom: 1px; ">
+        <p>{{{clientssubtitle}}}</p>
+
+<div style="width:100%!important;">
+   <section class="customer-logos slider">
+        {{#clientsimage0}}
+            <div class="slide clientimage"><img src="{{clientsimage0}}" ></div>
+        {{/clientsimage0}}
+        {{#clientsimage1}}
+            <div class="slide clientimage"><img src="{{clientsimage1}}"></div>
+        {{/clientsimage1}}
+        {{#clientsimage2}}
+            <div class="slide clientimage"><img src="{{clientsimage2}}"></div>
+        {{/clientsimage2}}
+        {{#clientsimage3}}
+            <div class="slide clientimage"><img src="{{clientsimage3}}"></div>
+        {{/clientsimage3}}
+        {{#clientsimage4}}
+            <div class="slide clientimage"><img src="{{clientsimage4}}"></div>
+        {{/clientsimage4}}
+        {{#clientsimage5}}
+            <div class="slide clientimage"><img src="{{clientsimage5}}"></div>
+        {{/clientsimage5}}
+        {{#clientsimage6}}
+            <div class="slide clientimage"><img src="{{clientsimage6}}"></div>
+        {{/clientsimage6}}
+        {{#clientsimage7}}
+            <div class="slide clientimage"><img src="{{clientsimage7}}"></div>
+        {{/clientsimage7}}
+        {{#clientsimage8}}
+            <div class="slide clientimage"><img src="{{clientsimage8}}"></div>
+        {{/clientsimage8}}
+        {{#clientsimage9}}
+            <div class="slide clientimage"><img src="{{clientsimage9}}"></div>
+        {{/clientsimage9}}
+   </section>
+</div>
+    {{/clientsfrontpage}}
+</div>
+<script src="https://code.jquery.com/jquery-2.2.0.min.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.js"></script>
+<script>
+$(document).ready(function(){
+    $('.customer-logos').slick({
+        slidesToShow: 6,
+        slidesToScroll: 1,
+        autoplay: true,
+        autoplaySpeed: 1000,
+        arrows: false,
+        dots: false,
+        pauseOnHover: false,
+        responsive: [{
+            breakpoint: 768,
+            settings: {
+                slidesToShow: 4
+            }
+        }, {
+            breakpoint: 520,
+            settings: {
+                slidesToShow: 3
+            }
+        }]
+    });
+});
+</script>
