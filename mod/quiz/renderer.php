@@ -290,12 +290,17 @@ class mod_quiz_renderer extends plugin_renderer_base {
         }
         else {
             $allsections = $DB->get_records('quiz_sections', array('quizid' => $quiz->id), 'firstslot');
+            $allslots = $DB->get_records('quiz_slots', array('quizid' => $quiz->id, 'page' => $page + 1));
+            $pagefirstslot = reset($allslots)->slot;
             if($page == -1) {
                 $thissection = end($allsections);
             }
             else {
-                $keys = array_keys($allsections);
-                $thissection = $allsections[$keys[$page]];
+                foreach($allsections as $s) {
+                    if($pagefirstslot >= $s->firstslot) {
+                        $thissection = $s;
+                    }
+                }
             }
 
             $attempt = $DB->get_record('quiz_attempts', array('id' => $attemptobj->get_attemptid()));

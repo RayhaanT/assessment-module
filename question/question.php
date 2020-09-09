@@ -278,6 +278,7 @@ foreach($diffpairs as $diff) {
     }
     $count++;
 }
+$toform->techversion = floatval($toform->techversion);
 if(!$toform->techversion) {
     unset($toform->techversion);
 }

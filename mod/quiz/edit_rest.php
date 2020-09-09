@@ -218,10 +218,10 @@ switch($requestmethod) {
                 // Get all slots in the section
 
                 /* -------------------  page != section ------------------- */
-                /* $allsections = $DB->get_records('quiz_sections', array('quizid' => $quiz->id));
+                $allsections = $DB->get_records('quiz_sections', array('quizid' => $quiz->id), 'firstslot');
                 $thissection = $DB->get_record('quiz_sections', array('id' => $id));
                 $firstslot = $thissection->firstslot;
-                $allslots = $DB->get_records('quiz_slots', array('quizid' => $quiz->id));
+                $allslots = $DB->get_records('quiz_slots', array('quizid' => $quiz->id), 'slot');
                 $lastslotobj = end($allslots);
                 $lastslot = $lastslotobj->slot;
 
@@ -230,17 +230,17 @@ switch($requestmethod) {
                         $lastslot = $s->$firstslot - 1;
                     }
                 }
-
                 $deleteslots = $DB->get_records_select(
                     'quiz_slots',
-                    "slot >= '" . $firstslot . "' AND slot <= '" . $lastslot . "'"
-                ) */
+                    "slot >= $firstslot AND slot <= $lastslot AND quizid = $quiz->id"
+                );
+                $firstslotobj = $DB->get_record('quiz_slots', array('quizid' => $quiz->id, 'slot' => $thissection->firstslot));
                 /* ------------------- /page != section ------------------- */
 
                 /* -------------------  page == section ------------------- */
-                $section = $structure->get_section_by_id($id);
+                /*$section = $structure->get_section_by_id($id);
                 $firstslotobj = $DB->get_record('quiz_slots', array('quizid' => $quiz->id, 'slot' => $section->firstslot));
-                $deleteslots = $DB->get_records('quiz_slots', array('quizid' => $quiz->id, 'page' => $firstslotobj->page));
+                $deleteslots = $DB->get_records('quiz_slots', array('quizid' => $quiz->id, 'page' => $firstslotobj->page));*/
                 /* ------------------- /page == section ------------------- */
 
                 // throw new moodle_exception('Number of slots to be deleted: ' . sizeof($deleteslots));

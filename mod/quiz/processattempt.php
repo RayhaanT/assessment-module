@@ -51,7 +51,35 @@ $overtime      = optional_param('overtime', 0, PARAM_INT);
 $attemptobj = quiz_create_attempt_handling_errors($attemptid, $cmid);
 
 // Set $nexturl now.
-if ($next || $timeoutnext) {
+if($timeoutnext && !$timeup) {
+    $thisattempt = $DB->get_record('quiz_attempts', array('id' => $attemptid));
+    $quizid = $thisattempt->quiz;
+    $sections = array_values($DB->get_records('quiz_sections', array('quizid' => $quizid), 'firstslot'));
+    $slots = $DB->get_records('quiz_slots', array('quizid' => $quizid, 'page' => $thispage + 1));
+    $allslots = $DB->get_records('quiz_slots', array('quizid' => $quizid), 'slot');
+    $pageslot = reset($slots)->slot;
+    $thissectionindex = sizeof($sections) - 1;
+    for($x = 0; $x < sizeof($sections) - 1; $x++) {
+        if($pageslot >= $sections[$x]->firstslot && $pageslot < $sections[$x + 1]->firstslot) {
+            $thissectionindex = $x;
+            break;
+        }
+    }
+    $page = 20;
+    if($thissectionindex + 1 >= sizeof($sections)) {
+        $timeup = true;
+        $page = -1;
+    }
+    else {
+        $nextslot = $sections[$thissectionindex + 1]->firstslot;
+        foreach($allslots as $s) {
+            if($nextslot == $s->slot) {
+                $page = $s->page - 1;
+                break;
+            }
+        }
+    }
+} else if ($next) {
     $page = $nextpage;
 } else if ($previous && $thispage > 0) {
     $page = $thispage - 1;
@@ -95,8 +123,16 @@ if ($status == quiz_attempt::OVERDUE) {
 } else if ($status == quiz_attempt::IN_PROGRESS) {
     if($page != -1 && $page != $thispage) {
         $thisattempt = $DB->get_record('quiz_attempts', array('id' => $attemptid));
-        $thisattempt->pagechangetime = $timenow + $overtime;
-        $DB->update_record('quiz_attempts', $thisattempt);
+        $newpageslots = $DB->get_records('quiz_slots', array('quizid' => $thisattempt->quiz, 'page' => $page + 1), 'slot');
+        $firstnewslot = reset($newpageslots)->slot;
+        $sections = $DB->get_records('quiz_sections', array('quizid' => $thisattempt->quiz), 'firstslot');
+        foreach($sections as $s) {
+            if($s->firstslot == $firstnewslot) {
+                $thisattempt->pagechangetime = $timenow + $overtime;
+                $DB->update_record('quiz_attempts', $thisattempt);
+                break;
+            }
+        }
     }
     redirect($nexturl);
 } else {

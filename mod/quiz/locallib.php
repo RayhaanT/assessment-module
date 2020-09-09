@@ -2490,18 +2490,17 @@ function quiz_add_quiz_question($questionid, $quiz, $page = 0, $maxmark = null, 
 
     $DB->insert_record('quiz_slots', $slot);
 
-    if(!$ignorenewsection) {
-        // Add new section if new page was created
-        if($slot->page > $maxpage) {
-            $section = new \stdClass();
-            $section->heading = get_string('newpagesectionheading', 'quiz');
-            $section->quizid = $quiz->id;
-            $section->firstslot = $slot->slot;
-            $section->shufflequestions = 0;
-            $section->module = 0;
-            $DB->insert_record('quiz_sections', $section);
-        }
-    }
+    // if(!$ignorenewsection) {
+    //     // Add new section if new page was created
+    //     if($slot->page > $maxpage) {
+    //         $section = new \stdClass();
+    //         $section->heading = get_string('newpagesectionheading', 'quiz');
+    //         $section->quizid = $quiz->id;
+    //         $section->firstslot = $slot->slot;
+    //         $section->shufflequestions = 0;
+    //         $DB->insert_record('quiz_sections', $section);
+    //     }
+    // }
 
     $trans->allow_commit();
 }

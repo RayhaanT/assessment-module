@@ -2072,7 +2072,6 @@ class quiz_attempt {
             foreach($slots as $s) {
                 $this->quba->finish_question($s->slot);
             }
-            print_r($slots);
         }
 
         $this->attempt->sumgrades = $this->quba->get_total_mark();

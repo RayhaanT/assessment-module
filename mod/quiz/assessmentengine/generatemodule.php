@@ -246,7 +246,6 @@ if ($mform->is_cancelled()) {
 			// Only triggers if there are no other questions in the quiz. Edits the default section
 			if($addbeforepage == 0) {
 				$modulesection->heading = $fromform->name;
-				$modulesection->module = 1;
 				$modulesection->timelimit = $timelimit;
 				$DB->update_record('quiz_sections', $modulesection);
 			}
@@ -259,7 +258,6 @@ if ($mform->is_cancelled()) {
 
 				$structure->add_section_heading($addbeforepage, $fromform->name);
 				$newmodsection = $DB->get_record('quiz_sections', array('quizid' => $quiz->id, 'firstslot' => $firstnewslot));
-				$newmodsection->module = 1;
 				$newmodsection->timelimit = $timelimit;
 				$DB->update_record('quiz_sections', $newmodsection);
 			}
@@ -274,7 +272,6 @@ if ($mform->is_cancelled()) {
 			}
 			$structure->add_section_heading($sectionpage, $fromform->name);
 			$modulesection = $DB->get_record('quiz_sections', array('quizid' => $quiz->id, 'firstslot' => $firstnewslot));
-			$modulesection->module = 1;
 			$modulesection->timelimit = $timelimit;
 			$DB->update_record('quiz_sections', $modulesection);
 		}
