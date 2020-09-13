@@ -95,7 +95,7 @@ if ($mform->is_cancelled()) {
     $returnurl->param('sesskey', sesskey());
     $returnurl->param('courseid', $courseid);
 
-    foreach($fromform->rolename as $rolename) {
+    foreach($fromform->rolename as $index => $rolename) {
         if(!$rolename) {
             continue;
         }
@@ -106,10 +106,44 @@ if ($mform->is_cancelled()) {
                 break;
             }
         }
-        if(!$exists) {
-            $newrole = new stdClass();
-            $newrole->name = $rolename;
-            $DB->insert_record('question_roles', $newrole);
+        if (!$exists) {
+            if($index >= sizeof($rolekeys)) {
+                $newrole = new stdClass();
+                $newrole->name = $rolename;
+                $DB->insert_record('question_roles', $newrole);
+            }
+            else {
+                $newrolename = $rolename;
+                $oldrolename = $allroles[$rolekeys[$index]]->name;
+                $affectedquestions = $DB->get_records_select('question', "difficulty REGEXP '$oldrolename'");
+
+                foreach ($affectedquestions as $q) {
+                    if (strpos($q->difficulty, ':') !== false) {
+                        $pairs = explode(',', $q->difficulty);
+
+                        for ($p = 0; $p < count($pairs); $p++) {
+                            $rolediff = explode(':', $pairs[$p]);
+                            if ($rolediff[0] == $oldrolename) {
+                                $newpair = $newrolename . ':' . $rolediff[1];
+                                $pairs[$p] = $newpair;
+                            }
+                        }
+                        $compileddiff = '';
+                        foreach ($pairs as $p) {
+                            if ($compileddiff != '') {
+                                $compileddiff .= ',';
+                            }
+                            $compileddiff .= $p;
+                        }
+                        $q->difficulty = $compileddiff;
+                    }
+                    $DB->update_record('question', $q);
+                }
+
+                $newrole = $allroles[$rolekeys[$index]];
+                $newrole->name = $newrolename;
+                $DB->update_record('question_roles', $newrole);
+            }
         }
     }
 

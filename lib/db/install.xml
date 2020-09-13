@@ -1436,6 +1436,7 @@
         <FIELD NAME="cyclesuspended" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether the question is currently enabled or disabled according to its suspension cycle (1 = suspended)"/>
         <FIELD NAME="attempts" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of times this question has been attempted"/>
         <FIELD NAME="attemptaccuracy" TYPE="number" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" DECIMALS="5" COMMENT="Number of correct responses to the question (decimals for partial correct answers)"/>
+        <FIELD NAME="adaptedforattempt" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Attempt id for which an adaptive question was created"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

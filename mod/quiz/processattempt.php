@@ -65,7 +65,6 @@ if($timeoutnext && !$timeup) {
             break;
         }
     }
-    $page = 20;
     if($thissectionindex + 1 >= sizeof($sections)) {
         $timeup = true;
         $page = -1;
