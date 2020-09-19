@@ -92,14 +92,13 @@ function objectArrayUnique($array) {
     return $array;
 }
 
-function validateTemplatesWithQuiz($quiz, $pendingTemplates = null) {
+function validateTemplatesWithQuiz($quiz, $pendingTemplates = null, $filterSuspended = false) {
     $questions = getQuestionsInQuiz($quiz);
-    return validateTemplates($questions, $pendingTemplates);
+    return validateTemplates($questions, $pendingTemplates, $filterSuspended);
 }
 
-function validateTemplates($quiz, $pendingTemplates = null) {
+function validateTemplates($questions, $pendingTemplates = null, $filterSuspended = false) {
     global $DB;
-    $questions = getQuestionsInQuiz($quiz);
 
     $templatesNo = 0;
     $templates = array();
@@ -195,6 +194,9 @@ function validateTemplates($quiz, $pendingTemplates = null) {
         $allquestions = objectArrayUnique($allquestions);
     }
     $allquestions = filterDuplicates($allquestions, $regular);
+    if($filterSuspended) {
+        $allquestions = filterAndEvaluateRetirement($allquestions);
+    }
 
     if (sizeof($allquestions) < $templatesNo) {
         return $templatesNo - sizeof($allquestions);
@@ -369,12 +371,14 @@ function fillTemplate($templateObj, $existing) {
     $pullPool = $DB->get_records_select('question', $conditions[0]);
     $pullPool = array_merge($pullPool, $DB->get_records_select('question', $conditions[1]));
     $pullPool = filterDuplicates($pullPool, $used);
+    $pullPool = filterAndEvaluateRetirement($pullPool);
     $noOverlap = fullclone($pullPool);
 
     foreach($templates as $t) {
         $conditions = getTemplateSQLConditions($temp->topic, $temp->difficulty);
         $newPool = $DB->get_records_select('question', $conditions[0]);
         $newPool = array_merge($newPool, $DB->get_records_select('question', $conditions[1]));
+        $newPool = filterAndEvaluateRetirement($newPool);
         $noOverlap = filterDuplicates($noOverlap, $newPool);
 
         /* For when we figure out an algorithm to optimize picking order

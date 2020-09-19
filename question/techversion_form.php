@@ -16,7 +16,7 @@ class techversion_form extends moodleform
     // Define the body of the form
     protected function definition()
     {
-        global $DB;
+        global $DB, $CFG;
 
         $mform = $this->_form;
 
@@ -30,7 +30,7 @@ class techversion_form extends moodleform
         $mform->addElement('hidden', 'returnurl');
         $mform->setType('returnurl', PARAM_LOCALURL);
 
-        $sql = 'SELECT DISTINCT topic FROM moodle.mdl_question ORDER BY topic';
+        $sql = "SELECT DISTINCT topic FROM " . $CFG->dbname . "." . $CFG->prefix . "question ORDER BY topic";
         $alltopics = $DB->get_records_sql($sql);
 
         $count = 0;

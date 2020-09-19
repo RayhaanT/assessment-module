@@ -816,7 +816,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
         $output .= $this->view_information($quiz, $cm, $context, $viewobj->infomessages);
         $output .= $this->view_table($quiz, $context, $viewobj);
         $output .= $this->view_result_info($quiz, $context, $cm, $viewobj);
-        $output .= $this->box($this->view_page_buttons($viewobj), 'quizattempt');
+        $output .= $this->box($this->view_page_buttons($viewobj, $quiz), 'quizattempt');
         return $output;
     }
 
@@ -824,15 +824,19 @@ class mod_quiz_renderer extends plugin_renderer_base {
      * Work out, and render, whatever buttons, and surrounding info, should appear
      * at the end of the review page.
      * @param mod_quiz_view_object $viewobj the information required to display
+     * @param $quiz Array containing quiz data
      * the view page.
      * @return string HTML to output.
      */
-    public function view_page_buttons(mod_quiz_view_object $viewobj) {
+    public function view_page_buttons(mod_quiz_view_object $viewobj, $quiz) {
         global $CFG;
         $output = '';
 
         if (!$viewobj->quizhasquestions) {
             $output .= $this->no_questions_message($viewobj->canedit, $viewobj->editurl);
+        }
+        else if (validateTemplatesWithQuiz($quiz, null, true) !== true) {
+            $output .= $this->templates_not_filled_message();
         }
 
         $output .= $this->access_messages($viewobj->preventmessages);
@@ -912,6 +916,13 @@ class mod_quiz_renderer extends plugin_renderer_base {
         if ($canedit) {
             $output .= $this->single_button($editurl, get_string('editquiz', 'quiz'), 'get');
         }
+
+        return $output;
+    }
+
+    public function templates_not_filled_message() {
+        $output = '';
+        $output .= $this->notification(get_string('templatesnotfilled', 'quiz'));
 
         return $output;
     }

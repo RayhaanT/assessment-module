@@ -28,7 +28,7 @@ if(!$question = $DB->get_record('question', array('id' => $id))) {
 }
 $toform->disabledperiod = $question->disableperiod;
 $toform->enabledperiod = $question->enableperiod;
-$toform->suspensionend = $question->suspensionend;
+$toform->suspensionenddate = $question->suspensionend;
 
 $mform = new suspend_form('suspend.php');
 $mform->set_data($toform);

@@ -83,6 +83,12 @@ class edit_renderer extends \plugin_renderer_base {
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
 
+        $output .= html_writer::start_div('d-flex justify-content-between flex-wrap mb-1');
+        if(validateTemplatesWithQuiz($quizobj->get_quiz(), null, true) !== true) {
+            $output .= $this->templates_not_filled_message();
+        }
+        $output .= html_writer::end_tag('div');
+
         $output .= $this->selectmultiple_controls($structure);
         $output .= html_writer::end_tag('div');
 
@@ -125,6 +131,13 @@ class edit_renderer extends \plugin_renderer_base {
             // Include the question chooser.
             $output .= $this->question_chooser();
         }
+
+        return $output;
+    }
+
+    public function templates_not_filled_message() {
+        $output = '';
+        $output .= $this->notification(get_string('templatesnotfilled', 'quiz'));
 
         return $output;
     }

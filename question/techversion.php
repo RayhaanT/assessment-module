@@ -20,7 +20,7 @@ $toform = new stdClass();
 $toform->returnurl = $url;
 $toform->courseid = $courseid;
 
-$sql = 'SELECT DISTINCT topic FROM moodle.mdl_question ORDER BY topic';
+$sql = "SELECT DISTINCT topic FROM " .  $CFG->dbname . "." . $CFG->prefix . "question ORDER BY topic";
 $alltopics = $DB->get_records_sql($sql);
 
 $count = 0;

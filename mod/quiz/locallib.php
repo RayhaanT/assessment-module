@@ -354,9 +354,6 @@ function adapt_questions(&$attempt, $lastSlot, $nextLastSlot) {
         $maxMark += $qa->get_max_mark();
     }
 
-    echo 'Current: ' . $currentGrade . '<br>';
-    echo 'Max: ' . $maxMark . '<br>';
-
     if($currentGrade / $maxMark < 0.9 && $currentGrade / $maxMark > 0.5) {
         return;
     }
@@ -395,7 +392,7 @@ function adapt_questions(&$attempt, $lastSlot, $nextLastSlot) {
             }
             $q->difficulty = $newDiffString;
 
-            if(validateTemplates($allQuestions, array($q)) !== true) {
+            if (validateTemplates($allQuestions, array($q)) !== true) {
                 $allQuestions[$s] = $holdQuestion;
             }
             else {
