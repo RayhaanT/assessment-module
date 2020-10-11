@@ -28,6 +28,20 @@ class modulesettings_form extends moodleform
         return $repeated;
     }
 
+    private function getSubjectFields($mform, &$repeatedoptions) {
+        $repeated = array();
+        $subjectFields = array();
+
+        $subjectFields[] = $mform->createElement('text', 'subjectname', '');
+        $mform->registerNoSubmitButton('deletesubject');
+        $subjectFields[] = $mform->createElement('submit', 'deletesubject', get_string('delete'));
+        $repeated[] = $mform->createElement('group', 'subjectbuttonpair', get_string('subjectno', 'question', '{no}'), $subjectFields, null, false);
+
+        $repeatedoptions['subjectname']['type'] = PARAM_TEXT;
+
+        return $repeated;
+    }
+
     private function getDifficultyLifeCycleFields($mform, &$repeatedoptions, $upperbounds) {
         $repeated = array();
         $repeated[] = $mform->createElement('text', 'difficultyname', get_string('difficultyno', 'question', '{no}'));
@@ -67,7 +81,7 @@ class modulesettings_form extends moodleform
         $repeated = $this->getRoleFields($mform, $repeatedoptions);
         $allroles = $DB->get_records('question_roles');
         $repeatsatstart = count($allroles);
-        $rolesperclick = 3;
+        $rolesperclick = 2;
 
         $this->repeat_elements(
             $repeated,
@@ -77,6 +91,25 @@ class modulesettings_form extends moodleform
             'addrole',
             $rolesperclick,
             get_string('addroles', 'question', $rolesperclick),
+            true
+        );
+
+        $mform->addElement('header', 'generalheader', get_string("subjects", "question"));
+
+        $repeatedoptions = array();
+        $repeated = $this->getSubjectFields($mform, $repeatedoptions);
+        $allSubjects = $DB->get_records('question_subjects');
+        $repeatsatstart = count($allSubjects);
+        $subjectsperclick = 1;
+
+        $this->repeat_elements(
+            $repeated,
+            $repeatsatstart,
+            $repeatedoptions,
+            'nosubjects',
+            'addsubject',
+            $subjectsperclick,
+            get_string('addsubjects', 'question', $subjectsperclick),
             true
         );
 

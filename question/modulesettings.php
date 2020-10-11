@@ -46,9 +46,33 @@ if (count($deletedroles)) {
     }
 }
 
+$allSubjects = $DB->get_records('question_subjects');
+$subjectKeys = array_keys($allSubjects);
+
+$deletedSubjects = optional_param_array('deletesubject', array(), PARAM_INT);
+$noSubjects = count($allSubjects);
+if (count($deletedSubjects)) {
+    foreach ($deletedSubjects as $key => $s) {
+        if ($key < $noSubjects) {
+            $DB->delete_records('question_subjects', array('id' => $allSubjects[$subjectKeys[$key]]->id));
+            unset($allSubjects[$subjectKeys[$key]]);
+        }
+        if ($key <= $_POST['nosubjects']) {
+            unset($_POST['subjectname'][$key]);
+            $_POST['subjectname'] = array_values($_POST['subjectname']);
+        }
+        $_POST['nosubjects']--;
+    }
+}
+
 $count = 0;
 foreach($allroles as $role) {
     $toform->rolename[$count] = $role->name;
+    $count++;
+}
+$count = 0;
+foreach($allSubjects as $subject) {
+    $toform->subjectname[$count] = $subject->name;
     $count++;
 }
 
@@ -94,6 +118,40 @@ if ($mform->is_cancelled()) {
     // Return data from form to quiz for processing
     $returnurl->param('sesskey', sesskey());
     $returnurl->param('courseid', $courseid);
+
+    foreach($fromform->subjectname as $index => $subname) {
+        if(!$subname) {
+            continue;
+        }
+        $exists = false;
+        foreach($allSubjects as $subject) {
+            if($subject->name == $subname) {
+                $exists = true;
+                break;
+            }
+        }
+
+        if(!$exists) {
+            if ($index >= sizeof($subjectKeys)) {
+                $newSub = new stdClass();
+                $newSub->name = $subname;
+                $DB->insert_record('question_subjects', $newSub);
+            } else {
+                $newSubName = $subname;
+                $oldSubName = $allSubjects[$subjectKeys[$index]]->name;
+                $affectedquestions = $DB->get_records('question', array('subject' => $oldSubName));
+
+                foreach ($affectedquestions as $q) {
+                    $q->subject = $newSubName;
+                    $DB->update_record('question', $q);
+                }
+
+                $newSub = $allSubjects[$subjectKeys[$index]];
+                $newSub->name = $newSubName;
+                $DB->update_record('question_subjects', $newSub);
+            }
+        }
+    }
 
     foreach($fromform->rolename as $index => $rolename) {
         if(!$rolename) {

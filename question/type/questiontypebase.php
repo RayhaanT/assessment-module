@@ -341,6 +341,14 @@ class question_type {
         $question->penalty = isset($form->penalty) ? $form->penalty : 0;
 
         // Save assessment engine-related parameters
+        if(isset($form->subject)) {
+            if($form->subject != 0) {
+                $allSubjects = $DB->get_records('question_subjects');
+                $subjectKeys = array_keys($allSubjects);
+                $thisSub = $allSubjects[$subjectKeys[$form->subject] - 1];
+                $question->subject = $thisSub->name;
+            }
+        }
         if(isset($form->topic)) {
             $lowertopic = trim($form->topic);
             $question->topic = strtolower($lowertopic);

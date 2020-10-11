@@ -23,6 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
 
+use core\plugininfo\qformat;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -218,6 +219,13 @@ abstract class question_edit_form extends question_wizard_form {
 
 
         // Fields used by the assessment engine to poll the question bank
+        $allSubjects = $DB->get_records('question_subjects', null, 'id');
+        $subjects = ['None'];
+        foreach ($allSubjects as $sub) {
+            array_push($subjects, $sub->name);
+        }
+        $mform->addElement('select', 'subject', get_string('subject', 'question'), $subjects);
+
         $mform->addElement('text', 'topic', get_string('topic', 'quiz'));
         $mform->setType('topic', PARAM_TEXT);
         $mform->addElement('float', 'techversion', get_string('techversion', 'question'));

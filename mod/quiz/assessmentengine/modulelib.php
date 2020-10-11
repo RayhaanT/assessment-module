@@ -109,6 +109,7 @@ function validateTemplates($questions, $pendingTemplates = null, $filterSuspende
             // Extract only the data that is relevant to the template
             $temp = new stdClass();
             $temp->topic = $q->topic;
+            $temp->subject = $q->subject;
             if (strpos(':', $q->difficulty) === false) {
                 $temp->difficulty = $q->difficulty;
             } else {
@@ -125,6 +126,7 @@ function validateTemplates($questions, $pendingTemplates = null, $filterSuspende
         $templatesNo++;
         $temp = new stdClass();
         $temp->topic = $p->topic;
+        $temp->subject = $p->subject;
         if (strpos(':', $p->difficulty) === false) {
             $temp->difficulty = $p->difficulty;
         } else {
@@ -168,6 +170,9 @@ function validateTemplates($questions, $pendingTemplates = null, $filterSuspende
         $condition = "qtype != 'modtemplate'";
         if ($t->topic) {
             $condition = addSelectCondition($condition, 'topic', $t->topic);
+        }
+        if($t->subject) {
+            $condition = addSelectCondition($condition, 'subject', $t->subject);
         }
         if ($condition != '') {
             $rolecondition = $condition . " AND ";
@@ -316,10 +321,13 @@ function getQuestionsInQuiz($quiz) {
 }
 
 // Returns array of 2 conditions
-function getTemplateSQLConditions($topic, $difficulty) {
+function getTemplateSQLConditions($subject, $topic, $difficulty) {
     $condition = "qtype != 'modtemplate'";
     if ($topic) {
         $condition = addSelectCondition($condition, 'topic', $topic);
+    }
+    if($subject) {
+        $condition = addSelectCondition($condition, 'subject', $subject);
     }
     if ($condition != '') {
         $roleCondition = $condition . " AND ";
@@ -367,7 +375,7 @@ function fillTemplate($templateObj, $existing) {
     $temp = $DB->get_record('question', array('id' => $templateObj->id));
 
     $pullPool = array();
-    $conditions = getTemplateSQLConditions($temp->topic, $temp->difficulty);
+    $conditions = getTemplateSQLConditions($temp->subject, $temp->topic, $temp->difficulty);
     $pullPool = $DB->get_records_select('question', $conditions[0]);
     $pullPool = array_merge($pullPool, $DB->get_records_select('question', $conditions[1]));
     $pullPool = filterDuplicates($pullPool, $used);
@@ -375,7 +383,7 @@ function fillTemplate($templateObj, $existing) {
     $noOverlap = fullclone($pullPool);
 
     foreach($templates as $t) {
-        $conditions = getTemplateSQLConditions($temp->topic, $temp->difficulty);
+        $conditions = getTemplateSQLConditions($temp->subject, $temp->topic, $temp->difficulty);
         $newPool = $DB->get_records_select('question', $conditions[0]);
         $newPool = array_merge($newPool, $DB->get_records_select('question', $conditions[1]));
         $newPool = filterAndEvaluateRetirement($newPool);

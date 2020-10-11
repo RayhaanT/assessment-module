@@ -106,6 +106,17 @@ if ($mform->is_cancelled()) {
 	else {
 		$role = '';
 	}
+
+	$subjectIndex = $fromform->subject;
+	if($subjectIndex != 0) {
+		$allSubjects = $DB->get_records('question_subjects');
+		$subjectKeys = array_keys($allSubjects);
+		$subject = $allSubjects[$subjectKeys[$subjectIndex - 1]]->name;
+	}
+	else {
+		$subject = '';
+	}
+
 	$timelimit = $fromform->timelimit;
 	$addqsection = 0;
 
@@ -120,6 +131,9 @@ if ($mform->is_cancelled()) {
 		$condition = '';
 		if($topic) {
 			$condition = addSelectCondition($condition, 'topic', $topic);
+		}
+		if($subject) {
+			$condition = addSelectCondition($conditionm, 'subject', $subject);
 		}
 		if ($condition != '') {
 			$condition .= ' AND ';
@@ -143,6 +157,9 @@ if ($mform->is_cancelled()) {
 			if($topic) {
 				$newTemplate->topic = $topic;
 				$newTemplate->name .= $topic . ' ';
+			}
+			if($topic) {
+				$newTemplate->subject = $subject;
 			}
 			$newTemplate->name .= 'question template';
 			if($role) {

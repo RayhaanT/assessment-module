@@ -69,6 +69,14 @@ class generate_module_form extends moodleform {
 
     $mform->addElement('select', 'role', get_string('role', 'quiz'), $roles);
 
+    $subjects = array('None');
+    $allSubjects = $DB->get_records('question_subjects');
+    foreach ($allSubjects as $sub) {
+      array_push($subjects, $sub->name);
+    }
+    
+    $mform->addElement('select', 'subject', get_string('subject', 'question'), $subjects);
+
     // Submodules
     $mform->addElement('header', 'submodulesheader', 'Submodules', '');
     $mform->setExpanded('submodulesheader', 1);
