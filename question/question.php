@@ -294,6 +294,23 @@ if ($cm !== null){
 
 $toform->inpopup = $inpopup;
 
+$allRegions = $DB->get_records('question_regions', null, 'id');
+$count = 0;
+foreach($allRegions as $r) {
+    if($r->name == $question->region) {
+        $toform->region = $count;
+    }
+    $count++;
+}
+$allSubjects = $DB->get_records('question_subjects', null, 'id');
+$count = 0;
+foreach($allSubjects as $sub) {
+    if($sub->name == $question->subject) {
+        $toform->subject = $count + 1;
+    }
+    $count++;
+}
+
 $mform->set_data($toform);
 
 if ($mform->is_cancelled()) {

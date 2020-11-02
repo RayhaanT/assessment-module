@@ -226,42 +226,67 @@ abstract class question_edit_form extends question_wizard_form {
         }
         $mform->addElement('select', 'subject', get_string('subject', 'question'), $subjects);
 
+        $allRegions = $DB->get_records('question_regions', null, 'id');
+        $regions = [];
+        foreach ($allRegions as $reg) {
+            array_push($regions, $reg->name);
+        }
+        $autocompleteOptions = array(
+                'noselectionstring' => 'None',
+            );
+        $mform->addElement('autocomplete', 'region', get_string('region', 'question'), $regions, $autocompleteOptions);
+
         $mform->addElement('text', 'topic', get_string('topic', 'quiz'));
         $mform->setType('topic', PARAM_TEXT);
+
         $mform->addElement('float', 'techversion', get_string('techversion', 'question'));
 
-        $mform->addElement('date_selector', 'lifecycleexpiry', get_string('lifeexpirydate', 'quiz'));
+        $mform->addElement('text', 'subtopic', get_string('subtopic', 'question'));
+        $mform->setType('subtopic', PARAM_TEXT);
 
         // Role based complexity fields
+        // $difficulties = array('None');
+        // $alldiffs = $DB->get_records('question_difficulties', null, 'listindex');
+        // foreach ($alldiffs as $diff) {
+        //     array_push($difficulties, $diff->name);
+        // }
+        // $roles = array('All');
+        // $allroles = $DB->get_records('question_roles');
+        // foreach ($allroles as $role) {
+        //     array_push($roles, $role->name);
+        // }
+        // $repeatedoptions = array();
+        // $repeated = $this->getRoleDifficultyFields($mform, $repeatedoptions, $difficulties, $roles);
+        // $diffrolepairs = explode(',', $this->question->difficulty);
+        // $repeatsatstart = count($diffrolepairs);
+        // $fieldsperclick = 2;
+
+        // $this->repeat_elements(
+        //     $repeated,
+        //     $repeatsatstart,
+        //     $repeatedoptions,
+        //     'nodiffpairs',
+        //     'adddiffpairs',
+        //     $fieldsperclick,
+        //     'Add ' . $fieldsperclick .' more difficulty settings',
+        //     true
+        // );
+
+        // $mform->addElement('select', 'overalldifficulty', get_string('overalldifficulty', 'question'), $difficulties);
+        // $mform->addHelpButton('overalldifficulty', 'overalldifficulty', 'question');
+
+        // Universal difficulty/boundary fields
+        $mform->addElement('float', 'boundary', get_string('boundary', 'question'));
+        $mform->addHelpButton('boundary', 'boundary', 'question');
+
         $difficulties = array('None');
         $alldiffs = $DB->get_records('question_difficulties', null, 'listindex');
         foreach ($alldiffs as $diff) {
             array_push($difficulties, $diff->name);
         }
-        $roles = array('All');
-        $allroles = $DB->get_records('question_roles');
-        foreach ($allroles as $role) {
-            array_push($roles, $role->name);
-        }
-        $repeatedoptions = array();
-        $repeated = $this->getRoleDifficultyFields($mform, $repeatedoptions, $difficulties, $roles);
-        $diffrolepairs = explode(',', $this->question->difficulty);
-        $repeatsatstart = count($diffrolepairs);
-        $fieldsperclick = 2;
+        $mform->addElement('select', 'difficulty', get_string('difficulty', 'quiz'), $difficulties);
 
-        $this->repeat_elements(
-            $repeated,
-            $repeatsatstart,
-            $repeatedoptions,
-            'nodiffpairs',
-            'adddiffpairs',
-            $fieldsperclick,
-            'Add ' . $fieldsperclick .' more difficulty settings',
-            true
-        );
-
-        $mform->addElement('select', 'overalldifficulty', get_string('overalldifficulty', 'question'), $difficulties);
-        $mform->addHelpButton('overalldifficulty', 'overalldifficulty', 'question');
+        $mform->addElement('date_selector', 'lifecycleexpiry', get_string('lifeexpirydate', 'quiz'));
 
         // Any questiontype specific fields.
         $this->definition_inner($mform);

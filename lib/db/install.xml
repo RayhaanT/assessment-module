@@ -1423,8 +1423,11 @@
         <FIELD NAME="createdby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="userid of person who created this question"/>
         <FIELD NAME="modifiedby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="userid of person who last edited this question"/>
         <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="subject" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" = "Question subject area for module generation purposes"/>
+        <FIELD NAME="subject" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Question subject area for module generation purposes"/>
+        <FIELD NAME="region" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Question region"/>
         <FIELD NAME="topic" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Question topic for module generation purposes"/>
+        <FIELD NAME="subtopic" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Question sub-topic"/>
+        <FIELD NAME="boundary" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Question boundary"/>
         <FIELD NAME="difficulty" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Question difficulty level relative to roles, for module generation"/>
         <FIELD NAME="overalldifficulty" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Average difficulty level used for determining accuracy-based retirement ranking. Relates to diff index in difficulties table."/>
         <FIELD NAME="lifecycleexpiry" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp after which question becomes deprecated"/>

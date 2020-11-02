@@ -342,16 +342,26 @@ class question_type {
 
         // Save assessment engine-related parameters
         if(isset($form->subject)) {
+            echo $form->subject;
             if($form->subject != 0) {
                 $allSubjects = $DB->get_records('question_subjects');
                 $subjectKeys = array_keys($allSubjects);
-                $thisSub = $allSubjects[$subjectKeys[$form->subject] - 1];
+                $thisSub = $allSubjects[$subjectKeys[$form->subject - 1]];
                 $question->subject = $thisSub->name;
             }
+        }
+        if(isset($form->region)) {
+            $allRegions = $DB->get_records('question_regions', null, 'id');
+            $regionKeys = array_keys($allRegions);
+            $question->region = $allRegions[$regionKeys[$form->region]]->name;
         }
         if(isset($form->topic)) {
             $lowertopic = trim($form->topic);
             $question->topic = strtolower($lowertopic);
+        }
+        if(isset($form->subtopic)) {
+            $lowersubtopic = trim($form->subtopic);
+            $question->subtopic = strtolower($lowersubtopic);
         }
         if(isset($form->lifecycleexpiry)) {
             if(date("Y-m-d", time()) != date("Y-m-d", $form->lifecycleexpiry)) {
@@ -361,34 +371,46 @@ class question_type {
                 $question->lifecycleexpiry = 0;
             }
         }
-        $allroles = $DB->get_records('question_roles');
+        // $allroles = $DB->get_records('question_roles');
+        // $alldiffs = $DB->get_records('question_difficulties', null, 'listindex');
+        // $rolekeys = array_keys($allroles);
+        // $diffkeys = array_keys($alldiffs);
+        // if(isset($form->difficulty)) {
+        //     $diffstring = '';
+        //     for($x = 0; $x < count($form->difficulty); $x++) {
+        //         if(!$form->difficulty[$x]) {
+        //             continue;
+        //         }
+        //
+        //         if($diffstring != '') {
+        //             $diffstring .= ',';
+        //         }
+        //         $thisdiff = '';
+        //         $thisdiff = $alldiffs[$diffkeys[$form->difficulty[$x] - 1]]->name;
+        //         if($form->role[$x] == 0) {
+        //             $diffstring = $thisdiff;
+        //             break;
+        //         }
+        //         $thisrole = $allroles[$rolekeys[$form->role[$x] - 1]]->name;
+        //         $diffstring .= $thisrole . ':' . $thisdiff;
+        //     }
+        //     $question->difficulty = $diffstring;
+        // }
+        // else  {
+        //     $question->difficulty = '';
+        // }
+
         $alldiffs = $DB->get_records('question_difficulties', null, 'listindex');
-        $rolekeys = array_keys($allroles);
         $diffkeys = array_keys($alldiffs);
         if(isset($form->difficulty)) {
-            $diffstring = '';
-            for($x = 0; $x < count($form->difficulty); $x++) {
-                if(!$form->difficulty[$x]) {
-                    continue;
-                }
-
-                if($diffstring != '') {
-                    $diffstring .= ',';
-                }
-                $thisdiff = '';
-                $thisdiff = $alldiffs[$diffkeys[$form->difficulty[$x] - 1]]->name;
-                if($form->role[$x] == 0) {
-                    $diffstring = $thisdiff;
-                    break;
-                }
-                $thisrole = $allroles[$rolekeys[$form->role[$x] - 1]]->name;
-                $diffstring .= $thisrole . ':' . $thisdiff;
+            if($form->difficulty) {
+                $question->difficulty = $alldiffs[$diffkeys[$form->difficulty[$x] - 1]]->name;
             }
-            $question->difficulty = $diffstring;
         }
-        else  {
-            $question->difficulty = '';
+        if(isset($form->boundary)) {
+            $question->boundary = $form->boundary;
         }
+
         if(isset($form->techversion)) {
             $question->techversion = $form->techversion;
         }

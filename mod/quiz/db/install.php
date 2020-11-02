@@ -38,4 +38,12 @@ function xmldb_quiz_install() {
     $DB->insert_record('question_subjects', $subject);
     $subject->name = 'Non-verbal reasoning';
     $DB->insert_record('question_subjects', $subject);
+
+    $region = new stdClass();
+    $region->name = 'Algebra';
+    $DB->insert_record('question_regions', $region);
+    $region->name = 'Arithmetic';
+    $DB->insert_record('question_regions', $region);
+    $region->name = 'Grammar';
+    $DB->insert_record('question_regions', $region);
 }
