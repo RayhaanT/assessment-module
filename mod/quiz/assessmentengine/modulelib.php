@@ -110,6 +110,9 @@ function validateTemplates($questions, $pendingTemplates = null, $filterSuspende
             $temp = new stdClass();
             $temp->topic = $q->topic;
             $temp->subject = $q->subject;
+            $temp->region = $q->region;
+            $temp->subtopic = $q->subtopic;
+            $temp->boundary = $q->boundary;
             if (strpos(':', $q->difficulty) === false) {
                 $temp->difficulty = $q->difficulty;
             } else {
@@ -127,6 +130,9 @@ function validateTemplates($questions, $pendingTemplates = null, $filterSuspende
         $temp = new stdClass();
         $temp->topic = $p->topic;
         $temp->subject = $p->subject;
+        $temp->region = $q->region;
+        $temp->subtopic = $q->subtopic;
+        $temp->boundary = $q->boundary;
         if (strpos(':', $p->difficulty) === false) {
             $temp->difficulty = $p->difficulty;
         } else {
@@ -174,6 +180,16 @@ function validateTemplates($questions, $pendingTemplates = null, $filterSuspende
         if($t->subject) {
             $condition = addSelectCondition($condition, 'subject', $t->subject);
         }
+        if ($t->region) {
+            $condition = addSelectCondition($condition, 'region', $t->region);
+        }
+        if ($t->subtopic) {
+            $condition = addSelectCondition($condition, 'subtopic', $t->subtopic);
+        }
+        if ($t->boundary) {
+            $condition = addSelectCondition($condition, 'boundary', $t->boundary);
+        }
+
         if ($condition != '') {
             $rolecondition = $condition . " AND ";
         }
@@ -321,7 +337,7 @@ function getQuestionsInQuiz($quiz) {
 }
 
 // Returns array of 2 conditions
-function getTemplateSQLConditions($subject, $topic, $difficulty) {
+function getTemplateSQLConditions($subject, $region, $topic, $subtopic, $boundary, $difficulty) {
     $condition = "qtype != 'modtemplate'";
     if ($topic) {
         $condition = addSelectCondition($condition, 'topic', $topic);
@@ -329,6 +345,16 @@ function getTemplateSQLConditions($subject, $topic, $difficulty) {
     if($subject) {
         $condition = addSelectCondition($condition, 'subject', $subject);
     }
+    if ($region) {
+        $condition = addSelectCondition($condition, 'region', $region);
+    }
+    if ($subtopic) {
+        $condition = addSelectCondition($condition, 'subtopic', $subtopic);
+    }
+    if ($boundary) {
+        $condition = addSelectCondition($condition, 'boundary', $boundary);
+    }
+
     if ($condition != '') {
         $roleCondition = $condition . " AND ";
     }
@@ -375,7 +401,7 @@ function fillTemplate($templateObj, $existing) {
     $temp = $DB->get_record('question', array('id' => $templateObj->id));
 
     $pullPool = array();
-    $conditions = getTemplateSQLConditions($temp->subject, $temp->topic, $temp->difficulty);
+    $conditions = getTemplateSQLConditions($temp->subject, $temp->region, $temp->topic, $temp->subtopic, $temp->boundary, $temp->difficulty);
     $pullPool = $DB->get_records_select('question', $conditions[0]);
     $pullPool = array_merge($pullPool, $DB->get_records_select('question', $conditions[1]));
     $pullPool = filterDuplicates($pullPool, $used);
@@ -383,7 +409,7 @@ function fillTemplate($templateObj, $existing) {
     $noOverlap = fullclone($pullPool);
 
     foreach($templates as $t) {
-        $conditions = getTemplateSQLConditions($temp->subject, $temp->topic, $temp->difficulty);
+        $conditions = getTemplateSQLConditions($temp->subject, $temp->region, $temp->topic, $temp->subtopic, $temp->boundary, $temp->difficulty);
         $newPool = $DB->get_records_select('question', $conditions[0]);
         $newPool = array_merge($newPool, $DB->get_records_select('question', $conditions[1]));
         $newPool = filterAndEvaluateRetirement($newPool);

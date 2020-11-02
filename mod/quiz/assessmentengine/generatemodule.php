@@ -117,6 +117,16 @@ if ($mform->is_cancelled()) {
 		$subject = '';
 	}
 
+	$regionIndex = $fromform->region;
+	if($regionIndex != 0) {
+		$allRegions = $DB->get_records('question_regions');
+		$regionKeys = array_keys($allRegions);
+		$region = $allRegions[$regionKeys[$regionIndex - 1]]->name;
+	}
+	else {
+		$region = '';
+	}
+
 	$timelimit = $fromform->timelimit;
 	$addqsection = 0;
 
@@ -127,13 +137,24 @@ if ($mform->is_cancelled()) {
 		$lowertopic = strtolower($fromform->topic[$m]);
 		$topic = trim($lowertopic);
 		$topic = $fromform->topic[$m];
+		$subtopic = $fromform->subtopic[$m];
+		$boundary = $fromform->boundary[$m];
 
 		$condition = '';
+		if ($subject) {
+			$condition = addSelectCondition($conditionm, 'subject', $subject);
+		}
+		if ($region) {
+			$condition = addSelectCondition($condition, 'region', $region);
+		}
 		if($topic) {
 			$condition = addSelectCondition($condition, 'topic', $topic);
 		}
-		if($subject) {
-			$condition = addSelectCondition($conditionm, 'subject', $subject);
+		if($subtopic) {
+			$condition = addSelectCondition($condition, 'subtopic', $subtopic);
+		}
+		if($boundary) {
+			$condition = addSelectCondition($condition, 'boundary', $boundary);
 		}
 		if ($condition != '') {
 			$condition .= ' AND ';
@@ -158,8 +179,17 @@ if ($mform->is_cancelled()) {
 				$newTemplate->topic = $topic;
 				$newTemplate->name .= $topic . ' ';
 			}
-			if($topic) {
+			if($subject) {
 				$newTemplate->subject = $subject;
+			}
+			if($region) {
+				$newTemplate->region = $region;
+			}
+			if($subtopic) {
+				$newTemplate->subtopic = $subtopic;
+			}
+			if($boundary) {
+				$newTemplate->boundary = $boundary;
 			}
 			$newTemplate->name .= 'question template';
 			if($role) {

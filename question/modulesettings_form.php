@@ -42,6 +42,20 @@ class modulesettings_form extends moodleform
         return $repeated;
     }
 
+    private function getRegionFields($mform, &$repeatedoptions){
+        $repeated = array();
+        $regionFields = array();
+
+        $regionFields[] = $mform->createElement('text', 'regionname', '');
+        $mform->registerNoSubmitButton('deleteregion');
+        $regionFields[] = $mform->createElement('submit', 'deleteregion', get_string('delete'));
+        $repeated[] = $mform->createElement('group', 'regionbuttonpair', get_string('regionno', 'question', '{no}'), $regionFields, null, false);
+
+        $repeatedoptions['regionname']['type'] = PARAM_TEXT;
+
+        return $repeated;
+    }
+
     private function getDifficultyLifeCycleFields($mform, &$repeatedoptions, $upperbounds) {
         $repeated = array();
         $repeated[] = $mform->createElement('text', 'difficultyname', get_string('difficultyno', 'question', '{no}'));
@@ -110,6 +124,25 @@ class modulesettings_form extends moodleform
             'addsubject',
             $subjectsperclick,
             get_string('addsubjects', 'question', $subjectsperclick),
+            true
+        );
+
+        $mform->addElement('header', 'generalheader', get_string("regions", "question"));
+
+        $repeatedoptions = array();
+        $repeated = $this->getRegionFields($mform, $repeatedoptions);
+        $allRegions = $DB->get_records('question_regions');
+        $repeatsatstart = count($allRegions);
+        $regionsperclick = 2;
+
+        $this->repeat_elements(
+            $repeated,
+            $repeatsatstart,
+            $repeatedoptions,
+            'noregions',
+            'addregion',
+            $regionsperclick,
+            get_string('addregions', 'question', $regionsperclick),
             true
         );
 

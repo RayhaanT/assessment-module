@@ -65,6 +65,25 @@ if (count($deletedSubjects)) {
     }
 }
 
+$allRegions = $DB->get_records('question_regions');
+$regionKeys = array_keys($allRegions);
+
+$deletedRegions = optional_param_array('deleteregion', array(), PARAM_INT);
+$noRegions = count($allRegions);
+if (count($deletedRegions)) {
+    foreach ($deletedRegions as $key => $s) {
+        if ($key < $noRegions) {
+            $DB->delete_records('question_regions', array('id' => $allRegions[$regionKeys[$key]]->id));
+            unset($allRegions[$regionKeys[$key]]);
+        }
+        if ($key <= $_POST['noregions']) {
+            unset($_POST['regionname'][$key]);
+            $_POST['regionname'] = array_values($_POST['regionname']);
+        }
+        $_POST['noregions']--;
+    }
+}
+
 $count = 0;
 foreach($allroles as $role) {
     $toform->rolename[$count] = $role->name;
@@ -73,6 +92,11 @@ foreach($allroles as $role) {
 $count = 0;
 foreach($allSubjects as $subject) {
     $toform->subjectname[$count] = $subject->name;
+    $count++;
+}
+$count = 0;
+foreach($allRegions as $region) {
+    $toform->regionname[$count] = $region->name;
     $count++;
 }
 
@@ -149,6 +173,40 @@ if ($mform->is_cancelled()) {
                 $newSub = $allSubjects[$subjectKeys[$index]];
                 $newSub->name = $newSubName;
                 $DB->update_record('question_subjects', $newSub);
+            }
+        }
+    }
+
+    foreach ($fromform->regionname as $index => $regname) {
+        if (!$regname) {
+            continue;
+        }
+        $exists = false;
+        foreach ($allRegions as $region) {
+            if ($region->name == $regname) {
+                $exists = true;
+                break;
+            }
+        }
+
+        if (!$exists) {
+            if ($index >= sizeof($regionKeys)) {
+                $newReg = new stdClass();
+                $newReg->name = $regname;
+                $DB->insert_record('question_regions', $newReg);
+            } else {
+                $newRegName = $regname;
+                $oldRegName = $allRegions[$regionKeys[$index]]->name;
+                $affectedquestions = $DB->get_records('question', array('region' => $oldRegName));
+
+                foreach ($affectedquestions as $q) {
+                    $q->region = $newRegName;
+                    $DB->update_record('question', $q);
+                }
+
+                $newReg = $allRegions[$regionKeys[$index]];
+                $newReg->name = $newRegName;
+                $DB->update_record('question_regions', $newReg);
             }
         }
     }

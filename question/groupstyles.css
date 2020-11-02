@@ -92,3 +92,23 @@ body#page-mod-quiz-generatesection-generatesection div[id^=fitem_id_][id*=qnum] 
 .configureversions {
     padding-bottom: 10px;
 }
+
+body#page-question-techversion div[id^=fitem_id_][id*=version] {
+    background: #eee;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #bbb;
+    border-bottom: 0;
+}
+
+body#page-question-techversion div[id^=fitem_id_][id*=difficulty] {
+    background: #eee;
+    margin-bottom: 2em;
+    margin-top: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #bbb;
+    border-top: 0;
+}

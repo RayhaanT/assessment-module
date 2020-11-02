@@ -17,6 +17,8 @@ class generate_module_form extends moodleform {
   private function getSubModuleFields($mform, &$repeatedoptions, $alldiffs) {
     $repeated = array();
     $repeated[] = $mform->createElement('text', 'topic', get_string('topic', 'quiz'));
+    $repeated[] = $mform->createElement('text', 'subtopic', get_string('subtopic', 'question'));
+    $repeated[] = $mform->createElement('float', 'boundary', get_string('boundary', 'question'));
     $repeated[] = $mform->createElement('static', 'complexityqlabel', 'Number of questions of different difficulty levels:', '');
 
     foreach($alldiffs as $diff) {
@@ -30,6 +32,7 @@ class generate_module_form extends moodleform {
     }
     
     $repeatedoptions['topic']['type'] = PARAM_TEXT;
+    $repeatedoptions['subtopic']['type'] = PARAM_TEXT;
     $repeatedoptions['highq']['default'] = 0;
     
     return $repeated;
@@ -76,6 +79,14 @@ class generate_module_form extends moodleform {
     }
     
     $mform->addElement('select', 'subject', get_string('subject', 'question'), $subjects);
+
+    $regions = array('None');
+    $allRegions = $DB->get_records('question_regions');
+    foreach ($allRegions as $reg) {
+      array_push($regions, $reg->name);
+    }
+
+    $mform->addElement('select', 'region', get_string('region', 'question'), $regions);
 
     // Submodules
     $mform->addElement('header', 'submodulesheader', 'Submodules', '');

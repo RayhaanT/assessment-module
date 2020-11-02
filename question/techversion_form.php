@@ -33,10 +33,17 @@ class techversion_form extends moodleform
         $sql = "SELECT DISTINCT topic FROM " . $CFG->dbname . "." . $CFG->prefix . "question ORDER BY topic";
         $alltopics = $DB->get_records_sql($sql);
 
+        $difficulties = array('None');
+        $alldiffs = $DB->get_records('question_difficulties', null, 'listindex');
+        foreach ($alldiffs as $diff) {
+            array_push($difficulties, $diff->name);
+        }
+
         $count = 0;
         foreach($alltopics as $t) {
             if(!$t->topic) {continue;} 
             $mform->addElement('float', 'version' . $count, get_string('topicversiongroup', 'question', $t->topic));
+            $mform->addElement('select', 'difficulty' . $count, get_string('difficulty', 'quiz'), $difficulties);
             $mform->addHelpButton('version' . $count, 'techversion', 'question');
             $count++;
         }
