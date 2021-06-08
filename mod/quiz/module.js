@@ -54,17 +54,12 @@ M.mod_quiz.focusManager = {
         M.mod_quiz.timer.Y = Y;
         this.focusViolations = parseInt(existingViolations);
         this.attemptID = parseInt(attemptID);
-        console.log(this.focusViolations);
-        console.log(this.attemptID);
-        console.log(typeof(this.attemptID));
 
         document.addEventListener(
             "visibilitychange"
             , () => {
                 if (document.hidden) {
-                    console.log("document is hidden");
                     this.focusViolations++;
-                    console.log(this.focusViolations);
                     var violationbus = Y.one('input[name=proctorviolations]');
                     violationbus.set('value', this.focusViolations);
 
@@ -76,9 +71,12 @@ M.mod_quiz.focusManager = {
                         ]);
 
                         promises[0].done(function (response) {
-                            console.log(response);
+                            // Use the response
+                            // console.log(response);
                         }).fail(function (ex) {
-                            console.log(ex)
+                            // Handle the exception
+                            // mod/quiz/processattempt.php acts as redundancy with the violationbus above
+                            // console.log(ex)
                         });
                     });
 
@@ -86,11 +84,21 @@ M.mod_quiz.focusManager = {
                         this.cancelQuiz();
                     }
                     else {
-                        // this.snackBar.open("Don't leave this page. Your exam will be automatically submitted the next time you leave the page.", 'Close', { duration: 5000 });
                         // Warn user
+                        require(['core/modal_factory'], function(modalFactory) {
+                            console.log(modalFactory);
+                            modalFactory.create({
+                                type: modalFactory.types.ALERT,
+                                title: 'Warning: Do not leave the quiz page',
+                                body: 'Your leaving the quiz page has been recorded on this attempt. If you leave the page again, the rest of the quiz will be automatically submitted and your proctoring violation will be recorded',
+                            })
+                            .then(function (modal) {
+                                modal.show();
+                            });
+                        });
                     }
                 } else {
-                    console.log("document is showing");
+                    // What to do when page visibility changes from hidden -> visible
                 }
             }
         );
