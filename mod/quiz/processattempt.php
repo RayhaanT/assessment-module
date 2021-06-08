@@ -47,8 +47,15 @@ $scrollpos     = optional_param('scrollpos',     '',     PARAM_RAW);
 $cmid          = optional_param('cmid', null, PARAM_INT);
 $timeoutnext   = optional_param('sectiontimeup', false, PARAM_BOOL);
 $overtime      = optional_param('overtime', 0, PARAM_INT);
+$violations    = optional_param('proctorviolations', 0, PARAM_INT);
 
 $attemptobj = quiz_create_attempt_handling_errors($attemptid, $cmid);
+
+if($violations > 0) {
+    $thisattempt = $DB->get_record('quiz_attempts', array('id' => $attemptid));
+    $thisattempt->proctorviolations = $violations;
+    $DB->update_record('quiz_attempts', $thisattempt);
+}
 
 // Set $nexturl now.
 if($timeoutnext && !$timeup) {
@@ -115,7 +122,7 @@ if ($attemptobj->is_finished()) {
 }
 
 // Process the attempt, getting the new status for the attempt.
-$status = $attemptobj->process_attempt($timenow, $finishattempt, $timeup, $thispage);
+$status = $attemptobj->process_attempt($timenow, $finishattempt, $timeup, $thispage, $violations);
 
 if ($status == quiz_attempt::OVERDUE) {
     redirect($attemptobj->summary_url());

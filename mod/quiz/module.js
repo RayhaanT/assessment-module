@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+let notification = require(['core/notification']);
+
 M.mod_quiz = M.mod_quiz || {};
 
 M.mod_quiz.init_attempt_form = function(Y) {
@@ -41,6 +43,70 @@ M.mod_quiz.init_comment_popup = function(Y) {
     closebutton.set('value', M.util.get_string('cancel', 'moodle'));
     Y.one('#id_submitbutton').ancestor().append(closebutton);
     Y.on('click', function() { window.close() }, closebutton);
+}
+
+M.mod_quiz.focusManager = {
+    Y: null,
+    focusViolations: 0,
+    attemptID: null,
+
+    init: function(Y, existingViolations, attemptID) {
+        M.mod_quiz.timer.Y = Y;
+        this.focusViolations = parseInt(existingViolations);
+        this.attemptID = parseInt(attemptID);
+        console.log(this.focusViolations);
+        console.log(this.attemptID);
+        console.log(typeof(this.attemptID));
+
+        document.addEventListener(
+            "visibilitychange"
+            , () => {
+                if (document.hidden) {
+                    console.log("document is hidden");
+                    this.focusViolations++;
+                    console.log(this.focusViolations);
+                    var violationbus = Y.one('input[name=proctorviolations]');
+                    violationbus.set('value', this.focusViolations);
+
+                    // Update database via AJAX to prevent refreshing the page resetting the tally
+                    let intermediary = this.attemptID;
+                    require(['core/ajax'], function (ajax) {
+                        var promises = ajax.call([
+                            { methodname: 'mod_quiz_record_proctoring_violation', args: { attemptid: intermediary } },
+                        ]);
+
+                        promises[0].done(function (response) {
+                            console.log(response);
+                        }).fail(function (ex) {
+                            console.log(ex)
+                        });
+                    });
+
+                    if (this.focusViolations > 1) {
+                        this.cancelQuiz();
+                    }
+                    else {
+                        // this.snackBar.open("Don't leave this page. Your exam will be automatically submitted the next time you leave the page.", 'Close', { duration: 5000 });
+                        // Warn user
+                    }
+                } else {
+                    console.log("document is showing");
+                }
+            }
+        );
+    },
+
+    cancelQuiz: function() {
+        // Cancel exam
+        console.log("Cancelled");
+        var input = Y.one('input[name=timeup]');
+        input.set('value', 1);
+
+        var nextpage = Y.one('input[name=nextpage]');
+        var form = nextpage.ancestor('form');
+        M.core_formchangechecker.set_form_submitted();
+        form.submit();
+    },
 }
 
 // Code for updating the countdown timer that is used on timed quizzes.

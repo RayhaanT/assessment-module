@@ -2372,11 +2372,14 @@ class quiz_attempt {
      * @param  bool $finishattempt whether to finish the attempt or not.
      * @param  bool $timeup true if form was submitted by timer.
      * @param  int $thispage current page number.
+     * @param  int $proctorviolations the number of times the writer has violated proctoring protocol
      * @return string the attempt state once the data has been processed.
      * @since  Moodle 3.1
      */
-    public function process_attempt($timenow, $finishattempt, $timeup, $thispage) {
+    public function process_attempt($timenow, $finishattempt, $timeup, $thispage, $proctorviolations = 0) {
         global $DB;
+
+        $this->attempt->proctorviolations = $proctorviolations;
 
         $transaction = $DB->start_delegated_transaction();
 

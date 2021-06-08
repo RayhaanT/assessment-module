@@ -41,6 +41,7 @@ $string['sectionlimitfield'] = 'Use per-section time limits?';
 $string['sectionfulldelete'] = 'Delete \'{$a}\' heading and contents';
 $string['confirmdeletesection'] = 'Are you sure you want to remove all contents of the \'{$a}\' section?';
 $string['templatesnotfilled'] = 'There are currently not enough questions in circulation to fill all question templates';
+$string['proctorattemptsfield'] = "Proctor attempts";
 
 // Errors
 $string['topicinvalid'] = "This topic doesn't match any existing questions";

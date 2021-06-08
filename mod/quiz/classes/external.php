@@ -1931,4 +1931,46 @@ class mod_quiz_external extends external_api {
         );
     }
 
+    /**
+     * Describes the parameters for record_proctoring_violation.
+     *
+     * @return external_function_parameters
+     */
+    public static function record_proctoring_violation_parameters() {
+        return new external_function_parameters (
+            array(
+                'attemptid' => new external_value(PARAM_INT, 'attempt instance id')
+            )
+        );
+    }
+
+    /**
+     * Increments the proctor violation counter in the database for a quiz attempt when its detected via JS
+     * 
+     * @param int $attemptid the id of the quiz attempt to record against
+     * @return none
+     */
+    public static function record_proctoring_violation($attemptid) {
+        global $DB;
+
+        $params = self::validate_parameters(self::record_proctoring_violation_parameters(), array('attemptid' => $attemptid));
+        $thisattempt = $DB->get_record('quiz_attempts', array('id' => $attemptid));
+        $thisattempt->proctorviolations+=1;
+        $DB->update_record('quiz_attempts', $thisattempt);
+
+        return array('id' => $attemptid);
+    }
+
+    /**
+     * Describes the record_proctoring_violation return value.
+     *
+     * @return external_single_structure
+     */
+    public static function record_proctoring_violation_returns() {
+        return new external_single_structure(
+            array(
+                'id' => new external_value(PARAM_INT, 'the attempt id'),
+            )
+        );
+    }
 }

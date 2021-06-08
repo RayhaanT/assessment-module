@@ -79,6 +79,8 @@ class mod_quiz_mod_form extends moodleform_mod {
         // Introduction.
         $this->standard_intro_elements(get_string('introduction', 'quiz'));
 
+        $mform->addElement('checkbox', 'proctorattempts', get_string('proctorattemptsfield', 'quiz'));
+
         // -------------------------------------------------------------------------------
         $mform->addElement('header', 'timing', get_string('timing', 'quiz'));
 

@@ -284,6 +284,8 @@ class mod_quiz_renderer extends plugin_renderer_base {
         global $DB;
         $quiz = $attemptobj->get_quiz();
         $usesectionlimits = $quiz->usesectiontimelimits;
+        $proctor = $quiz->proctorattempts;
+        $attempt = $DB->get_record('quiz_attempts', array('id' => $attemptobj->get_attemptid()));
 
         if(!$usesectionlimits) {
             $timeleft = $attemptobj->get_time_left_display($timenow);
@@ -303,7 +305,6 @@ class mod_quiz_renderer extends plugin_renderer_base {
                 }
             }
 
-            $attempt = $DB->get_record('quiz_attempts', array('id' => $attemptobj->get_attemptid()));
             $starttime = $attempt->pagechangetime;
             if(!$starttime) {
                 $starttime = $attempt->timestart;
@@ -320,6 +321,10 @@ class mod_quiz_renderer extends plugin_renderer_base {
                 // $timerstartvalue = max($timerstartvalue, 1);
             }
             $this->initialise_timer($timerstartvalue, $ispreview, $usesectionlimits);
+        }
+
+        if($proctor) {
+            $this->initialise_proctoring($attempt->proctorviolations, $attempt->id);
         }
 
         return html_writer::tag('div', get_string('timeleft', 'quiz') . ' ' .
@@ -539,6 +544,8 @@ class mod_quiz_renderer extends plugin_renderer_base {
                 'value' => '0', 'id' => 'sectiontimeup'));
         $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'overtime',
                 'value' => '0', 'id' => 'overtime'));
+        $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'proctorviolations',
+                'value' => '0', 'id' => 'proctorviolations'));
 
         // Add a hidden field with questionids. Do this at the end of the form, so
         // if you navigate before the form has finished loading, it does not wipe all
@@ -607,6 +614,13 @@ class mod_quiz_renderer extends plugin_renderer_base {
     public function initialise_timer($timerstartvalue, $ispreview, $usesectionlimits) {
         $options = array($timerstartvalue, (bool)$ispreview, $usesectionlimits);
         $this->page->requires->js_init_call('M.mod_quiz.timer.init', $options, false, quiz_get_js_module());
+    }
+
+    /**
+     * Output the JavaScript required to intialise the proctoring event listeners
+     */
+    public function initialise_proctoring($existingViolations, $attemptid) {
+        $this->page->requires->js_init_call('M.mod_quiz.focusManager.init', array($existingViolations, $attemptid), false, quiz_get_js_module());
     }
 
     /**

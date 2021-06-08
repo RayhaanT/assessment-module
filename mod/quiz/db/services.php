@@ -191,4 +191,13 @@ $functions = array(
         'capabilities'  => 'mod/quiz:view',
         'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
     ),
+
+    'mod_quiz_record_proctoring_violation' => array(
+        'classname'     => 'mod_quiz_external',
+        'methodname'    => 'record_proctoring_violation',
+        'description'   => 'Increment the proctor violation counter in the database for a quiz attempt when its detected via JS',
+        'type'          => 'write',
+        'ajax'          => true,
+        'capabilities'  => 'mod/quiz:view',
+    )
 );
