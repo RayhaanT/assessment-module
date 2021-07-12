@@ -42,6 +42,19 @@ $string['sectionfulldelete'] = 'Delete \'{$a}\' heading and contents';
 $string['confirmdeletesection'] = 'Are you sure you want to remove all contents of the \'{$a}\' section?';
 $string['templatesnotfilled'] = 'There are currently not enough questions in circulation to fill all question templates';
 $string['proctorattemptsfield'] = "Proctor attempts";
+$string['proctorvideofield'] = "Record video footage for proctoring";
+$string['webcamvideo'] = 'Webcam recording';
+$string['violations'] = 'Proctoring violations';
+$string['proctorstatus'] = 'Proctoring status';
+$string['enteringquizx'] = 'Entering quiz: {$a}';
+$string['accesscamera1'] = 'This assessment requires the camera for proctoring';
+$string['accesscamera2'] = 'Please allow the use of the camera and microphone to continue.';
+$string['accesscamera3'] = 'If you have already allowed access in the past you will be redirect to the assessment shortly.';
+$string['analyze'] = 'Send video for analysis';
+$string['flagmajorviolations'] = 'Flag a major violation';
+$string['flagminorviolations'] = 'Flag a minor violation';
+$string['proctorviewertitle'] = 'View proctoring recording';
+$string['clearviolations'] = 'Clear violations';
 
 // Errors
 $string['topicinvalid'] = "This topic doesn't match any existing questions";

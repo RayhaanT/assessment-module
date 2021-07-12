@@ -4,6 +4,31 @@
     font-size: 0.7em;
 }
 
+#page-mod-quiz-report .proctor-major-violation-cell {
+    /* This is just so javascript can identify it */
+}
+#page-mod-quiz-report .proctor-minor-violation-cell {
+    /* This is just so javascript can identify it */
+}
+
+body.path-mod-quiz .proctor-major-violation-row,
+body.path-mod-quiz table tbody tr.proctor-major-violation-row  > td {
+    border-color: #fa9278;
+    background-color: #f7a1a1;
+}
+
+body.path-mod-quiz .proctor-minor-violation-row,
+body.path-mod-quiz table tbody tr.proctor-minor-violation-row  > td {
+    border-color: #f8e3a8;
+    background-color: #ffefb5;
+}
+
+.center-video {
+    margin-left: auto;
+    margin-right: auto;
+    display: block
+}
+
 /** Attempt and review pages **/
 #page-mod-quiz-attempt #page .controls,
 #page-mod-quiz-summary #page .controls,

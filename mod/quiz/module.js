@@ -45,15 +45,172 @@ M.mod_quiz.init_comment_popup = function(Y) {
     Y.on('click', function() { window.close() }, closebutton);
 }
 
+M.mod_quiz.change_attempt_colours = function(Y) {
+    var cells = document.getElementsByClassName("proctor-major-violation-cell");
+    var rows = [];
+    for (var i = 0; i < cells.length; i++) {
+        rows.push(cells[i].parentElement);
+    }
+
+    rows.forEach((row) => {
+        row.parentElement.className = 'proctor-major-violation-row';
+    });
+
+    cells = document.getElementsByClassName("proctor-minor-violation-cell");
+    rows = [];
+    for (var i = 0; i < cells.length; i++) {
+        rows.push(cells[i].parentElement);
+    }
+
+    rows.forEach((row) => {
+        row.parentElement.className = 'proctor-minor-violation-row';
+    });
+}
+
+M.mod_quiz.get_camera_access = function(Y, id, pageParam, forceNewParam, targetURL, failureURL, sessKey) {
+    var postToStart = function (path, params) {
+        // Generate a form and submit it with the appropriate data
+        const form = document.createElement('form');
+        form.method = 'post';
+        form.action = path;
+
+        for (const key in params) {
+            if (params.hasOwnProperty(key)) {
+                const hiddenField = document.createElement('input');
+                hiddenField.type = 'hidden';
+                hiddenField.name = key;
+                hiddenField.value = params[key];
+
+                form.appendChild(hiddenField);
+            }
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    var startAttempt = function () {
+        let data = {
+            cmid: id,
+            page: pageParam,
+            forcenew: forceNewParam,
+            camerapermission: true,
+            sesskey: sessKey
+        };
+        postToStart(targetURL, data);
+    }
+
+    var abortAttempt = function (err) {
+        window.location.replace(failureURL);
+    }
+
+    navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+        .then(startAttempt)
+        .catch(abortAttempt);
+}
+
+M.mod_quiz.videoRecorder = {
+    Y: null,
+    attemptID: null,
+    shouldStop: false,
+    stopped: false,
+
+    init: function(Y, attemptID, uploadURL) {
+        this.Y = Y;
+        this.attemptID = attemptID;
+        
+        const recordedChunks = [];
+
+        var mediaRecorder;
+
+        var handleSuccess = function (stream) {
+            const options = { mimeType: 'video/webm; codecs="opus, VP8' };
+            mediaRecorder = new MediaRecorder(stream, options);
+
+            mediaRecorder.addEventListener('dataavailable', function (e) {
+                if (e.data.size > 0) {
+                    recordedChunks.push(e.data);
+                }
+
+                if (this.shouldStop === true && this.stopped === false) {
+                    mediaRecorder.stop();
+                    this.stopped = true;
+                }
+            });
+
+            mediaRecorder.addEventListener('stop', function () {
+                var recording = new Blob(recordedChunks, {
+                    type: 'video/webm'
+                });
+                recording.name = "newProctor.webm";
+                recording.lastModifiedDate = new Date();
+
+                let req = new XMLHttpRequest();
+                let formData = new FormData();
+
+                // req.onreadystatechange = function () {
+                //     if (req.readyState == XMLHttpRequest.DONE) {
+                //         alert(req.responseText);
+                //     }
+                // }
+
+                formData.append("video", recording);
+                formData.append("attemptid", attemptID);
+                req.open("POST", uploadURL);
+                req.send(formData);
+            });
+
+            mediaRecorder.start();
+
+            window.onbeforeunload = function () {
+                this.shouldStop = true;
+                mediaRecorder.stop();
+            };
+        };
+
+        var handleRecordingError = function (stream) {
+            // Warn user
+            require(['core/modal_factory'], function (modalFactory) {
+                modalFactory.create({
+                    type: modalFactory.types.ALERT,
+                    title: 'Camera access denied',
+                    body: 'This quiz requires use of the camera for proctoring.',
+                })
+                .done(function (modal) {
+                    // Cancel exam
+                    var input = Y.one('input[name=timeup]');
+                    input.set('value', 1);
+
+                    var nextpage = Y.one('input[name=nextpage]');
+                    var form = nextpage.ancestor('form');
+                    M.core_formchangechecker.set_form_submitted();
+                    form.submit();
+                })
+                .then(function (modal) {
+                    modal.show();
+                });
+            });
+        }
+
+        navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+            .then(handleSuccess)
+            .catch(handleRecordingError);
+    }
+};
+
 M.mod_quiz.focusManager = {
     Y: null,
     focusViolations: 0,
     attemptID: null,
 
     init: function(Y, existingViolations, attemptID) {
-        M.mod_quiz.timer.Y = Y;
+        this.Y = Y;
         this.focusViolations = parseInt(existingViolations);
         this.attemptID = parseInt(attemptID);
+        var preloadViolationBus = Y.one('input[name=proctorviolations]');
+        if(preloadViolationBus) {
+            preloadViolationBus.set('value', this.focusViolations);
+        }
 
         document.addEventListener(
             "visibilitychange"
@@ -61,21 +218,22 @@ M.mod_quiz.focusManager = {
                 if (document.hidden) {
                     this.focusViolations++;
                     var violationbus = Y.one('input[name=proctorviolations]');
-                    violationbus.set('value', this.focusViolations);
+                    if(violationbus) {
+                        violationbus.set('value', this.focusViolations);
+                    }
 
                     // Update database via AJAX to prevent refreshing the page resetting the tally
                     let intermediary = this.attemptID;
                     require(['core/ajax'], function (ajax) {
                         var promises = ajax.call([
-                            { methodname: 'mod_quiz_record_proctoring_violation', args: { attemptid: intermediary } },
+                            { methodname: 'mod_quiz_record_proctoring_violation', args: { attemptid: intermediary, severity: 1 } },
                         ]);
 
                         promises[0].done(function (response) {
-                            // Use the response
+                            // The response is just the attempt id for now
                             // console.log(response);
                         }).fail(function (ex) {
-                            // Handle the exception
-                            // mod/quiz/processattempt.php acts as redundancy with the violationbus above
+                            // mod/quiz/processattempt.php acts as redundancy with the violationbus above so exception handling not necessary
                             // console.log(ex)
                         });
                     });
@@ -86,7 +244,6 @@ M.mod_quiz.focusManager = {
                     else {
                         // Warn user
                         require(['core/modal_factory'], function(modalFactory) {
-                            console.log(modalFactory);
                             modalFactory.create({
                                 type: modalFactory.types.ALERT,
                                 title: 'Warning: Do not leave the quiz page',
@@ -106,16 +263,14 @@ M.mod_quiz.focusManager = {
 
     cancelQuiz: function() {
         // Cancel exam
-        console.log("Cancelled");
         var input = Y.one('input[name=timeup]');
         input.set('value', 1);
 
-        var nextpage = Y.one('input[name=nextpage]');
-        var form = nextpage.ancestor('form');
+        var form = input.ancestor('form');
         M.core_formchangechecker.set_form_submitted();
         form.submit();
     },
-}
+};
 
 // Code for updating the countdown timer that is used on timed quizzes.
 M.mod_quiz.timer = {

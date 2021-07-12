@@ -49,7 +49,7 @@ require_once($CFG->dirroot . '/mod/quiz/report/responses/first_or_all_responses_
 class quiz_responses_report extends quiz_attempts_report {
 
     public function display($quiz, $cm, $course) {
-        global $OUTPUT, $DB;
+        global $OUTPUT, $DB, $PAGE, $CFG;
 
         list($currentgroup, $studentsjoins, $groupstudentsjoins, $allowedjoins) = $this->init(
                 'responses', 'quiz_responses_settings_form', $quiz, $cm, $course);
@@ -67,6 +67,13 @@ class quiz_responses_report extends quiz_attempts_report {
 
         // Load the required questions.
         $questions = quiz_report_get_significant_questions($quiz);
+
+        if ($quiz->proctorvideo || $quiz->proctorattempts) {
+            $PAGE->requires->js_init_call('M.mod_quiz.change_attempt_colours', array(), false, quiz_get_js_module());
+        }
+        if ($quiz->proctorvideo) {
+            $PAGE->requires->js_call_amd('mod_quiz/proctorvideoview', 'init' [$CFG->wwwroot]);
+        }
 
         // Prepare for downloading, if applicable.
         $courseshortname = format_string($course->shortname, true,
@@ -151,6 +158,10 @@ class quiz_responses_report extends quiz_attempts_report {
 
             if ($table->is_downloading()) {
                 $this->add_time_columns($columns, $headers);
+            }
+
+            if ($quiz->proctorvideo || $quiz->proctorattempts) {
+                $this->add_proctor_columns($columns, $headers, $quiz->proctorvideo);
             }
 
             $this->add_grade_columns($quiz, $options->usercanseegrades, $columns, $headers);

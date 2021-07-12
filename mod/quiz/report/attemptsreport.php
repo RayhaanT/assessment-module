@@ -255,6 +255,22 @@ abstract class quiz_attempts_report extends quiz_default_report {
     }
 
     /**
+     * Add column for proctor violations
+     * @param array $columns the list of columns. Added to.
+     * @param array $headers the columns headings. Added to.
+     * @param bool $video whether a video was recorded for this attempt
+     */
+    protected function add_proctor_columns(&$columns, &$headers, $video) {
+        $columns[] = 'proctorviolations';
+        $headers[] = get_string('proctorstatus', 'quiz');
+
+        if($video) {
+            $columns[] = 'video';
+            $headers[] = get_string('webcamvideo', 'quiz');
+        }
+    }
+
+    /**
      * Add all the grade and feedback columns, if applicable, to the $columns
      * and $headers arrays.
      * @param object $quiz the quiz settings.

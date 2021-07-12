@@ -97,6 +97,19 @@ function update_section_time_limits($quiz) {
         $quiz->navmethod = 'sequential';
     }
 
+    if(isset($quiz->proctorattempts)) {
+        $quiz->proctorattempts = $quiz->proctorattempts;
+    }
+    else {
+        $quiz->proctorattempts = 0;
+    }
+
+    if (isset($quiz->proctorvideo)) {
+        $quiz->proctorvideo = $quiz->proctorvideo;
+    } else {
+        $quiz->proctorvideo = 0;
+    }
+
     $DB->update_record('quiz', $quiz);
     return $quiz;
 }

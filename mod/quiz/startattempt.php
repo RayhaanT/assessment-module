@@ -33,6 +33,7 @@ require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 $id = required_param('cmid', PARAM_INT); // Course module id
 $forcenew = optional_param('forcenew', false, PARAM_BOOL); // Used to force a new preview
 $page = optional_param('page', -1, PARAM_INT); // Page to jump to in the attempt.
+$camera = optional_param('camerapermission', false, PARAM_BOOL);
 
 if (!$cm = get_coursemodule_from_id('quiz', $id)) {
     print_error('invalidcoursemodule');
@@ -44,6 +45,11 @@ if (!$course = $DB->get_record('course', array('id' => $cm->course))) {
 $quizobj = quiz::create($cm->instance, $USER->id);
 // This script should only ever be posted to, so set page URL to the view page.
 $PAGE->set_url($quizobj->view_url());
+
+if($quizobj->get_quiz()->proctorvideo && !$camera) {
+    $verifycameraurl = new moodle_url('/mod/quiz/verifycamera.php', array('cmid' => $id, 'forcenew' => $forcenew, 'page' => $page));
+    redirect($verifycameraurl);
+}
 
 // Check login and sesskey.
 require_login($quizobj->get_course(), false, $quizobj->get_cm());

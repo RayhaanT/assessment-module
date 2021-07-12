@@ -210,6 +210,43 @@ abstract class quiz_attempts_report_table extends table_sql {
     }
 
     /**
+     * Generate the display of the proctor violations column.
+     * @param object $attempt the table row being output.
+     * @return string HTML content to go inside the td.
+     */
+    public function col_proctorviolations($attempt) {
+        global $DB;
+
+        $attemptdata = $DB->get_record('quiz_attempts', array('id' => $attempt->attempt));
+
+        $violations = 0;
+        if($attemptdata->proctorviolations > 0) {
+            $violations = $attemptdata->proctorviolations;
+            $message = '';
+            $classname = '';
+            if($violations == 1) {
+                $message = "Minor violation";
+                $classname = 'minor';
+            }
+            if($violations == 2) {
+                $message = "<b>Major violation</b>";
+                $classname = 'major';
+            }
+            return "
+            <div class=\"proctor-$classname-violation-cell\">
+                $message
+            </div>";
+        }
+        return "None";
+    }
+
+    public function col_video($attempt) {
+        return "
+        <a href=\"#\" id=\"videolink\" data-action=\"videoviewer\" data-attemptid=\"$attempt->attempt\"> View </a>
+        ";
+    }
+
+    /**
      * Generate the display of the feedback column.
      * @param object $attempt the table row being output.
      * @return string HTML content to go inside the td.

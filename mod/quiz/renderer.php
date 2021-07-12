@@ -285,6 +285,8 @@ class mod_quiz_renderer extends plugin_renderer_base {
         $quiz = $attemptobj->get_quiz();
         $usesectionlimits = $quiz->usesectiontimelimits;
         $proctor = $quiz->proctorattempts;
+        $proctorvideo = $quiz->proctorvideo;
+        $additionalOutput = '';
         $attempt = $DB->get_record('quiz_attempts', array('id' => $attemptobj->get_attemptid()));
 
         if(!$usesectionlimits) {
@@ -326,11 +328,14 @@ class mod_quiz_renderer extends plugin_renderer_base {
         if($proctor) {
             $this->initialise_proctoring($attempt->proctorviolations, $attempt->id);
         }
+        if($proctorvideo) {
+            $additionalOutput .= $this->initialise_video_proctoring($attempt->id);
+        }
 
         return html_writer::tag('div', get_string('timeleft', 'quiz') . ' ' .
                 html_writer::tag('span', '', array('id' => 'quiz-time-left')),
                 array('id' => 'quiz-timer', 'role' => 'timer',
-                    'aria-atomic' => 'true', 'aria-relevant' => 'text'));
+                    'aria-atomic' => 'true', 'aria-relevant' => 'text')) . $additionalOutput;
     }
 
     /**
@@ -621,6 +626,11 @@ class mod_quiz_renderer extends plugin_renderer_base {
      */
     public function initialise_proctoring($existingViolations, $attemptid) {
         $this->page->requires->js_init_call('M.mod_quiz.focusManager.init', array($existingViolations, $attemptid), false, quiz_get_js_module());
+    }
+
+    public function initialise_video_proctoring($attemptid) {
+        $this->page->requires->js_init_call('M.mod_quiz.videoRecorder.init', array($attemptid, '/moodle/mod/quiz/savevideo.php'), false, quiz_get_js_module());
+        return '';
     }
 
     /**

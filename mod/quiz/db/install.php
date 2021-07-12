@@ -34,8 +34,4 @@ function xmldb_quiz_install() {
     $DB->insert_record('question_subjects', $subject);
     $subject->name = 'English';
     $DB->insert_record('question_subjects', $subject);
-    $subject->name = 'Verbal reasoning';
-    $DB->insert_record('question_subjects', $subject);
-    $subject->name = 'Non-verbal reasoning';
-    $DB->insert_record('question_subjects', $subject);
 }

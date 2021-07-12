@@ -1,0 +1,15 @@
+{{< core/modal }}
+  {{$title}}{{#str}} proctorviewertitle, mod_quiz {{/str}}{{/title}}
+  {{$body}}
+    <div class="container">
+      <video id="player" class="center-video" controls></video>
+    </div>
+  {{/body}}
+  {{$footer}}
+    <i class="fa fa-spinner fa-spin" style="display:none" id="loading-spinner"></i>
+    <button type="button" class="btn btn-primary" data-action="analyze">{{#str}} analyze, mod_quiz {{/str}}</button>
+    <button type="button" class="btn btn-danger" data-action="flagmajor">{{#str}} flagmajorviolations, mod_quiz {{/str}}</button>
+    <button type="button" class="btn btn-warning" data-action="flagminor">{{#str}} flagminorviolations, mod_quiz {{/str}}</button>
+    <button type="button" class="btn btn-light" data-action="clear">{{#str}} clearviolations, mod_quiz {{/str}}</button>
+  {{/footer}}
+{{/ core/modal }}

@@ -45,7 +45,7 @@ class quiz_overview_report extends quiz_attempts_report {
     protected $hasgroupstudents;
 
     public function display($quiz, $cm, $course) {
-        global $DB, $OUTPUT, $PAGE;
+        global $DB, $OUTPUT, $PAGE, $CFG;
 
         list($currentgroup, $studentsjoins, $groupstudentsjoins, $allowedjoins) = $this->init(
                 'overview', 'quiz_overview_settings_form', $quiz, $cm, $course);
@@ -63,6 +63,13 @@ class quiz_overview_report extends quiz_attempts_report {
 
         // Load the required questions.
         $questions = quiz_report_get_significant_questions($quiz);
+
+        if($quiz->proctorvideo || $quiz->proctorattempts) {
+            $PAGE->requires->js_init_call('M.mod_quiz.change_attempt_colours', array(), false, quiz_get_js_module());
+        }
+        if($quiz->proctorvideo) {
+            $PAGE->requires->js_call_amd('mod_quiz/proctorvideoview', 'init', [$CFG->wwwroot]);
+        }
 
         // Prepare for downloading, if applicable.
         $courseshortname = format_string($course->shortname, true,
@@ -180,6 +187,10 @@ class quiz_overview_report extends quiz_attempts_report {
             $this->add_user_columns($table, $columns, $headers);
             $this->add_state_column($columns, $headers);
             $this->add_time_columns($columns, $headers);
+
+            if($quiz->proctorvideo || $quiz->proctorattempts) {
+                $this->add_proctor_columns($columns, $headers, $quiz->proctorvideo);
+            }
 
             $this->add_grade_columns($quiz, $options->usercanseegrades, $columns, $headers, false);
 

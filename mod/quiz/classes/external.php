@@ -1939,7 +1939,8 @@ class mod_quiz_external extends external_api {
     public static function record_proctoring_violation_parameters() {
         return new external_function_parameters (
             array(
-                'attemptid' => new external_value(PARAM_INT, 'attempt instance id')
+                'attemptid' => new external_value(PARAM_INT, 'attempt instance id'),
+                'severity' => new external_value(PARAM_INT, 'severity of violation (1 = minor, 2 = major)')
             )
         );
     }
@@ -1948,14 +1949,23 @@ class mod_quiz_external extends external_api {
      * Increments the proctor violation counter in the database for a quiz attempt when its detected via JS
      * 
      * @param int $attemptid the id of the quiz attempt to record against
+     * @param int $number the number of violations to record
      * @return none
      */
-    public static function record_proctoring_violation($attemptid) {
+    public static function record_proctoring_violation($attemptid, $severity) {
         global $DB;
 
-        $params = self::validate_parameters(self::record_proctoring_violation_parameters(), array('attemptid' => $attemptid));
+        $params = self::validate_parameters(self::record_proctoring_violation_parameters(), array('attemptid' => $attemptid, 'severity' => $severity));
         $thisattempt = $DB->get_record('quiz_attempts', array('id' => $attemptid));
-        $thisattempt->proctorviolations+=1;
+        $thisattempt->proctorviolations += $severity;
+
+        if($thisattempt->proctorviolations > 2) {
+            $thisattempt->proctorviolations = 2;
+        }
+        else if($thisattempt->proctorviolations < 0) {
+            $thisattempt->proctorviolations = 0;
+        }
+        
         $DB->update_record('quiz_attempts', $thisattempt);
 
         return array('id' => $attemptid);

@@ -50,6 +50,7 @@
         <FIELD NAME="usesectiontimelimits" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Whether to use section-based time limits"/>
         <FIELD NAME="useadaptivequestions" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Whether to enable adaptive question behaviour"/>
         <FIELD NAME="proctorattempts" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Whether to proctor the quiz" />
+        <FIELD NAME="proctorvideo" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Whether to record webcam video for proctoring purposes" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
