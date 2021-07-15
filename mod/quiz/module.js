@@ -124,7 +124,7 @@ M.mod_quiz.videoRecorder = {
         var mediaRecorder;
 
         var handleSuccess = function (stream) {
-            const options = { mimeType: 'video/webm; codecs="opus, VP8' };
+            const options = { mimeType: 'video/webm;codecs="opus,vp8"' };
             mediaRecorder = new MediaRecorder(stream, options);
 
             mediaRecorder.addEventListener('dataavailable', function (e) {

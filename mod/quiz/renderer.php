@@ -629,7 +629,8 @@ class mod_quiz_renderer extends plugin_renderer_base {
     }
 
     public function initialise_video_proctoring($attemptid) {
-        $this->page->requires->js_init_call('M.mod_quiz.videoRecorder.init', array($attemptid, '/moodle/mod/quiz/savevideo.php'), false, quiz_get_js_module());
+        global $CFG;
+        $this->page->requires->js_init_call('M.mod_quiz.videoRecorder.init', array($attemptid, $CFG->wwwroot . '/mod/quiz/savevideo.php'), false, quiz_get_js_module());
         return '';
     }
 

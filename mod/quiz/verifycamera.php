@@ -15,9 +15,11 @@ global $USER, $DB;
 require_login();
 $PAGE->set_url('/mod/quiz/verifycamera.php', array('id' => $id));
 $PAGE->set_pagelayout('incourse');
-$quiz = $DB->get_record('quiz', array('id' => $id));
+/*$quiz = $DB->get_record('quiz', array('id' => $id)); */
+$course_modules = $DB->get_record('course_modules', array('id' => $id));
+$quiz = $DB->get_record('quiz', array('id' => $course_modules->instance));
 $PAGE->set_title(get_string('enteringquizx', 'quiz', format_string($quiz->name)));
-$course = $DB->get_record('course', array('id' => $quiz->course), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $course_modules->course), '*', MUST_EXIST);
 $PAGE->set_heading($course->fullname);
 
 $sesskey = $USER->sesskey;
